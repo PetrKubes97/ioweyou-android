@@ -34,8 +34,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         loginButton = (LoginButton) this.findViewById(R.id.login_button);
-        loginButton.setReadPermissions("email");
-        loginButton.setReadPermissions("user_friends");
+        loginButton.setReadPermissions("user_friends", "email");
 
         // Starts application if the user is already logged in
         if (isLoggedIn()) {
