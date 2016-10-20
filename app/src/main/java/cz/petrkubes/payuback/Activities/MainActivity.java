@@ -11,12 +11,11 @@ import android.widget.Toast;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import cz.msebera.android.httpclient.Header;
 import cz.petrkubes.payuback.Api.ApiRestClient;
+import cz.petrkubes.payuback.Datatabase.DatabaseHandler;
 import cz.petrkubes.payuback.R;
 
 /**
@@ -29,6 +28,7 @@ public class MainActivity extends Activity {
     private Button button;
     private String facebookId;
     private String facebookToken;
+    private DatabaseHandler db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +53,7 @@ public class MainActivity extends Activity {
             }
         });
 
+        db = new DatabaseHandler(getApplicationContext());
 
 
     }
