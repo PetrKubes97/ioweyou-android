@@ -29,5 +29,7 @@ dependencies {
     compile 'com.android.support:appcompat-v7:24.2.1'
     compile 'com.facebook.android:facebook-android-sdk:4.16.1'
     compile 'com.loopj.android:android-async-http:1.4.9'
+    compile 'com.facebook.stetho:stetho:1.4.1'
+    compile 'com.facebook.stetho:stetho-urlconnection:1.4.1'
     testCompile 'junit:junit:4.12'
 }
