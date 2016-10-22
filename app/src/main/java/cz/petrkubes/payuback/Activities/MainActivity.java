@@ -1,9 +1,9 @@
 package cz.petrkubes.payuback.Activities;
 
-import android.app.Activity;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.ContactsContract;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -14,36 +14,32 @@ import com.facebook.stetho.Stetho;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.channels.FileChannel;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import cz.msebera.android.httpclient.Header;
+import cz.petrkubes.payuback.Adapters.FragmentsAdapter;
 import cz.petrkubes.payuback.Api.ApiRestClient;
 import cz.petrkubes.payuback.Database.DatabaseHandler;
 import cz.petrkubes.payuback.R;
-import cz.petrkubes.payuback.Structs.Friend;
 import cz.petrkubes.payuback.Structs.User;
 
 /**
  * Created by petr on 16.10.16.
  */
 
-public class MainActivity extends Activity {
+public class MainActivity extends FragmentActivity {
 
     private TextView textView;
     private Button button;
     private String facebookId;
     private String facebookToken;
     private DatabaseHandler db;
+    private FragmentsAdapter pageAdapter;
+    private ViewPager viewPager;
+    private TabLayout tabLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +49,14 @@ public class MainActivity extends Activity {
 
         textView = (TextView) findViewById(R.id.textView);
         button = (Button) findViewById(R.id.btn_main);
+        tabLayout = (TabLayout) findViewById(R.id.tabs);
+
+        pageAdapter = new FragmentsAdapter(getSupportFragmentManager());
+        viewPager = (ViewPager) findViewById(R.id.pager);
+        viewPager.setAdapter(pageAdapter);
+
+        tabLayout.setupWithViewPager(viewPager);
+
 
         db = new DatabaseHandler(getApplicationContext());
 
@@ -82,7 +86,7 @@ public class MainActivity extends Activity {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
-                Toast.makeText(getApplicationContext(),response.toString() + String.valueOf(statusCode), Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), response.toString() + String.valueOf(statusCode), Toast.LENGTH_LONG).show();
 
                 try {
                     // TODO Go through every friend and add him to database
@@ -111,19 +115,18 @@ public class MainActivity extends Activity {
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                 super.onFailure(statusCode, headers, responseString, throwable);
-                Toast.makeText(getApplicationContext(),responseString + String.valueOf(statusCode), Toast.LENGTH_LONG).show();
-                Log.d("debug",responseString);
+                Toast.makeText(getApplicationContext(), responseString + String.valueOf(statusCode), Toast.LENGTH_LONG).show();
+                Log.d("debug", responseString);
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 super.onFailure(statusCode, headers, throwable, errorResponse);
-                Toast.makeText(getApplicationContext(),errorResponse.toString() + String.valueOf(statusCode), Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), errorResponse.toString() + String.valueOf(statusCode), Toast.LENGTH_LONG).show();
             }
 
         });
     }
-
 
 
 }
