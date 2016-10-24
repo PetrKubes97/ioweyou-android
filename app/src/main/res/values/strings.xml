@@ -2,4 +2,13 @@
     <string name="app_name">PayUBack</string>
     <string name="facebook_app_id">652914441557685</string>
     <string name="fb_login_protocol_scheme">fb652914441557685</string>
+    <string name="add_debt_label">Add debt</string>
+    <string name="who">Name</string>
+    <string name="i_owe">My debt.</string>
+    <string name="they_owe">Their debt.</string>
+    <string name="note">Note</string>
+    <string name="amount">Amount</string>
+    <string name="money">money</string>
+    <string name="thing">thing</string>
+    <string name="add_debt">Add debt!</string>
 </resources>

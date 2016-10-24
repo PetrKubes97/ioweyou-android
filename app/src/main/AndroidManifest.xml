@@ -23,9 +23,19 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".Activities.MainActivity">
+        <activity
+            android:name=".Activities.MainActivity"
+            android:label="@string/app_name">
+        </activity>
+
+        <activity
+            android:name=".Activities.DebtActivity"
+            android:label="@string/add_debt_label"
+            android:parentActivityName=".Activities.MainActivity">
 
         </activity>
+
+
 
         <activity android:name="com.facebook.FacebookActivity"
             android:configChanges=

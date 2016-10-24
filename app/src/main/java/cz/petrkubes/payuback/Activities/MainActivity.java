@@ -1,6 +1,8 @@
 package cz.petrkubes.payuback.Activities;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
@@ -34,6 +36,8 @@ public class MainActivity extends FragmentActivity {
 
     private TextView textView;
     private Button button;
+
+    private FloatingActionButton btnAddDebt;
     private String facebookId;
     private String facebookToken;
     private DatabaseHandler db;
@@ -49,6 +53,8 @@ public class MainActivity extends FragmentActivity {
 
         textView = (TextView) findViewById(R.id.textView);
         button = (Button) findViewById(R.id.btn_main);
+
+        btnAddDebt = (FloatingActionButton) findViewById(R.id.btn_add_debt);
         tabLayout = (TabLayout) findViewById(R.id.tabs);
 
         pageAdapter = new FragmentsAdapter(getSupportFragmentManager());
@@ -73,6 +79,16 @@ public class MainActivity extends FragmentActivity {
                 getUserInfo(facebookId, facebookToken);
             }
         });
+
+        btnAddDebt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), DebtActivity.class);
+                startActivity(intent);
+            }
+        });
+
+
     }
 
     public void getUserInfo(String facebookId, String facebookToken) {

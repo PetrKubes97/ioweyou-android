@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <AutoCompleteTextView
+        android:layout_width="352dp"
+        android:layout_height="48dp"
+        android:id="@+id/autoCompleteTextView2"
+        android:layout_marginStart="16dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginLeft="16dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginRight="16dp"
+        app:layout_constraintTop_toTopOf="parent"
+        android:hint="@string/who"
+        android:layout_marginTop="16dp" />
+
+    <RadioGroup
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:id="@+id/radioGroup"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@+id/autoCompleteTextView2"
+        android:layout_marginStart="16dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginLeft="16dp"
+        app:layout_constraintBottom_toBottomOf="@+id/editText2">
+        <RadioButton android:id="@+id/radio_they_owe"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/they_owe" />
+        <RadioButton android:id="@+id/radio_i_owe"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/i_owe"
+            android:checked="true"/>
+    </RadioGroup>
+
+    <Switch
+        android:layout_width="99dp"
+        android:layout_height="29dp"
+        android:id="@+id/switch1"
+        android:text="@string/money"
+        android:checked="true"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@+id/editText"
+        android:layout_marginStart="16dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginLeft="16dp" />
+
+    <EditText
+        android:layout_width="156dp"
+        android:layout_height="118dp"
+        android:inputType="numberDecimal"
+        android:ems="10"
+        android:id="@+id/editText2"
+        android:textSize="36sp"
+        android:hint="@string/amount"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@+id/autoCompleteTextView2"
+        app:layout_constraintRight_toLeftOf="@+id/spinner2"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        app:layout_constraintLeft_toRightOf="@+id/radioGroup"
+        android:layout_marginLeft="8dp" />
+
+    <Spinner
+        android:layout_width="56dp"
+        android:layout_height="79dp"
+        android:id="@+id/spinner2"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@+id/autoCompleteTextView2"
+        app:layout_constraintBottom_toBottomOf="@+id/editText2" />
+
+    <EditText
+        android:layout_width="351dp"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:ems="10"
+        android:id="@+id/editText"
+        android:hint="Note"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@+id/editText2"
+        android:layout_marginStart="16dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginLeft="16dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginRight="16dp" />
+
+
+</android.support.constraint.ConstraintLayout>
