@@ -15,5 +15,7 @@ public class DebtActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_debt);
+        // Remove action bar shadow
+        getSupportActionBar().setElevation(0);
     }
 }

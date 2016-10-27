@@ -6,9 +6,10 @@
     <string name="who">Name</string>
     <string name="i_owe">My debt.</string>
     <string name="they_owe">Their debt.</string>
-    <string name="note">Note</string>
     <string name="amount">Amount</string>
-    <string name="money">money</string>
-    <string name="thing">thing</string>
+    <string name="money">Money</string>
+    <string name="thing">Thing</string>
     <string name="add_debt">Add debt!</string>
+    <string name="transition_button">transitionButton</string>
+    <string name="note">Note</string>
 </resources>

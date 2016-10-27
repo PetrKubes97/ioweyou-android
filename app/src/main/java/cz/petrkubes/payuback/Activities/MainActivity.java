@@ -1,11 +1,14 @@
 package cz.petrkubes.payuback.Activities;
 
+import android.app.Activity;
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -32,7 +35,7 @@ import cz.petrkubes.payuback.Structs.User;
  * Created by petr on 16.10.16.
  */
 
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends AppCompatActivity {
 
     private TextView textView;
     private Button button;
@@ -80,11 +83,21 @@ public class MainActivity extends FragmentActivity {
             }
         });
 
+
         btnAddDebt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), DebtActivity.class);
-                startActivity(intent);
+
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP){
+
+                    ActivityOptions options = ActivityOptions.
+                            makeSceneTransitionAnimation(MainActivity.this, btnAddDebt, getString(R.string.transition_button));
+                    startActivity(intent, options.toBundle());
+                } else{
+                    startActivity(intent);
+                }
+
             }
         });
 

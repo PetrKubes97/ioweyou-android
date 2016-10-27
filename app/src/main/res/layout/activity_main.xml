@@ -34,7 +34,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="top"
-                android:id="@+id/tabs"/>
+                android:id="@+id/tabs"
+                android:background="@color/primary"
+                app:tabTextColor="@android:color/white"
+                app:tabSelectedTextColor="@android:color/white"/>
 
         </android.support.v4.view.ViewPager>
     </LinearLayout>
@@ -46,5 +49,6 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
         android:clickable="true"
-        android:src="@drawable/ic_add_white_24dp" />
+        android:src="@drawable/ic_add_white_24dp"
+        android:transitionName="@string/transition_button"/>
 </android.support.design.widget.CoordinatorLayout>
