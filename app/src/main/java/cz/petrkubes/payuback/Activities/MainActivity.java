@@ -19,6 +19,8 @@ import com.facebook.stetho.Stetho;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.DateFormat;
@@ -29,6 +31,7 @@ import cz.petrkubes.payuback.Adapters.FragmentsAdapter;
 import cz.petrkubes.payuback.Api.ApiRestClient;
 import cz.petrkubes.payuback.Database.DatabaseHandler;
 import cz.petrkubes.payuback.R;
+import cz.petrkubes.payuback.Structs.Friend;
 import cz.petrkubes.payuback.Structs.User;
 
 /**
@@ -118,8 +121,26 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), response.toString() + String.valueOf(statusCode), Toast.LENGTH_LONG).show();
 
                 try {
-                    // TODO Go through every friend and add him to database
+                    // Go through every friend and add him to database
+                    JSONArray friendsJson = response.getJSONArray("friends");
 
+                    for (int i=0;i<friendsJson.length();i++) {
+                        JSONObject friendJson = friendsJson.getJSONObject(i);
+                        Friend friend = new Friend(
+                                friendJson.getInt("id"),
+                                friendJson.getString("email"),
+                                friendJson.getString("name"),
+                                friendJson.getString("facebookId")
+                        );
+                        try {
+                            db.addFriend(friend);
+                        } catch (Exception e) {
+                            Log.d("fdsa", e.getMessage());
+                        }
+
+                    }
+                    
+                    
                     // It is necessary to convert date string to Date class
                     DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -132,10 +153,15 @@ public class MainActivity extends AppCompatActivity {
                             null,
                             null);
 
-                    db.addUser(user);
+                    try {
+                        db.addUser(user);
+                    } catch (Exception e) {
+                        Log.d("fdsaa", e.getMessage());
+                    }
 
-                } catch (Exception e) {
-                    Log.d("PAYUBACK", e.getMessage());
+
+                } catch (JSONException e) {
+                    Log.d("fdsaaa", e.getMessage());
                 }
 
 

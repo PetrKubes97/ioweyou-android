@@ -7,14 +7,19 @@ package cz.petrkubes.payuback.Structs;
 public class Friend {
 
     public int id;
-    public int name;
-    public int email;
-    public int facebookId;
+    public String name;
+    public String email;
+    public String facebookId;
 
-    public Friend(int id, int name, int email, int facebookId) {
+    public Friend(int id, String name, String email, String facebookId) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.facebookId = facebookId;
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }
