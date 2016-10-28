@@ -57,21 +57,22 @@ public class MainActivity extends AppCompatActivity {
         Stetho.initializeWithDefaults(this);
         setContentView(R.layout.activity_main);
 
+        // Setup views and buttons
         textView = (TextView) findViewById(R.id.textView);
         button = (Button) findViewById(R.id.btn_main);
-
         btnAddDebt = (FloatingActionButton) findViewById(R.id.btn_add_debt);
         tabLayout = (TabLayout) findViewById(R.id.tabs);
 
+        // Setup tabs
         pageAdapter = new FragmentsAdapter(getSupportFragmentManager());
         viewPager = (ViewPager) findViewById(R.id.pager);
         viewPager.setAdapter(pageAdapter);
-
         tabLayout.setupWithViewPager(viewPager);
 
-
+        // Setup database
         db = new DatabaseHandler(getApplicationContext());
 
+        // Get facebookId and token from the login activity
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             facebookId = extras.getString("facebookId");
@@ -86,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
+        // Start a new activity, in which user adds debts
         btnAddDebt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -100,7 +101,6 @@ public class MainActivity extends AppCompatActivity {
                 } else{
                     startActivity(intent);
                 }
-
             }
         });
 

@@ -10,10 +10,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="16sp"
-        android:text="Name" />
+        android:text="Name"
+        android:textColor="@color/primary_text" />
     <TextView
         android:id="@+id/txt_email"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Email" />
+        android:text="Email"
+        android:textColor="@color/secondary_text" />
 </LinearLayout>

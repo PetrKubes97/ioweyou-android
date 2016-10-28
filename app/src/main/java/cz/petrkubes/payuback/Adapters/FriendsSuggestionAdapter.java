@@ -41,8 +41,6 @@ public class FriendsSuggestionAdapter extends ArrayAdapter<Friend> implements Fi
         // Get friend object for this position
         Friend friend = suggestions.get(position);
 
-        Log.d("FDSA", friend.name);
-
         // Check if an existing view is being reused, otherwise inflate the view
         ViewHolder viewHolder;
 
@@ -67,9 +65,13 @@ public class FriendsSuggestionAdapter extends ArrayAdapter<Friend> implements Fi
 
         // Make Facebook friends blue
         if (friend.facebookId != null && !friend.facebookId.isEmpty()) {
-            viewHolder.layout.setBackgroundColor(context.getResources().getColor(R.color.facebook_light));
+            viewHolder.layout.setBackgroundColor(ContextCompat.getColor(context, R.color.facebook_light));
             viewHolder.name.setTextColor(ContextCompat.getColor(context, R.color.white));
             viewHolder.email.setTextColor(ContextCompat.getColor(context, R.color.white));
+        } else {
+            viewHolder.layout.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
+            viewHolder.name.setTextColor(ContextCompat.getColor(context, R.color.primary_text));
+            viewHolder.email.setTextColor(ContextCompat.getColor(context, R.color.secondary_text));
         }
 
         // Return the completed view to render on screen
@@ -104,8 +106,7 @@ public class FriendsSuggestionAdapter extends ArrayAdapter<Friend> implements Fi
                 for (int i = 0; i < originalList.size(); i++) {
 
                     if (originalList.get(i).name.toLowerCase().matches("(.*)"+constraint.toString().toLowerCase()+"(.*)")) { // Compare item in original list if it contains constraints.
-                        suggestions.add(originalList.get(i)); // If TRUE add item in Suggestions.
-                        Log.d("FDSA", suggestions.toString() + suggestions.get(0).name);
+                        suggestions.add(originalList.get(i));
                     }
                 }
             }
