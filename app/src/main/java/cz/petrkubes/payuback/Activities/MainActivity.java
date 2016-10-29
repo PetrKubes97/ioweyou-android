@@ -128,8 +128,8 @@ public class MainActivity extends AppCompatActivity {
                         JSONObject friendJson = friendsJson.getJSONObject(i);
                         Friend friend = new Friend(
                                 friendJson.getInt("id"),
-                                friendJson.getString("email"),
                                 friendJson.getString("name"),
+                                friendJson.getString("email"),
                                 friendJson.getString("facebookId")
                         );
                         try {

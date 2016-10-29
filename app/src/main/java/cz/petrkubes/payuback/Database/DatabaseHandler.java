@@ -6,6 +6,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.util.ArrayList;
+
 import cz.petrkubes.payuback.Structs.Friend;
 import cz.petrkubes.payuback.Structs.User;
 
@@ -16,7 +18,7 @@ import cz.petrkubes.payuback.Structs.User;
 public class DatabaseHandler extends SQLiteOpenHelper {
 
     // Database Version
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 8;
 
     // Database Name
     private static final String DATABASE_NAME = "payUBack.db";
@@ -116,6 +118,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         cursor.close();
     }
 
+    /**
+     * Save friend object to database
+     * @param friend
+     * @throws Exception
+     */
     public void addFriend(Friend friend) throws Exception {
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -138,5 +145,32 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         db.close();
         cursor.close();
+    }
+
+    /**
+     * Get list of friends from the database
+     * @return
+     */
+    public ArrayList<Friend> getFriends() {
+        ArrayList<Friend> list = new ArrayList<Friend>();
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_FRIENDS, friendProjection, null, null, null, null, null);
+
+        if (cursor.moveToFirst())
+        {
+            do {
+                list.add(new Friend(
+                    cursor.getInt(0),
+                    cursor.getString(1),
+                    cursor.getString(2),
+                    cursor.getString(3)));
+            } while (cursor.moveToNext());
+
+        }
+
+        cursor.close();
+
+        return list;
     }
 }

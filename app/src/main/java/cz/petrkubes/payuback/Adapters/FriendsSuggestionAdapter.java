@@ -61,7 +61,12 @@ public class FriendsSuggestionAdapter extends ArrayAdapter<Friend> implements Fi
         }
         // Populate the data into the template view using the data object
         viewHolder.name.setText(friend.name);
-        viewHolder.email.setText(friend.email);
+        if (friend.email == null) {
+            viewHolder.email.setText("");
+        } else {
+            viewHolder.email.setText(friend.email);
+        }
+
 
         // Make Facebook friends blue
         if (friend.facebookId != null && !friend.facebookId.isEmpty()) {
