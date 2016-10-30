@@ -25,6 +25,7 @@ import org.json.JSONObject;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 
 import cz.msebera.android.httpclient.Header;
 import cz.petrkubes.payuback.Adapters.FragmentsAdapter;
@@ -83,7 +84,8 @@ public class MainActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getUserInfo(facebookId, facebookToken);
+                loginUser(facebookId, facebookToken);
+                getUser("higq5Qi5803XyOXdDCmiexXz07bbaOWxM9bTEXqj9QnSpYLYqDlHKgBtvhgsany");
             }
         });
 
@@ -107,14 +109,11 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void getUserInfo(String facebookId, String facebookToken) {
+    public void getUser(String apiKey) {
+        ArrayList<cz.petrkubes.payuback.Structs.Header> headers = new ArrayList<>();
+        headers.add(new cz.petrkubes.payuback.Structs.Header("api-key", apiKey));
 
-        RequestParams params = new RequestParams();
-        params.put("facebookToken", facebookToken);
-        params.put("facebookId", facebookId);
-
-        ApiRestClient.post("user/login", params, new JsonHttpResponseHandler() {
-
+        ApiRestClient.get("user/", null, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
@@ -139,8 +138,8 @@ public class MainActivity extends AppCompatActivity {
                         }
 
                     }
-                    
-                    
+
+
                     // It is necessary to convert date string to Date class
                     DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -163,7 +162,24 @@ public class MainActivity extends AppCompatActivity {
                 } catch (JSONException e) {
                     Log.d("fdsaaa", e.getMessage());
                 }
+            }
+        }, headers);
 
+    }
+
+    public void loginUser(String facebookId, String facebookToken) {
+
+        RequestParams params = new RequestParams();
+        params.put("facebookToken", facebookToken);
+        params.put("facebookId", facebookId);
+
+        ApiRestClient.post("user/login", params, new JsonHttpResponseHandler() {
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+                Toast.makeText(getApplicationContext(), response.toString() + String.valueOf(statusCode), Toast.LENGTH_SHORT).show();
+                // TODO get api key and update database
 
             }
 
