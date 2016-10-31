@@ -72,6 +72,7 @@
             android:layout_height="54dp"
             android:id="@+id/spn_currency"
             android:layout_marginStart="8dp"
+            android:background="@color/primary"
             app:layout_constraintLeft_toRightOf="@+id/textInputLayout2"
             app:layout_constraintRight_toRightOf="@+id/textInputLayout"
             app:layout_constraintTop_toTopOf="@+id/textInputLayout2"

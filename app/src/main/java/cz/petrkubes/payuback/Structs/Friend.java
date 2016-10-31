@@ -9,13 +9,11 @@ public class Friend {
     public int id;
     public String name;
     public String email;
-    public String facebookId;
 
-    public Friend(int id, String name, String email, String facebookId) {
+    public Friend(int id, String name, String email) {
         this.id = id;
         this.name = name;
         this.email = email;
-        this.facebookId = facebookId;
     }
 
     @Override

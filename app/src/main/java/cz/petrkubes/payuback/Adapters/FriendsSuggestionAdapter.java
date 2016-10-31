@@ -69,7 +69,7 @@ public class FriendsSuggestionAdapter extends ArrayAdapter<Friend> implements Fi
 
 
         // Make Facebook friends blue
-        if (friend.facebookId != null && !friend.facebookId.isEmpty()) {
+        if (friend.id > 0) {
             viewHolder.layout.setBackgroundColor(ContextCompat.getColor(context, R.color.facebook_light));
             viewHolder.name.setTextColor(ContextCompat.getColor(context, R.color.white));
             viewHolder.email.setTextColor(ContextCompat.getColor(context, R.color.white));

@@ -10,21 +10,17 @@ import java.util.Date;
 public class User {
 
     public int id;
+    public String apiKey;
     public String email;
     public String name;
-    public String facebookId;
-    public String facebookToken;
     public Date registredAt;
-    public ArrayList<Friend> friends;
 
-    public User(int id, String email, String name, String facebookId, String facebookToken, Date registredAt, ArrayList<Friend> friends) {
+    public User(int id, String apiKey, String email, String name, Date registredAt) {
         this.id = id;
+        this.apiKey = apiKey;
         this.email = email;
         this.name = name;
-        this.facebookId = facebookId;
-        this.facebookToken = facebookToken;
         this.registredAt = registredAt;
-        this.friends = friends;
     }
 
 

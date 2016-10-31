@@ -19,9 +19,11 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.RadioButton;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -30,6 +32,7 @@ import java.util.List;
 import cz.petrkubes.payuback.Adapters.FriendsSuggestionAdapter;
 import cz.petrkubes.payuback.Database.DatabaseHandler;
 import cz.petrkubes.payuback.R;
+import cz.petrkubes.payuback.Structs.Currency;
 import cz.petrkubes.payuback.Structs.Friend;
 
 /**
@@ -42,6 +45,7 @@ public class DebtActivity extends AppCompatActivity {
 
     private AutoCompleteTextView txtName;
     private EditText txtAmount;
+    private Spinner spnCurrency;
     private RadioButton rdioMyDebt;
     private RadioButton rdioTheirDebt;
     private RadioButton rdioThing;
@@ -50,7 +54,7 @@ public class DebtActivity extends AppCompatActivity {
     private FloatingActionButton btnAddDebt;
     private DatabaseHandler db;
 
-    private String tempFacebookFriendId;
+    private int tempFacebookFriendId;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -61,6 +65,7 @@ public class DebtActivity extends AppCompatActivity {
 
         txtName = (AutoCompleteTextView) findViewById(R.id.txt_name);
         txtAmount = (EditText) findViewById(R.id.txt_amount);
+        spnCurrency = (Spinner) findViewById(R.id.spn_currency);
         rdioMyDebt = (RadioButton) findViewById(R.id.rdio_my_debt);
         rdioTheirDebt = (RadioButton) findViewById(R.id.rdio_their_debt);
         rdioThing = (RadioButton) findViewById(R.id.rdio_thing);
@@ -78,14 +83,14 @@ public class DebtActivity extends AppCompatActivity {
         ArrayList<Friend> friends = db.getFriends();
         // 2) contacts
         for (String contact:getContacts()) {
-            friends.add(new Friend(-1, contact, "", ""));
+            friends.add(new Friend(-1, contact, ""));
         }
 
         // Create the adapter to convert the array to views
-        FriendsSuggestionAdapter adapter = new FriendsSuggestionAdapter(this, friends);
+        FriendsSuggestionAdapter friendsAdapter = new FriendsSuggestionAdapter(this, friends);
 
         // Setup autocomplete
-        txtName.setAdapter(adapter);
+        txtName.setAdapter(friendsAdapter);
         txtName.setThreshold(1);
         // Save the information, that selected user is facebook friend (his id) or a contact
         txtName.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -93,16 +98,22 @@ public class DebtActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
                 Friend selectedFriend = (Friend) adapterView.getItemAtPosition(i);
-                tempFacebookFriendId = selectedFriend.facebookId;
+                tempFacebookFriendId = selectedFriend.id;
 
                 // Set blue background to the box, so that user knows that facebook friend was selected
-                if (selectedFriend.facebookId.length()>1) {
+                if (selectedFriend.id > 0) {
                     txtName.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.facebook_lighter));
                 } else {
                     txtName.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.white));
                 }
             }
         });
+
+        // Set up currencies spinner
+        ArrayList<Currency> currencies = db.getCurrencies();
+        ArrayAdapter<Currency> currenciesAdapter = new ArrayAdapter<Currency>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, currencies);
+        spnCurrency.setPrompt("Currency:");
+        spnCurrency.setAdapter(currenciesAdapter);
 
         // Delete facebook friend info, when user types anything into the box
         txtName.addTextChangedListener(new TextWatcher() {
@@ -113,7 +124,7 @@ public class DebtActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                tempFacebookFriendId = "";
+                tempFacebookFriendId = 0;
                 txtName.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.white));
             }
 

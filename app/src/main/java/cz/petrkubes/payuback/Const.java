@@ -5,5 +5,5 @@ package cz.petrkubes.payuback;
  */
 
 public class Const {
-    public static final String SHARED_PREFS = "SharedPreferences";
+    public static final String TAG = "PBCK";
 }
