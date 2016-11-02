@@ -103,7 +103,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public void addOrUpdateUser(User user) throws Exception {
+    public void addOrUpdateUser(User user) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         // Checks if user doesn't already exist

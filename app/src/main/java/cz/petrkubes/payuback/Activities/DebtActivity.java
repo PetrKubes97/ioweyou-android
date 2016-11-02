@@ -137,7 +137,7 @@ public class DebtActivity extends AppCompatActivity {
         btnAddDebt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getApplicationContext(), tempFacebookFriendId,Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), String.valueOf(tempFacebookFriendId),Toast.LENGTH_SHORT).show();
             }
         });
 

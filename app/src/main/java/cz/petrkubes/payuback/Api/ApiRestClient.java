@@ -1,31 +1,181 @@
 package cz.petrkubes.payuback.Api;
 
+import android.content.Context;
+import android.provider.ContactsContract;
+import android.util.Log;
+import android.widget.Toast;
+
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.lang.reflect.Array;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import cz.msebera.android.httpclient.Header;
+import cz.petrkubes.payuback.Const;
+import cz.petrkubes.payuback.Database.DatabaseHandler;
+import cz.petrkubes.payuback.Structs.Currency;
+import cz.petrkubes.payuback.Structs.Friend;
+import cz.petrkubes.payuback.Structs.User;
 
 public class ApiRestClient {
+
     private static final String BASE_URL = "http://192.168.2.71/payuback-api/www/api/";
+    private AsyncHttpClient client;
+    private DatabaseHandler db;
+    private Context context;
 
-    private static AsyncHttpClient client = new AsyncHttpClient();
-
-    public static void get(String url, RequestParams params, AsyncHttpResponseHandler responseHandler, ArrayList<cz.petrkubes.payuback.Structs.Header> headers) {
-
-        for (cz.petrkubes.payuback.Structs.Header header : headers) {
-            client.addHeader(header.name, header.key);
-        }
-
-        client.get(getAbsoluteUrl(url), params, responseHandler);
+    public ApiRestClient(Context context) {
+        this.client = new AsyncHttpClient();
+        this.db = new DatabaseHandler(context);
+        this.context = context;
     }
 
+    public void getUser(String apiKey, final SimpleCallback callback) {
 
-    public static void post(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
-        client.post(getAbsoluteUrl(url), params, responseHandler);
+        client.addHeader("api-key",apiKey);
+
+        client.get(getAbsoluteUrl("user/"), null, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+                Toast.makeText(context, response.toString() + String.valueOf(statusCode), Toast.LENGTH_LONG).show();
+
+                try {
+                    // Go through every friend and add him to database
+                    JSONArray friendsJson = response.getJSONArray("friends");
+
+                    for (int i=0;i<friendsJson.length();i++) {
+                        JSONObject friendJson = friendsJson.getJSONObject(i);
+                        Friend friend = new Friend(
+                                friendJson.getInt("id"),
+                                friendJson.getString("name"),
+                                friendJson.getString("email")
+                        );
+                        try {
+                            db.addFriend(friend);
+                        } catch (Exception e) {
+                            Log.d("fdsa", e.getMessage());
+                        }
+                    }
+
+                    // It is necessary to convert date string to Date class
+                    DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+                    User user = new User(
+                            response.getInt("id"),
+                            null,
+                            response.getString("email"),
+                            response.getString("name"),
+                            null);
+
+                    db.addOrUpdateUser(user);
+
+                } catch (JSONException e) {
+                    callback.onFailure();
+                }
+                callback.onSuccess();
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                super.onFailure(statusCode, headers, throwable, errorResponse);
+                callback.onFailure();
+            }
+        });
+    }
+
+    public void login(String facebookId, String facebookToken, final SimpleCallback callback) {
+        RequestParams params = new RequestParams();
+        params.put("facebookToken", facebookToken);
+        params.put("facebookId", facebookId);
+
+        client.post(getAbsoluteUrl("user/login"), params, new JsonHttpResponseHandler() {
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+                Toast.makeText(context, response.toString() + String.valueOf(statusCode), Toast.LENGTH_SHORT).show();
+
+                try {
+                    // 1. case: user logged in for the first time so a new row is created with his id
+                    // 2. case: user logged in and already has a row in the database so we just update the api key
+                    db.addOrUpdateUser(new User(
+                            response.getInt("id"),
+                            response.getString("api-key"),
+                            null,
+                            null,
+                            null
+                    ));
+
+                    callback.onSuccess();
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    callback.onFailure();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                super.onFailure(statusCode, headers, throwable, errorResponse);
+                callback.onFailure();
+            }
+
+        });
+    }
+
+    public void getCurrencies(String apiKey, final SimpleCallback callback) {
+
+        client.addHeader("api-key",apiKey);
+
+        client.get(getAbsoluteUrl("currencies/"), null, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+                Toast.makeText(context, response.toString() + String.valueOf(statusCode), Toast.LENGTH_LONG).show();
+
+                try {
+                    // Go through every currency and add it to the database
+                    JSONArray friendsJson = response.getJSONArray("currencies");
+
+                    for (int i=0;i<friendsJson.length();i++) {
+
+                        JSONObject currencyJson = friendsJson.getJSONObject(i);
+
+                        Currency currency = new Currency(
+                                currencyJson.getInt("id"),
+                                currencyJson.getString("symbol"));
+
+                        try {
+                            db.addCurrency(currency);
+                        } catch (Exception e) {
+                            Log.d(Const.TAG, e.getMessage());
+                        }
+                    }
+
+                    callback.onSuccess();
+
+                } catch (JSONException e) {
+                    Log.d(Const.TAG, e.getMessage());
+                    callback.onFailure();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                super.onFailure(statusCode, headers, throwable, errorResponse);
+                callback.onFailure();
+            }
+        });
     }
 
     private static String getAbsoluteUrl(String relativeUrl) {

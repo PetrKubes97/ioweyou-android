@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import cz.msebera.android.httpclient.Header;
 import cz.petrkubes.payuback.Adapters.FragmentsAdapter;
 import cz.petrkubes.payuback.Api.ApiRestClient;
+import cz.petrkubes.payuback.Api.SimpleCallback;
 import cz.petrkubes.payuback.Const;
 import cz.petrkubes.payuback.Database.DatabaseHandler;
 import cz.petrkubes.payuback.R;
@@ -57,6 +58,8 @@ public class MainActivity extends AppCompatActivity {
     private ViewPager viewPager;
     private TabLayout tabLayout;
 
+    private ApiRestClient apiClient;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,6 +82,10 @@ public class MainActivity extends AppCompatActivity {
 
         // Setup database
         db = new DatabaseHandler(getApplicationContext());
+
+        // Setup api client for synchronization
+        apiClient = new ApiRestClient(getApplicationContext());
+
 
         // Get facebookId and token from the login activity
         Bundle extras = getIntent().getExtras();
@@ -129,141 +136,48 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void getUser(String apiKey) {
-        ArrayList<cz.petrkubes.payuback.Structs.Header> headers = new ArrayList<>();
-        headers.add(new cz.petrkubes.payuback.Structs.Header("api-key", apiKey));
+        apiClient.getUser(apiKey, new SimpleCallback() {
 
-        ApiRestClient.get("user/", null, new JsonHttpResponseHandler() {
             @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                super.onSuccess(statusCode, headers, response);
-                Toast.makeText(getApplicationContext(), response.toString() + String.valueOf(statusCode), Toast.LENGTH_LONG).show();
-
-                try {
-                    // Go through every friend and add him to database
-                    JSONArray friendsJson = response.getJSONArray("friends");
-
-                    for (int i=0;i<friendsJson.length();i++) {
-                        JSONObject friendJson = friendsJson.getJSONObject(i);
-                        Friend friend = new Friend(
-                                friendJson.getInt("id"),
-                                friendJson.getString("name"),
-                                friendJson.getString("email")
-                        );
-                        try {
-                            db.addFriend(friend);
-                        } catch (Exception e) {
-                            Log.d("fdsa", e.getMessage());
-                        }
-                    }
-
-                    // It is necessary to convert date string to Date class
-                    DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-                    User user = new User(
-                            response.getInt("id"),
-                            null,
-                            response.getString("email"),
-                            response.getString("name"),
-                            null);
-
-                    try {
-                        db.addOrUpdateUser(user);
-                    } catch (Exception e) {
-                        Log.d("fdsaa", e.getMessage());
-                    }
-
-
-                } catch (JSONException e) {
-                    Log.d("fdsaaa", e.getMessage());
-                }
+            public void onSuccess() {
+                Log.d(Const.TAG, "Success called.");
             }
 
             @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                super.onFailure(statusCode, headers, throwable, errorResponse);
-                Toast.makeText(getApplicationContext(), errorResponse.toString() + String.valueOf(statusCode), Toast.LENGTH_LONG).show();
+            public void onFailure() {
+                Log.d(Const.TAG, "Failure called.");
             }
-        }, headers);
-    }
-
-    public void loginUser(String facebookId, String facebookToken) {
-
-        RequestParams params = new RequestParams();
-        params.put("facebookToken", facebookToken);
-        params.put("facebookId", facebookId);
-
-        ApiRestClient.post("user/login", params, new JsonHttpResponseHandler() {
-
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                super.onSuccess(statusCode, headers, response);
-                Toast.makeText(getApplicationContext(), response.toString() + String.valueOf(statusCode), Toast.LENGTH_SHORT).show();
-
-                try {
-                    // 1. case: user logged in for the first time so a new row is created with his id
-                    // 2. case: user logged in and already has a row in the database so we just update the api key
-                    db.addOrUpdateUser(new User(
-                            response.getInt("id"),
-                            response.getString("api-key"),
-                            null,
-                            null,
-                            null
-                    ));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                super.onFailure(statusCode, headers, throwable, errorResponse);
-                Toast.makeText(getApplicationContext(), errorResponse.toString() + String.valueOf(statusCode), Toast.LENGTH_LONG).show();
-            }
-
         });
     }
 
+    public void loginUser(String facebookId, String facebookToken) {
+        apiClient.login(facebookId, facebookToken, new SimpleCallback() {
+            @Override
+            public void onSuccess() {
+
+            }
+
+            @Override
+            public void onFailure() {
+
+            }
+        });
+    }
+
+
+
     public void getCurrencies(String apiKey) {
-        ArrayList<cz.petrkubes.payuback.Structs.Header> headers = new ArrayList<>();
-        headers.add(new cz.petrkubes.payuback.Structs.Header("api-key", apiKey));
-
-        ApiRestClient.get("currencies/", null, new JsonHttpResponseHandler() {
+        apiClient.getCurrencies(apiKey, new SimpleCallback() {
             @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                super.onSuccess(statusCode, headers, response);
-                Toast.makeText(getApplicationContext(), response.toString() + String.valueOf(statusCode), Toast.LENGTH_LONG).show();
+            public void onSuccess() {
 
-                try {
-                    // Go through every currency and add it to the database
-                    JSONArray friendsJson = response.getJSONArray("currencies");
-
-                    for (int i=0;i<friendsJson.length();i++) {
-
-                        JSONObject currencyJson = friendsJson.getJSONObject(i);
-
-                        Currency currency = new Currency(
-                                currencyJson.getInt("id"),
-                                currencyJson.getString("symbol"));
-
-                        try {
-                            db.addCurrency(currency);
-                        } catch (Exception e) {
-                            Log.d(Const.TAG, e.getMessage());
-                        }
-                    }
-
-                } catch (JSONException e) {
-                    Log.d(Const.TAG, e.getMessage());
-                }
             }
 
             @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                super.onFailure(statusCode, headers, throwable, errorResponse);
-                Toast.makeText(getApplicationContext(), errorResponse.toString() + String.valueOf(statusCode), Toast.LENGTH_LONG).show();
+            public void onFailure() {
+
             }
-        }, headers);
+        });
     }
 
 
