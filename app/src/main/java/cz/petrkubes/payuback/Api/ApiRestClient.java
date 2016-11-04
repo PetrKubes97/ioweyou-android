@@ -16,13 +16,16 @@ import org.json.JSONObject;
 
 import java.lang.reflect.Array;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import cz.msebera.android.httpclient.Header;
 import cz.petrkubes.payuback.Const;
 import cz.petrkubes.payuback.Database.DatabaseHandler;
 import cz.petrkubes.payuback.Structs.Currency;
+import cz.petrkubes.payuback.Structs.Debt;
 import cz.petrkubes.payuback.Structs.Friend;
 import cz.petrkubes.payuback.Structs.User;
 
@@ -63,19 +66,25 @@ public class ApiRestClient {
                         try {
                             db.addFriend(friend);
                         } catch (Exception e) {
-                            Log.d("fdsa", e.getMessage());
+                            Log.d(Const.TAG, e.getMessage());
                         }
                     }
 
                     // It is necessary to convert date string to Date class
                     DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    Date registeredAt = null;
+                    try {
+                        registeredAt = df.parse(response.getString("registeredAt"));
+                    } catch (ParseException e) {
+                        Log.d(Const.TAG, e.getMessage());
+                    }
 
                     User user = new User(
                             response.getInt("id"),
                             null,
                             response.getString("email"),
                             response.getString("name"),
-                            null);
+                            registeredAt);
 
                     db.addOrUpdateUser(user);
 
@@ -110,7 +119,7 @@ public class ApiRestClient {
                     // 2. case: user logged in and already has a row in the database so we just update the api key
                     db.addOrUpdateUser(new User(
                             response.getInt("id"),
-                            response.getString("api-key"),
+                            response.getString("apiKey"),
                             null,
                             null,
                             null
@@ -135,7 +144,7 @@ public class ApiRestClient {
 
     public void getCurrencies(String apiKey, final SimpleCallback callback) {
 
-        client.addHeader("api-key",apiKey);
+        client.addHeader("api-key", apiKey);
 
         client.get(getAbsoluteUrl("currencies/"), null, new JsonHttpResponseHandler() {
             @Override
@@ -174,6 +183,33 @@ public class ApiRestClient {
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 super.onFailure(statusCode, headers, throwable, errorResponse);
                 callback.onFailure();
+            }
+        });
+    }
+
+    public void addDebt(String apiKey, Debt debt, final SimpleCallback callback) {
+
+        client.addHeader("api-key", apiKey);
+
+        RequestParams params = new RequestParams();
+        params.put("creditorId", debt.creatorId);
+        params.put("debtorId", debt.debtorId);
+        params.put("customFriendName", debt.customFriendName);
+        params.put("amount", debt.amount);
+        params.put("currencyId", debt.currencyId);
+        params.put("thingName", debt.thingName);
+        params.put("note", debt.note);
+
+        client.post(getAbsoluteUrl("debts/new"), params, new JsonHttpResponseHandler() {
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                super.onFailure(statusCode, headers, throwable, errorResponse);
             }
         });
     }

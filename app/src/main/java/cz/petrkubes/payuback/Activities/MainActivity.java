@@ -86,7 +86,6 @@ public class MainActivity extends AppCompatActivity {
         // Setup api client for synchronization
         apiClient = new ApiRestClient(getApplicationContext());
 
-
         // Get facebookId and token from the login activity
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
@@ -117,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Start a new activity, in which user adds debts
+        // Start a new activity in which user adds debts
         btnAddDebt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -163,8 +162,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
-
 
     public void getCurrencies(String apiKey) {
         apiClient.getCurrencies(apiKey, new SimpleCallback() {

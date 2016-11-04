@@ -21,7 +21,7 @@ import cz.petrkubes.payuback.Structs.User;
 public class DatabaseHandler extends SQLiteOpenHelper {
 
     // Database Version
-    private static final int DATABASE_VERSION = 13;
+    private static final int DATABASE_VERSION = 14;
 
     // Database Name
     private static final String DATABASE_NAME = "payUBack.db";
@@ -184,7 +184,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     /**
      * Get list of friends from the database
-     * @return
+     * @return ArrayList<Friend>
      */
     public ArrayList<Friend> getFriends() {
         ArrayList<Friend> list = new ArrayList<Friend>();

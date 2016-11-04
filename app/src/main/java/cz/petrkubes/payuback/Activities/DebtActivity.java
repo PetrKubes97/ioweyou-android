@@ -33,6 +33,7 @@ import cz.petrkubes.payuback.Adapters.FriendsSuggestionAdapter;
 import cz.petrkubes.payuback.Database.DatabaseHandler;
 import cz.petrkubes.payuback.R;
 import cz.petrkubes.payuback.Structs.Currency;
+import cz.petrkubes.payuback.Structs.Debt;
 import cz.petrkubes.payuback.Structs.Friend;
 
 /**
@@ -54,7 +55,7 @@ public class DebtActivity extends AppCompatActivity {
     private FloatingActionButton btnAddDebt;
     private DatabaseHandler db;
 
-    private int tempFacebookFriendId;
+    private Integer tempFacebookFriendId = null;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -78,11 +79,11 @@ public class DebtActivity extends AppCompatActivity {
 
         db = new DatabaseHandler(getApplicationContext());
 
-        // Array of all friends, who will be suggested
+        // Array of all friends who will be suggested
         // 1) facebook friends
         ArrayList<Friend> friends = db.getFriends();
         // 2) contacts
-        for (String contact:getContacts()) {
+        for (String contact : getContacts()) {
             friends.add(new Friend(-1, contact, ""));
         }
 
@@ -100,7 +101,7 @@ public class DebtActivity extends AppCompatActivity {
                 Friend selectedFriend = (Friend) adapterView.getItemAtPosition(i);
                 tempFacebookFriendId = selectedFriend.id;
 
-                // Set blue background to the box, so that user knows that facebook friend was selected
+                // Set blue text, so that user knows that facebook friend was selected
                 if (selectedFriend.id > 0) {
                     txtName.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.facebook_lighter));
                 } else {
@@ -124,7 +125,7 @@ public class DebtActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                tempFacebookFriendId = 0;
+                tempFacebookFriendId = null;
                 txtName.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.white));
             }
 
@@ -134,10 +135,12 @@ public class DebtActivity extends AppCompatActivity {
             }
         });
 
+        // Add debt
         btnAddDebt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getApplicationContext(), String.valueOf(tempFacebookFriendId),Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), String.valueOf(tempFacebookFriendId), Toast.LENGTH_SHORT).show();
+                addDebt(tempFacebookFriendId);
             }
         });
 
@@ -147,13 +150,20 @@ public class DebtActivity extends AppCompatActivity {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.showSoftInput(txtName, InputMethodManager.SHOW_IMPLICIT);
             }
 
         }, 400);
+
     }
 
+    /**
+     * Returns list of users contacts
+     *
+     * @return List<String> contacts
+     */
+    // TODO Refresh list after user accepts contacts permission
     private List<String> getContacts() {
 
         List<String> contacts = new ArrayList<>();
@@ -161,15 +171,13 @@ public class DebtActivity extends AppCompatActivity {
         if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_CONTACTS}, PERMISSIONS_REQUEST_READ_CONTACTS);
         } else {
-            // Permission is granted
 
+            // Permission is granted
             ContentResolver cr = getContentResolver();
-            Cursor cursor = cr.query(ContactsContract.Contacts.CONTENT_URI, new String[] {ContactsContract.Data.DISPLAY_NAME_PRIMARY}, null, null, null);
+            Cursor cursor = cr.query(ContactsContract.Contacts.CONTENT_URI, new String[]{ContactsContract.Data.DISPLAY_NAME_PRIMARY}, null, null, null);
 
             while (cursor.moveToNext()) {
-
                 String name = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME_PRIMARY));
-
                 if (name != null && !name.contains("@")) {
                     contacts.add(name);
                 }
@@ -181,8 +189,13 @@ public class DebtActivity extends AppCompatActivity {
         return contacts;
     }
 
-
-
+    /**
+     * Handle user's answer to 'request permission' dialog
+     *
+     * @param requestCode
+     * @param permissions
+     * @param grantResults
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         if (requestCode == PERMISSIONS_REQUEST_READ_CONTACTS) {
@@ -195,4 +208,14 @@ public class DebtActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * @param tempFacebookFriendId id of a facebookFriend, if user selected him from the list
+     */
+    public void addDebt(Integer tempFacebookFriendId) {
+
+        // Interpret add debt form
+
+        
+
+    }
 }
