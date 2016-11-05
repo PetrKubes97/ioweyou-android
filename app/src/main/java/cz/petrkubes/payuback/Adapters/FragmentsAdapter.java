@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 
 import cz.petrkubes.payuback.Fragments.DebtsFragment;
 import cz.petrkubes.payuback.Fragments.FeedFragment;
@@ -13,7 +14,7 @@ import cz.petrkubes.payuback.Fragments.FriendsFragment;
  * Created by petr on 22.10.16.
  */
 
-public class FragmentsAdapter extends FragmentPagerAdapter {
+public class FragmentsAdapter extends FragmentStatePagerAdapter {
 
     private Fragment fragment;
     private Bundle args;
@@ -30,13 +31,13 @@ public class FragmentsAdapter extends FragmentPagerAdapter {
             case 0:
                 fragment = new DebtsFragment();
                 args = new Bundle();
-                args.putBoolean(DebtsFragment.ARG_OBJECT, true);
+                args.putBoolean(DebtsFragment.ARG_MY, true);
                 fragment.setArguments(args);
                 return fragment;
             case 1:
                 fragment = new DebtsFragment();
                 args = new Bundle();
-                args.putBoolean(DebtsFragment.ARG_OBJECT, true);
+                args.putBoolean(DebtsFragment.ARG_MY, false);
                 fragment.setArguments(args);
                 return fragment;
             case 2:
@@ -48,10 +49,6 @@ public class FragmentsAdapter extends FragmentPagerAdapter {
         }
 
         Fragment fragment = new DebtsFragment();
-        Bundle args = new Bundle();
-        // Our object is just an integer :-P
-        args.putInt(DebtsFragment.ARG_OBJECT, i + 1);
-        fragment.setArguments(args);
         return fragment;
     }
 

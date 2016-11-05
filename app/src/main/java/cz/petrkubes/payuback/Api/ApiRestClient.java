@@ -1,12 +1,9 @@
 package cz.petrkubes.payuback.Api;
 
 import android.content.Context;
-import android.provider.ContactsContract;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
@@ -14,11 +11,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Array;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 
 import cz.msebera.android.httpclient.Header;
@@ -50,7 +45,6 @@ public class ApiRestClient {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
-                Toast.makeText(context, response.toString() + String.valueOf(statusCode), Toast.LENGTH_LONG).show();
 
                 try {
                     // Go through every friend and add him to database
@@ -112,7 +106,6 @@ public class ApiRestClient {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
-                Toast.makeText(context, response.toString() + String.valueOf(statusCode), Toast.LENGTH_SHORT).show();
 
                 try {
                     // 1. case: user logged in for the first time so a new row is created with his id
@@ -150,7 +143,6 @@ public class ApiRestClient {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
-                Toast.makeText(context, response.toString() + String.valueOf(statusCode), Toast.LENGTH_LONG).show();
 
                 try {
                     // Go through every currency and add it to the database
@@ -187,12 +179,12 @@ public class ApiRestClient {
         });
     }
 
-    public void addDebt(String apiKey, Debt debt, final SimpleCallback callback) {
+    public void addUnaddedDebt(String apiKey, final Debt debt, final SimpleCallback callback) {
 
         client.addHeader("api-key", apiKey);
 
         RequestParams params = new RequestParams();
-        params.put("creditorId", debt.creatorId);
+        params.put("creditorId", debt.creditorId);
         params.put("debtorId", debt.debtorId);
         params.put("customFriendName", debt.customFriendName);
         params.put("amount", debt.amount);
@@ -205,11 +197,29 @@ public class ApiRestClient {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
+
+                try {
+
+                    int newId = response.getInt("id");
+                    db.updateDebtId(debt.id, newId);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 super.onFailure(statusCode, headers, throwable, errorResponse);
+                Log.d(Const.TAG, errorResponse.toString());
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                super.onFailure(statusCode, headers, responseString, throwable);
+                Log.d(Const.TAG, responseString);
             }
         });
     }

@@ -3,7 +3,6 @@ package cz.petrkubes.payuback.Activities;
 import android.Manifest;
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -11,30 +10,37 @@ import android.os.Handler;
 import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+
+import java.util.Date;
 import java.util.ArrayList;
 import java.util.List;
 
 import cz.petrkubes.payuback.Adapters.FriendsSuggestionAdapter;
+import cz.petrkubes.payuback.Api.ApiRestClient;
 import cz.petrkubes.payuback.Database.DatabaseHandler;
 import cz.petrkubes.payuback.R;
 import cz.petrkubes.payuback.Structs.Currency;
 import cz.petrkubes.payuback.Structs.Debt;
 import cz.petrkubes.payuback.Structs.Friend;
+import cz.petrkubes.payuback.Structs.User;
 
 /**
  * Created by petr on 24.10.16.
@@ -45,7 +51,7 @@ public class DebtActivity extends AppCompatActivity {
     private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 100;
 
     private AutoCompleteTextView txtName;
-    private EditText txtAmount;
+    private EditText txtWhat;
     private Spinner spnCurrency;
     private RadioButton rdioMyDebt;
     private RadioButton rdioTheirDebt;
@@ -54,8 +60,10 @@ public class DebtActivity extends AppCompatActivity {
     private EditText txtNote;
     private FloatingActionButton btnAddDebt;
     private DatabaseHandler db;
+    private TextInputLayout txtIL;
 
     private Integer tempFacebookFriendId = null;
+    private ArrayList<Currency> currencies = null;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -65,7 +73,7 @@ public class DebtActivity extends AppCompatActivity {
         getSupportActionBar().setElevation(0);
 
         txtName = (AutoCompleteTextView) findViewById(R.id.txt_name);
-        txtAmount = (EditText) findViewById(R.id.txt_amount);
+        txtWhat = (EditText) findViewById(R.id.txt_what);
         spnCurrency = (Spinner) findViewById(R.id.spn_currency);
         rdioMyDebt = (RadioButton) findViewById(R.id.rdio_my_debt);
         rdioTheirDebt = (RadioButton) findViewById(R.id.rdio_their_debt);
@@ -73,6 +81,7 @@ public class DebtActivity extends AppCompatActivity {
         rdioMoney = (RadioButton) findViewById(R.id.rdio_money);
         txtNote = (EditText) findViewById(R.id.txt_note);
         btnAddDebt = (FloatingActionButton) findViewById(R.id.btn_add_debt);
+        txtIL = (TextInputLayout) findViewById(R.id.txtIL_what);
 
         // Set the hint after the animation completes, workaround for Android bug
         txtNote.setHint(getResources().getString(R.string.note));
@@ -111,7 +120,7 @@ public class DebtActivity extends AppCompatActivity {
         });
 
         // Set up currencies spinner
-        ArrayList<Currency> currencies = db.getCurrencies();
+        currencies = db.getCurrencies();
         ArrayAdapter<Currency> currenciesAdapter = new ArrayAdapter<Currency>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, currencies);
         spnCurrency.setPrompt("Currency:");
         spnCurrency.setAdapter(currenciesAdapter);
@@ -135,12 +144,29 @@ public class DebtActivity extends AppCompatActivity {
             }
         });
 
-        // Add debt
+        // Add debt button
         btnAddDebt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Toast.makeText(getApplicationContext(), String.valueOf(tempFacebookFriendId), Toast.LENGTH_SHORT).show();
-                addDebt(tempFacebookFriendId);
+                addDebt();
+            }
+        });
+
+        // Change input fields if user chooses a thing or money
+        rdioThing.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                // if button is checked
+                if (b) {
+                    spnCurrency.setVisibility(View.GONE);
+                    txtWhat.setInputType(InputType.TYPE_CLASS_TEXT);
+                    txtIL.setHint(getResources().getString(R.string.thing));
+                } else {
+                    spnCurrency.setVisibility(View.VISIBLE);
+                    txtWhat.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+                    txtIL.setHint(getResources().getString(R.string.amount));
+                }
             }
         });
 
@@ -209,13 +235,59 @@ public class DebtActivity extends AppCompatActivity {
     }
 
     /**
-     * @param tempFacebookFriendId id of a facebookFriend, if user selected him from the list
+     * Adds new debt to local database
      */
-    public void addDebt(Integer tempFacebookFriendId) {
+    public void addDebt() {
+
+        Integer creditorId = null;
+        Integer debtorId = null;
+        String customFriendName = null;
+        String thingName = null;
+        Integer amount = null;
+        Integer currencyId = null;
 
         // Interpret add debt form
+        if (rdioMyDebt.isChecked()) {
+            debtorId = db.getUser().id;
+        } else {
+            creditorId = db.getUser().id;
+        }
 
-        
+        if (tempFacebookFriendId != null) {
+            if (rdioMyDebt.isChecked()) {
+                creditorId = tempFacebookFriendId;
+            } else {
+                debtorId = tempFacebookFriendId;
+            }
+        } else {
+            customFriendName = txtName.getText().toString();
+        }
 
+        if (rdioThing.isChecked()) {
+            thingName = txtWhat.getText().toString();
+        } else {
+            amount = Integer.parseInt(txtWhat.getText().toString());
+            currencyId = currencies.get(spnCurrency.getSelectedItemPosition()).id;
+        }
+
+        Debt debt = new Debt(
+                null,
+                creditorId,
+                debtorId,
+                customFriendName,
+                amount,
+                currencyId,
+                thingName,
+                txtNote.getText().toString(),
+                null,
+                null,
+                new Date()
+        );
+
+        // Add debt into the local database
+        db.addDebt(debt);
+
+        setResult(RESULT_OK);
+        finish();
     }
 }

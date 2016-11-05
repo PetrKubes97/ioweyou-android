@@ -37,6 +37,7 @@ import cz.petrkubes.payuback.Const;
 import cz.petrkubes.payuback.Database.DatabaseHandler;
 import cz.petrkubes.payuback.R;
 import cz.petrkubes.payuback.Structs.Currency;
+import cz.petrkubes.payuback.Structs.Debt;
 import cz.petrkubes.payuback.Structs.Friend;
 import cz.petrkubes.payuback.Structs.User;
 
@@ -46,13 +47,12 @@ import cz.petrkubes.payuback.Structs.User;
 
 public class MainActivity extends AppCompatActivity {
 
+    static final int ADD_DEBT_REQUEST = 0;
+
     private TextView textView;
     private Button button;
-    private Button button2;
 
     private FloatingActionButton btnAddDebt;
-    private String facebookId;
-    private String facebookToken;
     private DatabaseHandler db;
     private FragmentsAdapter pageAdapter;
     private ViewPager viewPager;
@@ -69,7 +69,6 @@ public class MainActivity extends AppCompatActivity {
         // Setup views and buttons
         textView = (TextView) findViewById(R.id.textView);
         button = (Button) findViewById(R.id.btn_main);
-        button2 = (Button) findViewById(R.id.button2);
 
         btnAddDebt = (FloatingActionButton) findViewById(R.id.btn_add_debt);
         tabLayout = (TabLayout) findViewById(R.id.tabs);
@@ -86,14 +85,6 @@ public class MainActivity extends AppCompatActivity {
         // Setup api client for synchronization
         apiClient = new ApiRestClient(getApplicationContext());
 
-        // Get facebookId and token from the login activity
-        Bundle extras = getIntent().getExtras();
-        if (extras != null) {
-            facebookId = extras.getString("facebookId");
-            facebookToken = extras.getString("facebookToken");
-            textView.setText("Facebook Id: " + facebookId + "\n" + "Facebook token: " + facebookToken);
-        }
-
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -103,16 +94,10 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), db.getUser().apiKey, Toast.LENGTH_SHORT).show();
                     getUser(user.apiKey);
                     getCurrencies(user.apiKey);
+                    addUnaddedDebts();
                 } else {
                     Toast.makeText(getApplicationContext(), "Neni", Toast.LENGTH_SHORT).show();
                 }
-            }
-        });
-
-        button2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                loginUser(facebookId, facebookToken);
             }
         });
 
@@ -124,14 +109,45 @@ public class MainActivity extends AppCompatActivity {
 
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP){
 
-                    ActivityOptions options = ActivityOptions.
-                            makeSceneTransitionAnimation(MainActivity.this, btnAddDebt, getString(R.string.transition_button));
-                    startActivity(intent, options.toBundle());
+                    ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(MainActivity.this, btnAddDebt, getString(R.string.transition_button));
+                    startActivityForResult(intent, ADD_DEBT_REQUEST, options.toBundle());
                 } else{
-                    startActivity(intent);
+                    startActivityForResult(intent, ADD_DEBT_REQUEST);
                 }
             }
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        Log.d(Const.TAG, "Returned to the main activity" + String.valueOf(requestCode) + String.valueOf(resultCode));
+
+        if (requestCode == ADD_DEBT_REQUEST && resultCode == RESULT_OK) {
+            pageAdapter.notifyDataSetChanged();
+            addUnaddedDebts();
+        }
+    }
+
+    public void addUnaddedDebts() {
+        // Go through each unnadded
+        ArrayList<Debt> unaddedDebts = db.getUnaddedDebts();
+
+        for (Debt debt : unaddedDebts) {
+            Log.d(Const.TAG, "Adding unadded debt.");
+            apiClient.addUnaddedDebt(db.getUser().apiKey, debt, new SimpleCallback() {
+                @Override
+                public void onSuccess() {
+
+                }
+
+                @Override
+                public void onFailure() {
+
+                }
+            });
+        }
     }
 
     public void getUser(String apiKey) {

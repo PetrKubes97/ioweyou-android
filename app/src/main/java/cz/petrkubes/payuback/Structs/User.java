@@ -1,6 +1,5 @@
 package cz.petrkubes.payuback.Structs;
 
-import java.util.ArrayList;
 import java.util.Date;
 
 /**

@@ -3,6 +3,10 @@ package cz.petrkubes.payuback.Activities;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.AccessToken;
@@ -14,13 +18,25 @@ import com.facebook.appevents.AppEventsLogger;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 
+import org.w3c.dom.Text;
+
+import cz.petrkubes.payuback.Api.ApiRestClient;
+import cz.petrkubes.payuback.Api.SimpleCallback;
+import cz.petrkubes.payuback.Const;
+import cz.petrkubes.payuback.Database.DatabaseHandler;
 import cz.petrkubes.payuback.R;
 
 
 public class LoginActivity extends AppCompatActivity {
 
     private LoginButton loginButton;
+    private ProgressBar prgLoader;
+    private TextView txtLoadingDescription;
+    private ApiRestClient apiClient;
+    private DatabaseHandler db;
     private CallbackManager callbackManager;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,8 +49,20 @@ public class LoginActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_login);
 
+        // Remove actionbar shadow
+        getSupportActionBar().setElevation(0);
+
         loginButton = (LoginButton) this.findViewById(R.id.login_button);
+        prgLoader = (ProgressBar) this.findViewById(R.id.prg_loader);
+        txtLoadingDescription = (TextView) this.findViewById(R.id.txt_loading_description);
+
         loginButton.setReadPermissions("user_friends", "email");
+
+        loginButton.setVisibility(View.VISIBLE);
+        prgLoader.setVisibility(View.GONE);
+
+        apiClient = new ApiRestClient(getApplicationContext());
+        db = new DatabaseHandler(getApplicationContext());
 
         // Starts application if the user is already logged in
         if (isLoggedIn()) {
@@ -48,11 +76,13 @@ public class LoginActivity extends AppCompatActivity {
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
-                // Starts application
-                Intent intent = new Intent(getBaseContext(), MainActivity.class);
-                intent.putExtra("facebookId", loginResult.getAccessToken().getUserId());
-                intent.putExtra("facebookToken", loginResult.getAccessToken().getToken());
-                startActivity(intent);
+
+                loginButton.setVisibility(View.GONE);
+                prgLoader.setVisibility(View.VISIBLE);
+
+                // Starts loading tasks
+                loginUser(loginResult.getAccessToken().getUserId(), loginResult.getAccessToken().getToken());
+
             }
 
             @Override
@@ -76,5 +106,66 @@ public class LoginActivity extends AppCompatActivity {
     private boolean isLoggedIn() {
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
         return accessToken != null;
+    }
+
+
+    public void loginUser(String facebookId, String facebookToken) {
+
+        txtLoadingDescription.setText(getResources().getString(R.string.loading_login));
+
+        apiClient.login(facebookId, facebookToken, new SimpleCallback() {
+            @Override
+            public void onSuccess() {
+                getUser(db.getUser().apiKey);
+            }
+
+            @Override
+            public void onFailure() {
+
+            }
+        });
+    }
+
+    public void getUser(final String apiKey) {
+
+        txtLoadingDescription.setText(getResources().getString(R.string.loading_getting_user));
+
+        apiClient.getUser(apiKey, new SimpleCallback() {
+
+            @Override
+            public void onSuccess() {
+                getCurrencies(apiKey);
+            }
+
+            @Override
+            public void onFailure() {
+
+            }
+        });
+    }
+
+    public void getCurrencies(String apiKey) {
+
+        txtLoadingDescription.setText(getResources().getString(R.string.loading_other));
+
+        apiClient.getCurrencies(apiKey, new SimpleCallback() {
+            @Override
+            public void onSuccess() {
+
+                txtLoadingDescription.setText("");
+                prgLoader.setVisibility(View.GONE);
+                loginButton.setVisibility(View.VISIBLE);
+
+                // Starts application
+                Intent intent = new Intent(getBaseContext(), MainActivity.class);
+                startActivity(intent);
+
+            }
+
+            @Override
+            public void onFailure() {
+
+            }
+        });
     }
 }

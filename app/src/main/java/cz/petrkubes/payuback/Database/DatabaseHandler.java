@@ -3,25 +3,26 @@ package cz.petrkubes.payuback.Database;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.CursorIndexOutOfBoundsException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import cz.petrkubes.payuback.Const;
 import cz.petrkubes.payuback.Structs.Currency;
+import cz.petrkubes.payuback.Structs.Debt;
 import cz.petrkubes.payuback.Structs.Friend;
 import cz.petrkubes.payuback.Structs.User;
-
-/**
- * Created by petr on 20.10.16.
- */
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 
     // Database Version
-    private static final int DATABASE_VERSION = 14;
+    private static final int DATABASE_VERSION = 15;
 
     // Database Name
     private static final String DATABASE_NAME = "payUBack.db";
@@ -46,22 +47,48 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String CURRENCIES_KEY_ID = "id";
     private static final String CURRENCIES_KEY_SYMBOL = "symbol";
 
+    private static final String DEBTS_KEY_ID = "id";
+    private static final String DEBTS_KEY_CREDITOR_ID = "creditor_id";
+    private static final String DEBTS_KEY_DEBTOR_ID = "debtor_id";
+    private static final String DEBTS_KEY_CUSTOM_FRIEND_NAME = "custom_friend_name";
+    private static final String DEBTS_KEY_AMOUNT = "amount";
+    private static final String DEBTS_KEY_CURRENCY_ID = "currency_id";
+    private static final String DEBTS_KEY_THING_NAME = "thing_name";
+    private static final String DEBTS_KEY_NOTE = "note";
+    private static final String DEBTS_KEY_PAID_AT = "paid_at";
+    private static final String DEBTS_KEY_DELETED_AT = "deleted_at";
+    private static final String DEBTS_KEY_MODIFIED_AT = "modified_at";
+
     // Strings including all columns
-    private String[] userProjection = new String[]{
+    private String[] userProjection = new String[] {
             USERS_KEY_ID,
             USERS_KEY_API_KEY,
             USERS_KEY_NAME,
             USERS_KEY_EMAIL,
             USERS_KEY_REGISTERED_AT};
 
-    private String[] friendProjection = new String[]{
+    private String[] friendProjection = new String[] {
             FRIENDS_KEY_ID,
             FRIENDS_KEY_NAME,
             FRIENDS_KEY_EMAIL};
 
-    private String[] currenciesProjection = new String[]{
+    private String[] currenciesProjection = new String[] {
             CURRENCIES_KEY_ID,
             CURRENCIES_KEY_SYMBOL};
+
+    private String[] debtProjection = new String[] {
+            DEBTS_KEY_ID,
+            DEBTS_KEY_CREDITOR_ID,
+            DEBTS_KEY_DEBTOR_ID,
+            DEBTS_KEY_CUSTOM_FRIEND_NAME,
+            DEBTS_KEY_AMOUNT,
+            DEBTS_KEY_CURRENCY_ID,
+            DEBTS_KEY_THING_NAME,
+            DEBTS_KEY_NOTE,
+            DEBTS_KEY_PAID_AT,
+            DEBTS_KEY_DELETED_AT,
+            DEBTS_KEY_MODIFIED_AT
+    };
 
 
     public DatabaseHandler(Context context) {
@@ -86,6 +113,20 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 CURRENCIES_KEY_ID + " INTEGER PRIMARY KEY, " +
                 CURRENCIES_KEY_SYMBOL + " TEXT);";
 
+        String CREATE_DEBTS_TABLE = "CREATE TABLE " + TABLE_DEBTS + " (" +
+                DEBTS_KEY_ID + " INTEGER PRIMARY KEY, " +
+                DEBTS_KEY_CREDITOR_ID + " INTEGER, " +
+                DEBTS_KEY_DEBTOR_ID + " INTEGER, " +
+                DEBTS_KEY_CUSTOM_FRIEND_NAME + " TEXT, " +
+                DEBTS_KEY_AMOUNT + " NUMERIC, " +
+                DEBTS_KEY_CURRENCY_ID + " INTEGER, " +
+                DEBTS_KEY_THING_NAME + " TEXT, " +
+                DEBTS_KEY_NOTE + " TEXT, " +
+                DEBTS_KEY_PAID_AT + " NUMERIC, " +
+                DEBTS_KEY_DELETED_AT + " NUMERIC, " +
+                DEBTS_KEY_MODIFIED_AT + " NUMERIC);";
+
+        db.execSQL(CREATE_DEBTS_TABLE);
         db.execSQL(CREATE_FRIENDS_TABLE);
         db.execSQL(CREATE_USERS_TABLE);
         db.execSQL(CREATE_CURRENCIES_TABLE);
@@ -131,6 +172,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         cursor.close();
     }
 
+    /**
+     * Returns currently logged in user
+     * @return User
+     */
     public User getUser() {
         User user = null;
 
@@ -208,6 +253,36 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return list;
     }
 
+    /**
+     * Get friend by id
+     * @return Friend
+     */
+    public Friend getFriend(int id) {
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_FRIENDS, friendProjection, FRIENDS_KEY_ID + "=?",
+                new String[] {String.valueOf(id)}, null, null, null);
+
+        Friend friend = null;
+
+        if (cursor.moveToFirst())
+        {
+            friend = new Friend(
+                    cursor.getInt(0),
+                    cursor.getString(1),
+                    cursor.getString(2));
+        }
+
+        cursor.close();
+
+        return friend;
+    }
+
+    /**
+     * Inserts currency into local database
+     * @param currency currency received from the web
+     * @throws Exception
+     */
     public void addCurrency(Currency currency) throws Exception {
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -230,6 +305,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         cursor.close();
     }
 
+    /**
+     * Returns list of currencies in local database
+     * @return ArrayList<Currency>
+     */
     public ArrayList<Currency> getCurrencies() {
         ArrayList<Currency> list = new ArrayList<>();
 
@@ -242,6 +321,280 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 list.add(new Currency(
                         cursor.getInt(0),
                         cursor.getString(1)));
+            } while (cursor.moveToNext());
+
+        }
+
+        cursor.close();
+
+        return list;
+    }
+
+    /**
+     * Get currency by id
+     * @return Currency
+     */
+    public Currency getCurrency(int id) {
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_CURRENCIES, currenciesProjection, CURRENCIES_KEY_ID + "=?",
+                new String[] {String.valueOf(id)}, null, null, null);
+
+        Currency currency = null;
+
+        if (cursor.moveToFirst())
+        {
+            currency = new Currency(
+                    cursor.getInt(0),
+                    cursor.getString(1));
+        }
+
+        cursor.close();
+
+        return currency;
+    }
+
+
+    /**
+     * Save debt into the database, the id is set to be < 0, it will be later updated to match the online database
+     * @param debt Debt
+     */
+    public void addDebt(Debt debt) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        int lowestId = 0;
+        DateFormat df = new SimpleDateFormat();
+
+        // Find the currently lowest id in the database
+        Cursor cursor = db.query(TABLE_DEBTS, new String[] {DEBTS_KEY_ID}, null,
+                null, null, null, DEBTS_KEY_ID + " ASC");
+
+        if (cursor.moveToFirst()) {
+            if (cursor.getInt(0) < 0)
+            lowestId = cursor.getInt(0);
+        }
+
+        String paidAt = null;
+        String deletedAt = null;
+        String modifiedAt = null;
+
+        if (debt.paidAt != null) {
+            paidAt = df.format(debt.paidAt);
+        }
+
+        if (debt.deletedAt != null) {
+            deletedAt = df.format(debt.deletedAt);
+        }
+
+        if (debt.modifiedAt != null) {
+            modifiedAt = df.format(debt.modifiedAt);
+        }
+
+        // Set values and insert the row
+        ContentValues values = new ContentValues();
+        values.put(DEBTS_KEY_ID, lowestId-1);
+        values.put(DEBTS_KEY_CREDITOR_ID, debt.creditorId);
+        values.put(DEBTS_KEY_DEBTOR_ID, debt.debtorId);
+        values.put(DEBTS_KEY_CUSTOM_FRIEND_NAME, debt.customFriendName);
+        values.put(DEBTS_KEY_AMOUNT, debt.amount);
+        values.put(DEBTS_KEY_CURRENCY_ID, debt.currencyId);
+        values.put(DEBTS_KEY_THING_NAME, debt.thingName);
+        values.put(DEBTS_KEY_NOTE, debt.note);
+        values.put(DEBTS_KEY_PAID_AT, paidAt);
+        values.put(DEBTS_KEY_DELETED_AT, deletedAt);
+        values.put(DEBTS_KEY_MODIFIED_AT, modifiedAt);
+
+        db.insert(TABLE_DEBTS, null, values);
+
+        db.close();
+        cursor.close();
+    }
+
+
+    /**
+     * Returns list of debts, which were not added into the online database yet
+     * @return ArrayList<Debt>
+     */
+    public ArrayList<Debt> getUnaddedDebts() {
+        ArrayList<Debt> list = new ArrayList<>();
+        DateFormat df = new SimpleDateFormat();
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_DEBTS, debtProjection, DEBTS_KEY_ID+"< 0", null, null, null, null);
+
+        if (cursor.moveToFirst())
+        {
+            do {
+                try {
+                    Date paidAt = null;
+                    Date deletedAt = null;
+                    Date modifiedAt = null;
+
+                    if (cursor.getString(8) != null) {
+                        paidAt = df.parse(cursor.getString(8));
+                    }
+
+                    if (cursor.getString(9) != null) {
+                        deletedAt = df.parse(cursor.getString(9));
+                    }
+
+                    if (cursor.getString(10) != null) {
+                        modifiedAt = df.parse(cursor.getString(10));
+                    }
+
+                    list.add(new Debt(
+                            cursor.getInt(0),
+                            cursor.getInt(1),
+                            cursor.getInt(2),
+                            cursor.getString(3),
+                            cursor.getInt(4),
+                            cursor.getInt(5),
+                            cursor.getString(6),
+                            cursor.getString(7),
+                            paidAt,
+                            deletedAt,
+                            modifiedAt)
+                    );
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            } while (cursor.moveToNext());
+
+        }
+
+        cursor.close();
+
+        return list;
+    }
+
+    /**
+     * Update id of a debt.
+     * When adding a debt into the online database, local id must be updated so that it matches online id
+     * @param currentId Current id in local database
+     * @param newId Id, under which is debt saved online
+     * @throws Exception
+     */
+    public void updateDebtId(int currentId, int newId) throws Exception {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Checks if user doesn't already exist
+        Cursor cursor = db.query(TABLE_DEBTS, new String[] {DEBTS_KEY_ID}, DEBTS_KEY_ID + "=?",
+                new String[] {String.valueOf(currentId)}, null, null, null);
+
+        ContentValues values = new ContentValues();
+        values.put(DEBTS_KEY_ID, newId);
+
+        if (cursor.getCount() < 1) {
+            // Debt doesn't exist
+            throw new Exception("This current debt does not exist.");
+        } else {
+            // Update debt id
+            db.update(TABLE_DEBTS, values, DEBTS_KEY_ID + "=?", new String[] {String.valueOf(currentId)});
+        }
+
+        db.close();
+        cursor.close();
+    }
+
+    /**
+     * Returns list of debts with added variables for displaying
+     * @param my If true, returns only debts which user owes, otherwise debts he will collect
+     * @return ArrayList<Debt>
+     */
+    public ArrayList<Debt> getExtendedDebts(boolean my, int userId) {
+        ArrayList<Debt> list = new ArrayList<>();
+        DateFormat df = new SimpleDateFormat();
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+
+        if (my) {
+            cursor = db.query(TABLE_DEBTS, debtProjection, DEBTS_KEY_DEBTOR_ID + "=?", new String[] {String.valueOf(userId)}, null, null, null);
+        } else {
+            cursor = db.query(TABLE_DEBTS, debtProjection, DEBTS_KEY_CREDITOR_ID + "=?", new String[] {String.valueOf(userId)}, null, null, null);
+        }
+
+        if (cursor.moveToFirst())
+        {
+            do {
+                try {
+                    Date paidAt = null;
+                    Date deletedAt = null;
+                    Date modifiedAt = null;
+
+                    if (cursor.getString(8) != null) {
+                        paidAt = df.parse(cursor.getString(8));
+                    }
+
+                    if (cursor.getString(9) != null) {
+                        deletedAt = df.parse(cursor.getString(9));
+                    }
+
+                    if (cursor.getString(10) != null) {
+                        modifiedAt = df.parse(cursor.getString(10));
+                    }
+
+                    Debt debt = new Debt(
+                            cursor.getInt(0),
+                            cursor.getInt(1),
+                            cursor.getInt(2),
+                            cursor.getString(3),
+                            cursor.getInt(4),
+                            cursor.getInt(5),
+                            cursor.getString(6),
+                            cursor.getString(7),
+                            paidAt,
+                            deletedAt,
+                            modifiedAt);
+
+                    // Set additional variables
+
+                    // 1. Name of person
+                    if (my) {
+                        if (debt.creditorId == 0) {
+                            debt.who = debt.customFriendName;
+                        } else {
+                            Log.d(Const.TAG, String.valueOf(debt.creditorId));
+                            Friend friend = getFriend(debt.creditorId);
+                            if (friend != null) {
+                                debt.who = friend.name;
+                            } else {
+                                debt.who = "Error :-(";
+                            }
+
+                        }
+                    } else {
+                        if (debt.debtorId == 0) {
+                            debt.who = debt.customFriendName;
+                        } else {
+                            Friend friend = getFriend(debt.debtorId);
+                            if (friend != null) {
+                                debt.who = friend.name;
+                            } else {
+                                debt.who = "Error :-(";
+                            }
+                        }
+                    }
+
+                    // 2. money or thing that is owed
+                    if (debt.amount != 0) {
+                        debt.what = String.valueOf(debt.amount) + " " + String.valueOf(getCurrency(debt.currencyId));
+                    } else {
+                        debt.what = debt.thingName;
+                    }
+
+                    // 3. status
+                    if (debt.id < 0) {
+                        debt.status = "not synced";
+                    } else {
+                        debt.status = "synced";
+                    }
+
+                    list.add(debt);
+
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
             } while (cursor.moveToNext());
 
         }
