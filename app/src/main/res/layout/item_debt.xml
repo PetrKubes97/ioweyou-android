@@ -1,54 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="15dp">
-
-    <TextView
-        android:text="Petr Kubeš"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true"
-        android:id="@+id/txt_name"
-        android:textSize="18sp" />
+    android:paddingLeft="5dp"
+    android:paddingRight="5dp"
+    >
 
     <TextView
         android:text="520 $"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
+        android:layout_height="54dp"
         android:id="@+id/txt_what"
-        android:textSize="30sp"
-        android:textStyle="normal|bold"
-        android:layout_alignBottom="@+id/txt_date" />
+        android:textSize="18sp"
+        android:gravity="right|center"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:textColor="@android:color/black"
+        android:textStyle="normal|bold" />
+
+    <TextView
+        android:layout_height="34dp"
+        android:id="@+id/txt_note"
+        tools:text="asdf asdf  df sa sdaf  fdsa"
+        android:layout_width="0dp"
+        app:layout_constraintRight_toLeftOf="@+id/txt_what"
+        app:layout_constraintLeft_toRightOf="@+id/txt_name"
+        android:maxLines="2"
+        app:layout_constraintBottom_toBottomOf="@+id/txt_status"
+        app:layout_constraintTop_toTopOf="@+id/txt_name"
+        android:ellipsize="end"
+        android:gravity="top|left|start" />
+
+    <TextView
+        android:text="synced"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/txt_status"
+        android:textColor="@android:color/darker_gray"
+        android:paddingRight="10dp"
+        android:textSize="8sp"
+        app:layout_constraintBottom_toBottomOf="@+id/txt_date"
+        android:layout_marginStart="8dp"
+        app:layout_constraintLeft_toRightOf="@+id/txt_date" />
+
+    <TextView
+        android:text="Petr Kubes"
+        android:layout_height="wrap_content"
+        android:id="@+id/txt_name"
+        android:textSize="18sp"
+        android:textColor="@color/black"
+        android:ellipsize="marquee"
+        android:maxLines="1"
+        android:gravity="left|center"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginStart="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_width="140dp" />
 
     <TextView
         android:text="31.10.2017"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/txt_date"
-        android:layout_below="@+id/txt_name"
-        android:layout_alignParentStart="true" />
-
-    <TextView
-        android:text="hjklhj"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/txt_note"
-        android:layout_toStartOf="@+id/txt_what"
-        android:layout_toEndOf="@+id/txt_name"
-        android:paddingLeft="20dp"
-        android:layout_alignBottom="@+id/txt_name" />
-
-    <TextView
-        android:text="synced"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/txt_note"
-        android:layout_toStartOf="@+id/txt_what"
-        android:id="@+id/txt_status"
-        android:textColor="?android:attr/textColorSecondary"
-        android:paddingRight="10dp" />
-</RelativeLayout>
+        android:textSize="10sp"
+        app:layout_constraintTop_toBottomOf="@+id/txt_name"
+        android:layout_marginStart="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/txt_what"
+        android:layout_marginBottom="8dp" />
+</android.support.constraint.ConstraintLayout>

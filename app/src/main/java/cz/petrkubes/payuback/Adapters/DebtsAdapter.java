@@ -9,10 +9,13 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 import cz.petrkubes.payuback.Api.ApiRestClient;
+import cz.petrkubes.payuback.Fragments.UpdateableFragment;
 import cz.petrkubes.payuback.R;
 import cz.petrkubes.payuback.Structs.Debt;
 
@@ -53,12 +56,15 @@ public class DebtsAdapter extends ArrayAdapter<Debt> {
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
+
+        DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+
         // Populate the data from the data object via the viewHolder object
         // into the template view.
         viewHolder.txtName.setText(debt.who);
         viewHolder.txtWhat.setText(debt.what);
         viewHolder.txtNote.setText(debt.note);
-        viewHolder.txtDate.setText(debt.modifiedAt.toString()); // TODO this should be created at
+        viewHolder.txtDate.setText(df.format(debt.modifiedAt)); // TODO this should be created at
         viewHolder.txtStatus.setText(debt.status);
 
         // Return the completed view to render on screen

@@ -5,10 +5,13 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.util.Log;
 
+import cz.petrkubes.payuback.Const;
 import cz.petrkubes.payuback.Fragments.DebtsFragment;
 import cz.petrkubes.payuback.Fragments.FeedFragment;
 import cz.petrkubes.payuback.Fragments.FriendsFragment;
+import cz.petrkubes.payuback.Fragments.UpdateableFragment;
 
 /**
  * Created by petr on 22.10.16.
@@ -55,6 +58,16 @@ public class FragmentsAdapter extends FragmentStatePagerAdapter {
     @Override
     public int getCount() {
         return 4;
+    }
+
+    @Override
+    public int getItemPosition(Object object) {
+        if (object instanceof UpdateableFragment) {
+            Log.d(Const.TAG, "Calling update in adapter");
+            ((UpdateableFragment) object).update();
+        }
+        //don't return POSITION_NONE, avoid fragment recreation.
+        return super.getItemPosition(object);
     }
 
     @Override

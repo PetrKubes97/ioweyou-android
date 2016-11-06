@@ -65,20 +65,22 @@ public class LoginActivity extends AppCompatActivity {
         db = new DatabaseHandler(getApplicationContext());
 
         // Starts application if the user is already logged in
-        if (isLoggedIn()) {
-            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-            intent.putExtra("facebookId", AccessToken.getCurrentAccessToken().getUserId());
-            intent.putExtra("facebookToken", AccessToken.getCurrentAccessToken().getToken());
-            startActivity(intent);
+        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        if (accessToken != null) {
+            if (db.getUser() != null) {
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                intent.putExtra("facebookId", AccessToken.getCurrentAccessToken().getUserId());
+                intent.putExtra("facebookToken", AccessToken.getCurrentAccessToken().getToken());
+                startActivity(intent);
+            } else {
+                loginUser(accessToken.getUserId(), accessToken.getToken());
+            }
         }
 
         // Callback registration
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
-
-                loginButton.setVisibility(View.GONE);
-                prgLoader.setVisibility(View.VISIBLE);
 
                 // Starts loading tasks
                 loginUser(loginResult.getAccessToken().getUserId(), loginResult.getAccessToken().getToken());
@@ -103,14 +105,11 @@ public class LoginActivity extends AppCompatActivity {
         callbackManager.onActivityResult(requestCode, resultCode, data);
     }
 
-    private boolean isLoggedIn() {
-        AccessToken accessToken = AccessToken.getCurrentAccessToken();
-        return accessToken != null;
-    }
-
 
     public void loginUser(String facebookId, String facebookToken) {
 
+        loginButton.setVisibility(View.GONE);
+        prgLoader.setVisibility(View.VISIBLE);
         txtLoadingDescription.setText(getResources().getString(R.string.loading_login));
 
         apiClient.login(facebookId, facebookToken, new SimpleCallback() {
