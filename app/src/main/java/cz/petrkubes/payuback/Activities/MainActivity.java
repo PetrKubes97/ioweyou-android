@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), db.getUser().apiKey, Toast.LENGTH_SHORT).show();
                     getUser(user.apiKey);
                     getCurrencies(user.apiKey);
-                    addUnaddedDebts();
+                    updateDebts(user.apiKey);
                 } else {
                     Toast.makeText(getApplicationContext(), "Neni", Toast.LENGTH_SHORT).show();
                 }
@@ -125,21 +125,47 @@ public class MainActivity extends AppCompatActivity {
         Log.d(Const.TAG, "Returned to the main activity" + String.valueOf(requestCode) + String.valueOf(resultCode));
 
         if (requestCode == ADD_DEBT_REQUEST && resultCode == RESULT_OK) {
+            User user = db.getUser();
+            addUnaddedDebts(user.apiKey);
             pageAdapter.notifyDataSetChanged();
-            addUnaddedDebts();
         }
     }
 
-    public void addUnaddedDebts() {
+    public void addUnaddedDebts(String apiKey) {
+
+        DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+
         // Go through each unnadded
         ArrayList<Debt> unaddedDebts = db.getUnaddedDebts();
 
         for (Debt debt : unaddedDebts) {
-            Log.d(Const.TAG, "Adding unadded debt.");
-            apiClient.addUnaddedDebt(db.getUser().apiKey, debt, new SimpleCallback() {
+            Log.d(Const.TAG, "Adding unadded debt. Date: " + df.format(debt.createdAt));
+            apiClient.updateDebt(apiKey, debt, new SimpleCallback() {
                 @Override
                 public void onSuccess() {
+                    Log.d(Const.TAG, "Pridan dluh.");
+                }
 
+                @Override
+                public void onFailure() {
+
+                }
+            });
+        }
+    }
+
+    public void updateDebts(String apiKey) {
+
+        DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+
+        ArrayList<Debt> debts = db.getDebts();
+
+        for (Debt debt : debts) {
+            Log.d(Const.TAG, "Adding unadded debt. Dte" + df.format(debt.createdAt));
+            apiClient.updateDebt(apiKey, debt, new SimpleCallback() {
+                @Override
+                public void onSuccess() {
+                    Log.d(Const.TAG, "Obnoven dluh.");
                 }
 
                 @Override

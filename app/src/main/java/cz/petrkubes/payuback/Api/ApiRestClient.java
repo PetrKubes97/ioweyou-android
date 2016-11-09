@@ -1,6 +1,7 @@
 package cz.petrkubes.payuback.Api;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 
 import com.loopj.android.http.AsyncHttpClient;
@@ -60,7 +61,7 @@ public class ApiRestClient {
                         try {
                             db.addFriend(friend);
                         } catch (Exception e) {
-                            Log.d(Const.TAG, e.getMessage());
+
                         }
                     }
 
@@ -159,7 +160,7 @@ public class ApiRestClient {
                         try {
                             db.addCurrency(currency);
                         } catch (Exception e) {
-                            Log.d(Const.TAG, e.getMessage());
+
                         }
                     }
 
@@ -179,11 +180,35 @@ public class ApiRestClient {
         });
     }
 
-    public void addUnaddedDebt(String apiKey, final Debt debt, final SimpleCallback callback) {
+    public void updateDebt(String apiKey, final Debt debt, final SimpleCallback callback) {
+
+        final DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
         client.addHeader("api-key", apiKey);
 
+        String paidAt = "";
+        String deletedAt = "";
+        String modifiedAt = "";
+        String createdAt = "";
+
+        if (debt.paidAt != null) {
+            paidAt = df.format(debt.paidAt);
+        }
+
+        if (debt.deletedAt != null) {
+            deletedAt = df.format(debt.deletedAt);
+        }
+
+        if (debt.modifiedAt != null) {
+            modifiedAt = df.format(debt.modifiedAt);
+        }
+
+        if (debt.createdAt != null) {
+            createdAt = df.format(debt.createdAt);
+        }
+
         RequestParams params = new RequestParams();
+        params.put("id", debt.id);
         params.put("creditorId", debt.creditorId);
         params.put("debtorId", debt.debtorId);
         params.put("customFriendName", debt.customFriendName);
@@ -191,6 +216,10 @@ public class ApiRestClient {
         params.put("currencyId", debt.currencyId);
         params.put("thingName", debt.thingName);
         params.put("note", debt.note);
+        params.put("paidAt", paidAt);
+        params.put("deletedAt", deletedAt);
+        params.put("modifiedAt", modifiedAt);
+        params.put("createdAt", createdAt);
 
         client.post(getAbsoluteUrl("debts/update"), params, new JsonHttpResponseHandler() {
 
@@ -199,9 +228,67 @@ public class ApiRestClient {
                 super.onSuccess(statusCode, headers, response);
 
                 try {
+                    // It is necessary to convert dates strings to Date classes
+                    Date paidAt = null;
+                    Date deletedAt = null;
+                    Date createdAt = null;
+                    Date modifiedAt = null;
+                    Integer creditorId = null;
+                    Integer debtorId = null;
+                    Integer amount = null;
+                    Integer currencyId = null;
 
-                    int newId = response.getInt("id");
-                    db.updateDebtId(debt.id, newId);
+                    if (!response.getString("paidAt").isEmpty()) {
+                        paidAt = df.parse(response.getString("paidAt"));
+                    }
+
+                    if (!response.getString("deletedAt").isEmpty()) {
+                        deletedAt = df.parse(response.getString("deletedAt"));
+                    }
+
+                    if (!response.getString("createdAt").isEmpty()) {
+                        createdAt = df.parse(response.getString("createdAt"));
+                    }
+
+                    if (!response.getString("modifiedAt").isEmpty()) {
+                        modifiedAt = df.parse(response.getString("modifiedAt"));
+                    }
+
+                    if (!response.getString("creditorId").isEmpty()) {
+                        creditorId = response.getInt("creditorId");
+                    }
+
+                    if (!response.getString("debtorId").isEmpty()) {
+                        debtorId = response.getInt("debtorId");
+                    }
+
+                    if (!response.getString("amount").isEmpty()) {
+                        amount = response.getInt("amount");
+                    }
+
+                    if (!response.getString("currencyId").isEmpty()) {
+                        currencyId = response.getInt("currencyId");
+                    }
+
+
+
+                    Debt currentDebt = new Debt(
+                            response.getInt("id"),
+                            creditorId,
+                            debtorId,
+                            response.getString("customFriendName"),
+                            amount,
+                            currencyId,
+                            response.getString("thingName"),
+                            response.getString("note"),
+                            paidAt,
+                            deletedAt,
+                            modifiedAt,
+                            createdAt
+                    );
+
+                    db.updateDebt(debt.id, currentDebt);
+                    callback.onSuccess();
 
                 } catch (Exception e) {
                     e.printStackTrace();

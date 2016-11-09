@@ -473,21 +473,108 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     /**
-     * Update id of a debt.
+     * Returns list of debts
+     * @return ArrayList<Debt>
+     */
+    public ArrayList<Debt> getDebts() {
+        ArrayList<Debt> list = new ArrayList<>();
+        DateFormat df = new SimpleDateFormat();
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_DEBTS, debtProjection, null, null, null, null, null);
+
+        if (cursor.moveToFirst())
+        {
+            do {
+                try {
+                    Date paidAt = null;
+                    Date deletedAt = null;
+                    Date modifiedAt = null;
+                    Date createdAt = null;
+
+                    if (cursor.getString(8) != null) {
+                        paidAt = df.parse(cursor.getString(8));
+                    }
+
+                    if (cursor.getString(9) != null) {
+                        deletedAt = df.parse(cursor.getString(9));
+                    }
+
+                    if (cursor.getString(10) != null) {
+                        modifiedAt = df.parse(cursor.getString(10));
+                    }
+
+                    if (cursor.getString(11) != null) {
+                        createdAt = df.parse(cursor.getString(11));
+                    }
+
+                    list.add(new Debt(
+                            cursor.getInt(0),
+                            cursor.getInt(1),
+                            cursor.getInt(2),
+                            cursor.getString(3),
+                            cursor.getInt(4),
+                            cursor.getInt(5),
+                            cursor.getString(6),
+                            cursor.getString(7),
+                            paidAt,
+                            deletedAt,
+                            modifiedAt,
+                            createdAt)
+                    );
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            } while (cursor.moveToNext());
+
+        }
+
+        cursor.close();
+
+        return list;
+    }
+
+    /**
+     * Update debt.
      * When adding a debt into the online database, local id must be updated so that it matches online id
      * @param currentId Current id in local database
-     * @param newId Id, under which is debt saved online
+     * @param debt Current version of the debt
      * @throws Exception
      */
-    public void updateDebtId(int currentId, int newId) throws Exception {
+    public void updateDebt(int currentId, Debt debt) throws Exception {
         SQLiteDatabase db = this.getWritableDatabase();
+        DateFormat df = new SimpleDateFormat();
 
         // Checks if user doesn't already exist
         Cursor cursor = db.query(TABLE_DEBTS, new String[] {DEBTS_KEY_ID}, DEBTS_KEY_ID + "=?",
                 new String[] {String.valueOf(currentId)}, null, null, null);
 
+        String paidAt = null;
+        String deletedAt = null;
+
+        if (debt.paidAt != null) {
+            paidAt = df.format(debt.paidAt);
+        }
+
+        if (debt.deletedAt != null) {
+            deletedAt = df.format(debt.deletedAt);
+        }
+
+        Log.d(Const.TAG, String.valueOf(debt.id));
+
         ContentValues values = new ContentValues();
-        values.put(DEBTS_KEY_ID, newId);
+        values.put(DEBTS_KEY_ID, debt.id);
+        values.put(DEBTS_KEY_CREDITOR_ID, debt.creditorId);
+        values.put(DEBTS_KEY_DEBTOR_ID, debt.debtorId);
+        values.put(DEBTS_KEY_CUSTOM_FRIEND_NAME, debt.customFriendName);
+        values.put(DEBTS_KEY_AMOUNT, debt.amount);
+        values.put(DEBTS_KEY_CURRENCY_ID, debt.currencyId);
+        values.put(DEBTS_KEY_THING_NAME, debt.thingName);
+        values.put(DEBTS_KEY_NOTE, debt.note);
+        values.put(DEBTS_KEY_PAID_AT, paidAt);
+        values.put(DEBTS_KEY_DELETED_AT, deletedAt);
+        values.put(DEBTS_KEY_MODIFIED_AT, df.format(debt.modifiedAt));
+        values.put(DEBTS_KEY_CREATED_AT, df.format(debt.createdAt));
 
         if (cursor.getCount() < 1) {
             // Debt doesn't exist
