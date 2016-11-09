@@ -22,7 +22,7 @@ import cz.petrkubes.payuback.Structs.User;
 public class DatabaseHandler extends SQLiteOpenHelper {
 
     // Database Version
-    private static final int DATABASE_VERSION = 17;
+    private static final int DATABASE_VERSION = 18;
 
     // Database Name
     private static final String DATABASE_NAME = "payUBack.db";
@@ -58,6 +58,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String DEBTS_KEY_PAID_AT = "paid_at";
     private static final String DEBTS_KEY_DELETED_AT = "deleted_at";
     private static final String DEBTS_KEY_MODIFIED_AT = "modified_at";
+    private static final String DEBTS_KEY_CREATED_AT = "created_at";
 
     // Strings including all columns
     private String[] userProjection = new String[] {
@@ -87,7 +88,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             DEBTS_KEY_NOTE,
             DEBTS_KEY_PAID_AT,
             DEBTS_KEY_DELETED_AT,
-            DEBTS_KEY_MODIFIED_AT
+            DEBTS_KEY_MODIFIED_AT,
+            DEBTS_KEY_CREATED_AT
     };
 
 
@@ -124,6 +126,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 DEBTS_KEY_NOTE + " TEXT, " +
                 DEBTS_KEY_PAID_AT + " NUMERIC, " +
                 DEBTS_KEY_DELETED_AT + " NUMERIC, " +
+                DEBTS_KEY_CREATED_AT + " NUMERIC, " +
                 DEBTS_KEY_MODIFIED_AT + " NUMERIC);";
 
         db.execSQL(CREATE_DEBTS_TABLE);
@@ -376,7 +379,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         String paidAt = null;
         String deletedAt = null;
-        String modifiedAt = null;
 
         if (debt.paidAt != null) {
             paidAt = df.format(debt.paidAt);
@@ -384,10 +386,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         if (debt.deletedAt != null) {
             deletedAt = df.format(debt.deletedAt);
-        }
-
-        if (debt.modifiedAt != null) {
-            modifiedAt = df.format(debt.modifiedAt);
         }
 
         // Set values and insert the row
@@ -402,7 +400,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(DEBTS_KEY_NOTE, debt.note);
         values.put(DEBTS_KEY_PAID_AT, paidAt);
         values.put(DEBTS_KEY_DELETED_AT, deletedAt);
-        values.put(DEBTS_KEY_MODIFIED_AT, modifiedAt);
+        values.put(DEBTS_KEY_MODIFIED_AT, df.format(debt.modifiedAt));
+        values.put(DEBTS_KEY_CREATED_AT, df.format(debt.createdAt));
 
         db.insert(TABLE_DEBTS, null, values);
 
@@ -429,6 +428,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     Date paidAt = null;
                     Date deletedAt = null;
                     Date modifiedAt = null;
+                    Date createdAt = null;
 
                     if (cursor.getString(8) != null) {
                         paidAt = df.parse(cursor.getString(8));
@@ -442,6 +442,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                         modifiedAt = df.parse(cursor.getString(10));
                     }
 
+                    if (cursor.getString(11) != null) {
+                        createdAt = df.parse(cursor.getString(11));
+                    }
+
                     list.add(new Debt(
                             cursor.getInt(0),
                             cursor.getInt(1),
@@ -453,7 +457,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                             cursor.getString(7),
                             paidAt,
                             deletedAt,
-                            modifiedAt)
+                            modifiedAt,
+                            createdAt)
                     );
                 } catch (ParseException e) {
                     e.printStackTrace();
@@ -521,6 +526,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     Date paidAt = null;
                     Date deletedAt = null;
                     Date modifiedAt = null;
+                    Date createdAt = null;
 
                     if (cursor.getString(8) != null) {
                         paidAt = df.parse(cursor.getString(8));
@@ -534,6 +540,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                         modifiedAt = df.parse(cursor.getString(10));
                     }
 
+                    if (cursor.getString(11) != null) {
+                        createdAt = df.parse(cursor.getString(11));
+                    }
+
                     Debt debt = new Debt(
                             cursor.getInt(0),
                             cursor.getInt(1),
@@ -545,7 +555,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                             cursor.getString(7),
                             paidAt,
                             deletedAt,
-                            modifiedAt);
+                            modifiedAt,
+                            createdAt);
 
                     // Set additional variables
 

@@ -281,6 +281,7 @@ public class DebtActivity extends AppCompatActivity {
                 txtNote.getText().toString(),
                 null,
                 null,
+                new Date(),
                 new Date()
         );
 

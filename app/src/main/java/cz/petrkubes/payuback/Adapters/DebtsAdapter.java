@@ -64,7 +64,7 @@ public class DebtsAdapter extends ArrayAdapter<Debt> {
         viewHolder.txtName.setText(debt.who);
         viewHolder.txtWhat.setText(debt.what);
         viewHolder.txtNote.setText(debt.note);
-        viewHolder.txtDate.setText(df.format(debt.modifiedAt)); // TODO this should be created at
+        viewHolder.txtDate.setText(df.format(debt.createdAt));
         viewHolder.txtStatus.setText(debt.status);
 
         // Return the completed view to render on screen

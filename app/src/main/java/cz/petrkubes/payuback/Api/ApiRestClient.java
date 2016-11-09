@@ -192,7 +192,7 @@ public class ApiRestClient {
         params.put("thingName", debt.thingName);
         params.put("note", debt.note);
 
-        client.post(getAbsoluteUrl("debts/new"), params, new JsonHttpResponseHandler() {
+        client.post(getAbsoluteUrl("debts/update"), params, new JsonHttpResponseHandler() {
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {

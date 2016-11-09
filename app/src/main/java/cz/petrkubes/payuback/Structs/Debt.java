@@ -21,15 +21,14 @@ public class Debt {
     public Date paidAt;
     public Date deletedAt;
     public Date modifiedAt;
-
-    // TODO add createdAt field in database
+    public Date createdAt;
 
     // Variables used for easier displaying of debts
     public String who;
     public String what;
     public String status;
 
-    public Debt(Integer id, Integer creditorId, Integer debtorId, String customFriendName, Integer amount, Integer currencyId, String thingName, String note, Date paidAt, Date deletedAt, Date modifiedAt) {
+    public Debt(Integer id, Integer creditorId, Integer debtorId, String customFriendName, Integer amount, Integer currencyId, String thingName, String note, Date paidAt, Date deletedAt, Date modifiedAt, Date createdAt) {
         this.id = id;
         this.creditorId = creditorId;
         this.debtorId = debtorId;
@@ -41,5 +40,6 @@ public class Debt {
         this.paidAt = paidAt;
         this.deletedAt = deletedAt;
         this.modifiedAt = modifiedAt;
+        this.createdAt = createdAt;
     }
 }
