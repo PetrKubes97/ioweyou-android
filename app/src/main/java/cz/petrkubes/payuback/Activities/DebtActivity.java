@@ -93,7 +93,7 @@ public class DebtActivity extends AppCompatActivity {
         ArrayList<Friend> friends = db.getFriends();
         // 2) contacts
         for (String contact : getContacts()) {
-            friends.add(new Friend(-1, contact, ""));
+            friends.add(new Friend(null, contact, ""));
         }
 
         // Create the adapter to convert the array to views
@@ -111,7 +111,7 @@ public class DebtActivity extends AppCompatActivity {
                 tempFacebookFriendId = selectedFriend.id;
 
                 // Set blue text, so that user knows that facebook friend was selected
-                if (selectedFriend.id > 0) {
+                if (selectedFriend.id != null) {
                     txtName.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.facebook_lighter));
                 } else {
                     txtName.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.white));
