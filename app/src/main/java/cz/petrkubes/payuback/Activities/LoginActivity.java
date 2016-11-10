@@ -36,8 +36,6 @@ public class LoginActivity extends AppCompatActivity {
     private DatabaseHandler db;
     private CallbackManager callbackManager;
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

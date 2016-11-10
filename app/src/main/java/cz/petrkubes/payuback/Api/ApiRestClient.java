@@ -132,7 +132,6 @@ public class ApiRestClient {
                 super.onFailure(statusCode, headers, throwable, errorResponse);
                 callback.onFailure();
             }
-
         });
     }
 
@@ -270,8 +269,6 @@ public class ApiRestClient {
                         currencyId = response.getInt("currencyId");
                     }
 
-
-
                     Debt currentDebt = new Debt(
                             response.getInt("id"),
                             creditorId,
@@ -293,8 +290,6 @@ public class ApiRestClient {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
-
             }
 
             @Override
@@ -309,6 +304,10 @@ public class ApiRestClient {
                 Log.d(Const.TAG, responseString);
             }
         });
+    }
+
+    public void updateAll() {
+
     }
 
     private static String getAbsoluteUrl(String relativeUrl) {

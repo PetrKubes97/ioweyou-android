@@ -133,13 +133,11 @@ public class MainActivity extends AppCompatActivity {
 
     public void addUnaddedDebts(String apiKey) {
 
-        DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
-
         // Go through each unnadded
         ArrayList<Debt> unaddedDebts = db.getUnaddedDebts();
 
         for (Debt debt : unaddedDebts) {
-            Log.d(Const.TAG, "Adding unadded debt. Date: " + df.format(debt.createdAt));
+            Log.d(Const.TAG, "Adding unadded debt.");
             apiClient.updateDebt(apiKey, debt, new SimpleCallback() {
                 @Override
                 public void onSuccess() {
@@ -156,12 +154,11 @@ public class MainActivity extends AppCompatActivity {
 
     public void updateDebts(String apiKey) {
 
-        DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
 
         ArrayList<Debt> debts = db.getDebts();
 
         for (Debt debt : debts) {
-            Log.d(Const.TAG, "Adding unadded debt. Dte" + df.format(debt.createdAt));
+            Log.d(Const.TAG, "Updating debts");
             apiClient.updateDebt(apiKey, debt, new SimpleCallback() {
                 @Override
                 public void onSuccess() {
@@ -187,20 +184,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onFailure() {
                 Log.d(Const.TAG, "Failure called.");
-            }
-        });
-    }
-
-    public void loginUser(String facebookId, String facebookToken) {
-        apiClient.login(facebookId, facebookToken, new SimpleCallback() {
-            @Override
-            public void onSuccess() {
-
-            }
-
-            @Override
-            public void onFailure() {
-
             }
         });
     }

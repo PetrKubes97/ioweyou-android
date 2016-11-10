@@ -17,6 +17,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -35,6 +36,7 @@ import java.util.List;
 
 import cz.petrkubes.payuback.Adapters.FriendsSuggestionAdapter;
 import cz.petrkubes.payuback.Api.ApiRestClient;
+import cz.petrkubes.payuback.Const;
 import cz.petrkubes.payuback.Database.DatabaseHandler;
 import cz.petrkubes.payuback.R;
 import cz.petrkubes.payuback.Structs.Currency;
@@ -269,6 +271,8 @@ public class DebtActivity extends AppCompatActivity {
             amount = Integer.parseInt(txtWhat.getText().toString());
             currencyId = currencies.get(spnCurrency.getSelectedItemPosition()).id;
         }
+
+        Log.d(Const.TAG, "Adding debt to database: "+thingName);
 
         Debt debt = new Debt(
                 null,
