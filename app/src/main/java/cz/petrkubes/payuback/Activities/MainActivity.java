@@ -92,9 +92,7 @@ public class MainActivity extends AppCompatActivity {
 
                 if (user != null) {
                     Toast.makeText(getApplicationContext(), db.getUser().apiKey, Toast.LENGTH_SHORT).show();
-                    getUser(user.apiKey);
-                    getCurrencies(user.apiKey);
-                    updateDebts(user.apiKey);
+                    updateAll(user.apiKey);
                 } else {
                     Toast.makeText(getApplicationContext(), "Neni", Toast.LENGTH_SHORT).show();
                 }
@@ -152,52 +150,16 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void updateDebts(String apiKey) {
-
-
-        ArrayList<Debt> debts = db.getDebts();
-
-        for (Debt debt : debts) {
-            Log.d(Const.TAG, "Updating debts");
-            apiClient.updateDebt(apiKey, debt, new SimpleCallback() {
-                @Override
-                public void onSuccess() {
-                    Log.d(Const.TAG, "Obnoven dluh.");
-                }
-
-                @Override
-                public void onFailure() {
-
-                }
-            });
-        }
-    }
-
-    public void getUser(String apiKey) {
-        apiClient.getUser(apiKey, new SimpleCallback() {
-
+    public void updateAll(String apiKey) {
+        apiClient.updateAll(apiKey, new SimpleCallback() {
             @Override
             public void onSuccess() {
-                Log.d(Const.TAG, "Success called.");
+                pageAdapter.notifyDataSetChanged();
             }
 
             @Override
             public void onFailure() {
-                Log.d(Const.TAG, "Failure called.");
-            }
-        });
-    }
-
-    public void getCurrencies(String apiKey) {
-        apiClient.getCurrencies(apiKey, new SimpleCallback() {
-            @Override
-            public void onSuccess() {
-
-            }
-
-            @Override
-            public void onFailure() {
-
+                Toast.makeText(getApplicationContext(), "FAILED", Toast.LENGTH_SHORT).show();
             }
         });
     }

@@ -272,7 +272,7 @@ public class DebtActivity extends AppCompatActivity {
             currencyId = currencies.get(spnCurrency.getSelectedItemPosition()).id;
         }
 
-        Log.d(Const.TAG, "Adding debt to database: "+thingName);
+        Log.d(Const.TAG, "Adding debt to database: " + String.valueOf(tempFacebookFriendId));
 
         Debt debt = new Debt(
                 null,
@@ -286,11 +286,12 @@ public class DebtActivity extends AppCompatActivity {
                 null,
                 null,
                 new Date(),
-                new Date()
+                new Date(),
+                0
         );
 
         // Add debt into the local database
-        db.addDebt(debt);
+        db.addOrUpdateDebt(null, debt);
 
         setResult(RESULT_OK);
         finish();

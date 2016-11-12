@@ -125,7 +125,6 @@ public class FriendsSuggestionAdapter extends ArrayAdapter<Friend> implements Fi
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
             if (results.count > 0) {
-                Log.d("FDSA", results.values.toString());
                 notifyDataSetChanged();
             } else {
                 notifyDataSetInvalidated();

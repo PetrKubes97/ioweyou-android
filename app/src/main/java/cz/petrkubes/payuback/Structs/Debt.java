@@ -22,13 +22,17 @@ public class Debt {
     public Date deletedAt;
     public Date modifiedAt;
     public Date createdAt;
+    public Integer version;
 
     // Variables used for easier displaying of debts
     public String who;
     public String what;
     public String status;
 
-    public Debt(Integer id, Integer creditorId, Integer debtorId, String customFriendName, Integer amount, Integer currencyId, String thingName, String note, Date paidAt, Date deletedAt, Date modifiedAt, Date createdAt) {
+    public Debt(Integer id, Integer creditorId, Integer debtorId,
+                String customFriendName, Integer amount, Integer currencyId,
+                String thingName, String note, Date paidAt,
+                Date deletedAt, Date modifiedAt, Date createdAt, Integer version) {
         this.id = id;
         this.creditorId = creditorId;
         this.debtorId = debtorId;
@@ -41,5 +45,6 @@ public class Debt {
         this.deletedAt = deletedAt;
         this.modifiedAt = modifiedAt;
         this.createdAt = createdAt;
+        this.version = version;
     }
 }

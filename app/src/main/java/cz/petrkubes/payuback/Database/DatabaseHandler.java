@@ -22,7 +22,7 @@ import cz.petrkubes.payuback.Structs.User;
 public class DatabaseHandler extends SQLiteOpenHelper {
 
     // Database Version
-    private static final int DATABASE_VERSION = 18;
+    private static final int DATABASE_VERSION = 19;
 
     // Database Name
     private static final String DATABASE_NAME = "payUBack.db";
@@ -59,6 +59,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String DEBTS_KEY_DELETED_AT = "deleted_at";
     private static final String DEBTS_KEY_MODIFIED_AT = "modified_at";
     private static final String DEBTS_KEY_CREATED_AT = "created_at";
+    private static final String DEBTS_KEY_VERSION = "version";
 
     // Strings including all columns
     private String[] userProjection = new String[] {
@@ -89,7 +90,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             DEBTS_KEY_PAID_AT,
             DEBTS_KEY_DELETED_AT,
             DEBTS_KEY_MODIFIED_AT,
-            DEBTS_KEY_CREATED_AT
+            DEBTS_KEY_CREATED_AT,
+            DEBTS_KEY_VERSION
     };
 
 
@@ -127,7 +129,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 DEBTS_KEY_PAID_AT + " NUMERIC, " +
                 DEBTS_KEY_DELETED_AT + " NUMERIC, " +
                 DEBTS_KEY_CREATED_AT + " NUMERIC, " +
-                DEBTS_KEY_MODIFIED_AT + " NUMERIC);";
+                DEBTS_KEY_MODIFIED_AT + " NUMERIC, " +
+                DEBTS_KEY_VERSION +" INTEGER);";
 
         db.execSQL(CREATE_DEBTS_TABLE);
         db.execSQL(CREATE_FRIENDS_TABLE);
@@ -207,7 +210,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
      * @param friend
      * @throws Exception
      */
-    public void addFriend(Friend friend) throws Exception {
+    public void addFriend(Friend friend) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         // Checks if user doesn't already exist
@@ -215,7 +218,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 new String[] {String.valueOf(friend.id)}, null, null, null);
 
         if (cursor.getCount() > 0) {
-            throw new Exception("Friend already exists.");
+            return;
         }
 
         // Add friend into the database
@@ -286,7 +289,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
      * @param currency currency received from the web
      * @throws Exception
      */
-    public void addCurrency(Currency currency) throws Exception {
+    public void addCurrency(Currency currency) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         // Checks if user doesn't already exist
@@ -294,7 +297,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 new String[] {String.valueOf(currency.id)}, null, null, null);
 
         if (cursor.getCount() > 0) {
-            throw new Exception("Currency does already exist.");
+            return;
         }
 
         // Add currency into the database
@@ -359,58 +362,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 
     /**
-     * Save debt into the database, the id is set to be < 0, it will be later updated to match the online database
-     * @param debt Debt
-     */
-    public void addDebt(Debt debt) {
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        int lowestId = 0;
-        DateFormat df = new SimpleDateFormat();
-
-        // Find the currently lowest id in the database
-        Cursor cursor = db.query(TABLE_DEBTS, new String[] {DEBTS_KEY_ID}, null,
-                null, null, null, DEBTS_KEY_ID + " ASC");
-
-        if (cursor.moveToFirst()) {
-            if (cursor.getInt(0) < 0)
-            lowestId = cursor.getInt(0);
-        }
-
-        String paidAt = null;
-        String deletedAt = null;
-
-        if (debt.paidAt != null) {
-            paidAt = df.format(debt.paidAt);
-        }
-
-        if (debt.deletedAt != null) {
-            deletedAt = df.format(debt.deletedAt);
-        }
-
-        // Set values and insert the row
-        ContentValues values = new ContentValues();
-        values.put(DEBTS_KEY_ID, lowestId-1);
-        values.put(DEBTS_KEY_CREDITOR_ID, debt.creditorId);
-        values.put(DEBTS_KEY_DEBTOR_ID, debt.debtorId);
-        values.put(DEBTS_KEY_CUSTOM_FRIEND_NAME, debt.customFriendName);
-        values.put(DEBTS_KEY_AMOUNT, debt.amount);
-        values.put(DEBTS_KEY_CURRENCY_ID, debt.currencyId);
-        values.put(DEBTS_KEY_THING_NAME, debt.thingName);
-        values.put(DEBTS_KEY_NOTE, debt.note);
-        values.put(DEBTS_KEY_PAID_AT, paidAt);
-        values.put(DEBTS_KEY_DELETED_AT, deletedAt);
-        values.put(DEBTS_KEY_MODIFIED_AT, df.format(debt.modifiedAt));
-        values.put(DEBTS_KEY_CREATED_AT, df.format(debt.createdAt));
-
-        db.insert(TABLE_DEBTS, null, values);
-
-        db.close();
-        cursor.close();
-    }
-
-
-    /**
      * Returns list of debts, which were not added into the online database yet
      * @return ArrayList<Debt>
      */
@@ -424,45 +375,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         if (cursor.moveToFirst())
         {
             do {
-                try {
-                    Date paidAt = null;
-                    Date deletedAt = null;
-                    Date modifiedAt = null;
-                    Date createdAt = null;
-
-                    if (cursor.getString(8) != null) {
-                        paidAt = df.parse(cursor.getString(8));
-                    }
-
-                    if (cursor.getString(9) != null) {
-                        deletedAt = df.parse(cursor.getString(9));
-                    }
-
-                    if (cursor.getString(10) != null) {
-                        modifiedAt = df.parse(cursor.getString(10));
-                    }
-
-                    if (cursor.getString(11) != null) {
-                        createdAt = df.parse(cursor.getString(11));
-                    }
-
-                    list.add(new Debt(
-                            cursor.getInt(0),
-                            cursor.getInt(1),
-                            cursor.getInt(2),
-                            cursor.getString(3),
-                            cursor.getInt(4),
-                            cursor.getInt(5),
-                            cursor.getString(6),
-                            cursor.getString(7),
-                            paidAt,
-                            deletedAt,
-                            modifiedAt,
-                            createdAt)
-                    );
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
+                list.add(debtFromCursor(cursor));
             } while (cursor.moveToNext());
 
         }
@@ -486,45 +399,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         if (cursor.moveToFirst())
         {
             do {
-                try {
-                    Date paidAt = null;
-                    Date deletedAt = null;
-                    Date modifiedAt = null;
-                    Date createdAt = null;
-
-                    if (cursor.getString(8) != null) {
-                        paidAt = df.parse(cursor.getString(8));
-                    }
-
-                    if (cursor.getString(9) != null) {
-                        deletedAt = df.parse(cursor.getString(9));
-                    }
-
-                    if (cursor.getString(10) != null) {
-                        modifiedAt = df.parse(cursor.getString(10));
-                    }
-
-                    if (cursor.getString(11) != null) {
-                        createdAt = df.parse(cursor.getString(11));
-                    }
-
-                    list.add(new Debt(
-                            cursor.getInt(0),
-                            cursor.getInt(1),
-                            cursor.getInt(2),
-                            cursor.getString(3),
-                            cursor.getInt(4),
-                            cursor.getInt(5),
-                            cursor.getString(6),
-                            cursor.getString(7),
-                            paidAt,
-                            deletedAt,
-                            modifiedAt,
-                            createdAt)
-                    );
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
+                list.add(debtFromCursor(cursor));
             } while (cursor.moveToNext());
 
         }
@@ -536,18 +411,53 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     /**
      * Update debt.
-     * When adding a debt into the online database, local id must be updated so that it matches online id
      * @param currentId Current id in local database
      * @param debt Current version of the debt
      * @throws Exception
      */
-    public void updateDebt(int currentId, Debt debt) throws Exception {
+    public void addOrUpdateDebt(Integer currentId, Debt debt) {
+
+        // TODO Exception?
+        if (debt == null) {
+            return;
+        }
+
         SQLiteDatabase db = this.getWritableDatabase();
         DateFormat df = new SimpleDateFormat();
 
-        // Checks if user doesn't already exist
+        // TODO kontrolovat verze
+        // Get current debt
         Cursor cursor = db.query(TABLE_DEBTS, new String[] {DEBTS_KEY_ID}, DEBTS_KEY_ID + "=?",
                 new String[] {String.valueOf(currentId)}, null, null, null);
+
+        // Checks if we are updating a debt or adding a new one.
+        if (currentId == null || cursor.getCount() < 1) {
+
+            if (debt.id != null) { // It's a debt from the web
+                Log.d(Const.TAG, "Adding a downloaded debt");
+                // Checks if debt doesn't already exist
+                cursor = db.query(TABLE_DEBTS, new String[] {DEBTS_KEY_ID}, DEBTS_KEY_ID + "= ?",
+                        new String[] {String.valueOf(debt.id)}, null, null, null);
+                if (cursor.getCount() > 0) {
+                    return;
+                }
+
+            } else { // It's a new debt, we assign it a negative id, so there are not any conflicts with server database
+                // Find the currently lowest id in the database
+                int lowestId = 0;
+
+                cursor = db.query(TABLE_DEBTS, new String[] {DEBTS_KEY_ID}, null,
+                        null, null, null, DEBTS_KEY_ID + " ASC");
+
+                if (cursor.moveToFirst()) {
+                    if (cursor.getInt(0) < 0)
+                        lowestId = cursor.getInt(0);
+                }
+
+                debt.id = lowestId-1;
+            }
+        }
+
 
         String paidAt = null;
         String deletedAt = null;
@@ -559,8 +469,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         if (debt.deletedAt != null) {
             deletedAt = df.format(debt.deletedAt);
         }
-
-        Log.d(Const.TAG, String.valueOf(debt.id));
 
         ContentValues values = new ContentValues();
         values.put(DEBTS_KEY_ID, debt.id);
@@ -575,10 +483,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(DEBTS_KEY_DELETED_AT, deletedAt);
         values.put(DEBTS_KEY_MODIFIED_AT, df.format(debt.modifiedAt));
         values.put(DEBTS_KEY_CREATED_AT, df.format(debt.createdAt));
+        values.put(DEBTS_KEY_VERSION, debt.version);
 
-        if (cursor.getCount() < 1) {
+        if (currentId == null || cursor.getCount() < 1) {
             // Debt doesn't exist
-            throw new Exception("This current debt does not exist.");
+            db.insert(TABLE_DEBTS, null, values);
         } else {
             // Update debt id
             db.update(TABLE_DEBTS, values, DEBTS_KEY_ID + "=?", new String[] {String.valueOf(currentId)});
@@ -595,104 +504,65 @@ public class DatabaseHandler extends SQLiteOpenHelper {
      */
     public ArrayList<Debt> getExtendedDebts(boolean my, int userId) {
         ArrayList<Debt> list = new ArrayList<>();
-        DateFormat df = new SimpleDateFormat();
 
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = null;
 
         if (my) {
-            cursor = db.query(TABLE_DEBTS, debtProjection, DEBTS_KEY_DEBTOR_ID + "=?", new String[] {String.valueOf(userId)}, null, null, null);
+            cursor = db.query(TABLE_DEBTS, debtProjection, DEBTS_KEY_DEBTOR_ID + "=?", new String[] {String.valueOf(userId)}, null, null, DEBTS_KEY_CREATED_AT + " DESC");
         } else {
-            cursor = db.query(TABLE_DEBTS, debtProjection, DEBTS_KEY_CREDITOR_ID + "=?", new String[] {String.valueOf(userId)}, null, null, null);
+            cursor = db.query(TABLE_DEBTS, debtProjection, DEBTS_KEY_CREDITOR_ID + "=?", new String[] {String.valueOf(userId)}, null, null, DEBTS_KEY_CREATED_AT + " DESC");
         }
 
         if (cursor.moveToFirst())
         {
             do {
-                try {
-                    Date paidAt = null;
-                    Date deletedAt = null;
-                    Date modifiedAt = null;
-                    Date createdAt = null;
+                Debt debt = debtFromCursor(cursor);
 
-                    if (cursor.getString(8) != null) {
-                        paidAt = df.parse(cursor.getString(8));
-                    }
+                // Set additional variables
 
-                    if (cursor.getString(9) != null) {
-                        deletedAt = df.parse(cursor.getString(9));
-                    }
-
-                    if (cursor.getString(10) != null) {
-                        modifiedAt = df.parse(cursor.getString(10));
-                    }
-
-                    if (cursor.getString(11) != null) {
-                        createdAt = df.parse(cursor.getString(11));
-                    }
-
-                    Debt debt = new Debt(
-                            cursor.getInt(0),
-                            cursor.getInt(1),
-                            cursor.getInt(2),
-                            cursor.getString(3),
-                            cursor.getInt(4),
-                            cursor.getInt(5),
-                            cursor.getString(6),
-                            cursor.getString(7),
-                            paidAt,
-                            deletedAt,
-                            modifiedAt,
-                            createdAt);
-
-                    // Set additional variables
-
-                    // 1. Name of person
-                    if (my) {
-                        if (debt.creditorId == 0) {
-                            debt.who = debt.customFriendName;
-                        } else {
-                            Log.d(Const.TAG, String.valueOf(debt.creditorId));
-                            Friend friend = getFriend(debt.creditorId);
-                            if (friend != null) {
-                                debt.who = friend.name;
-                            } else {
-                                debt.who = "Error :-(";
-                            }
-
-                        }
+                // 1. Name of person
+                if (my) {
+                    if (debt.creditorId == 0) {
+                        debt.who = debt.customFriendName;
                     } else {
-                        if (debt.debtorId == 0) {
-                            debt.who = debt.customFriendName;
+                        Friend friend = getFriend(debt.creditorId);
+                        if (friend != null) {
+                            debt.who = friend.name;
                         } else {
-                            Friend friend = getFriend(debt.debtorId);
-                            if (friend != null) {
-                                debt.who = friend.name;
-                            } else {
-                                debt.who = "Error :-(";
-                            }
+                            debt.who = "Error :-(";
+                        }
+
+                    }
+                } else {
+                    if (debt.debtorId == 0) {
+                        debt.who = debt.customFriendName;
+                    } else {
+                        Friend friend = getFriend(debt.debtorId);
+                        if (friend != null) {
+                            debt.who = friend.name;
+                        } else {
+                            debt.who = "Error :-(";
                         }
                     }
-
-                    // 2. money or thing that is owed
-                    if (debt.amount != 0) {
-                        debt.what = String.valueOf(debt.amount) + " " + String.valueOf(getCurrency(debt.currencyId));
-                    } else {
-                        debt.what = debt.thingName;
-                    }
-
-                    // 3. status
-                    if (debt.id < 0) {
-                        debt.status = "not synced";
-                    } else {
-                        debt.status = "synced";
-                    }
-
-                    list.add(debt);
-
-                } catch (ParseException e) {
-                    e.printStackTrace();
                 }
+
+                // 2. money or thing that is owed
+                if (debt.amount != 0) {
+                    debt.what = String.valueOf(debt.amount) + " " + String.valueOf(getCurrency(debt.currencyId));
+                } else {
+                    debt.what = debt.thingName;
+                }
+
+                // 3. status
+                if (debt.id < 0) {
+                    debt.status = "not synced";
+                } else {
+                    debt.status = "synced";
+                }
+
+                list.add(debt);
+
             } while (cursor.moveToNext());
 
         }
@@ -700,5 +570,51 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         cursor.close();
 
         return list;
+    }
+
+    private Debt debtFromCursor(Cursor cursor) {
+
+        DateFormat df = new SimpleDateFormat();
+
+        Date paidAt = null;
+        Date deletedAt = null;
+        Date modifiedAt = null;
+        Date createdAt = null;
+
+        try {
+            if (cursor.getString(8) != null) {
+                    paidAt = df.parse(cursor.getString(8));
+            }
+
+            if (cursor.getString(9) != null) {
+                deletedAt = df.parse(cursor.getString(9));
+            }
+
+            if (cursor.getString(10) != null) {
+                modifiedAt = df.parse(cursor.getString(10));
+            }
+
+            if (cursor.getString(11) != null) {
+                createdAt = df.parse(cursor.getString(11));
+            }
+
+            return new Debt(
+                    cursor.getInt(0),
+                    cursor.getInt(1),
+                    cursor.getInt(2),
+                    cursor.getString(3),
+                    cursor.getInt(4),
+                    cursor.getInt(5),
+                    cursor.getString(6),
+                    cursor.getString(7),
+                    paidAt,
+                    deletedAt,
+                    modifiedAt,
+                    createdAt,
+                    cursor.getInt(12));
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }
