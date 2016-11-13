@@ -12,6 +12,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Array;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -19,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import cz.msebera.android.httpclient.Header;
+import cz.msebera.android.httpclient.entity.StringEntity;
 import cz.petrkubes.payuback.Const;
 import cz.petrkubes.payuback.Database.DatabaseHandler;
 import cz.petrkubes.payuback.Structs.Currency;
@@ -171,130 +174,56 @@ public class ApiRestClient {
         });
     }
 
-    // TODO zkrontrlovat jek to udělat s verzema
-    public void updateDebt(String apiKey, final Debt debt, final SimpleCallback callback) {
-
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
+    public void updateAllDebts (String apiKey, final SimpleCallback callback) {
+        // Login
         client.addHeader("api-key", apiKey);
 
-        String paidAt = "";
-        String deletedAt = "";
-        String modifiedAt = "";
-        String createdAt = "";
+        // Create a json with all offline debts
+        JSONObject debtsJson = new JSONObject();
+        StringEntity entity = null;
 
-        if (debt.paidAt != null) {
-            paidAt = df.format(debt.paidAt);
+        try {
+
+            ArrayList<Debt> offlineDebts = db.getDebts();
+            JSONArray offlineDebtsJson = new JSONArray();
+
+            for (Debt debt : offlineDebts) {
+                offlineDebtsJson.put(debt.toJson());
+            }
+
+            debtsJson.put("debts", offlineDebtsJson);
+            entity = new StringEntity(debtsJson.toString());
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-        if (debt.deletedAt != null) {
-            deletedAt = df.format(debt.deletedAt);
-        }
+        Log.d(Const.TAG, debtsJson.toString());
 
-        if (debt.modifiedAt != null) {
-            modifiedAt = df.format(debt.modifiedAt);
-        }
-
-        if (debt.createdAt != null) {
-            createdAt = df.format(debt.createdAt);
-        }
-
-        RequestParams params = new RequestParams();
-        params.put("id", debt.id);
-        params.put("creditorId", debt.creditorId);
-        params.put("debtorId", debt.debtorId);
-        params.put("customFriendName", debt.customFriendName);
-        params.put("amount", debt.amount);
-        params.put("currencyId", debt.currencyId);
-        params.put("thingName", debt.thingName);
-        params.put("note", debt.note);
-        params.put("paidAt", paidAt);
-        params.put("deletedAt", deletedAt);
-        params.put("modifiedAt", modifiedAt);
-        params.put("createdAt", createdAt);
-        params.put("version", debt.version);
-
-        client.post(getAbsoluteUrl("debts/update"), params, new JsonHttpResponseHandler() {
-
+        client.post(context, getAbsoluteUrl("debts/update"), entity, "application/json", new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
 
+                Log.d(Const.TAG, response.toString());
+                // Go through every currency and add it to the database
                 try {
 
-                    db.addOrUpdateDebt(debt.id, debtFromJson(response));
-                    callback.onSuccess();
+                    JSONArray onlineDebtsArr = response.getJSONArray("debts");
 
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    callback.onFailure();
-                }
-            }
+                    // Update only if we receive correct number of debts
+                    if (onlineDebtsArr.length() >= onlineDebtsArr.length()) {
+                        // Remove all old debts
+                        db.removeOfflineDebts();
+                    }
 
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                super.onFailure(statusCode, headers, throwable, errorResponse);
-                Log.d(Const.TAG, errorResponse.toString());
-                callback.onFailure();
-            }
+                    for (int i=0;i<onlineDebtsArr.length();i++) {
 
-            @Override
-            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                super.onFailure(statusCode, headers, responseString, throwable);
-                Log.d(Const.TAG, responseString);
-                callback.onFailure();
-            }
-        });
-    }
+                        JSONObject onlineDebtJson = onlineDebtsArr.getJSONObject(i);
 
-    public void updateDebts(String apiKey, final SimpleCallback callback) {
-
-        ArrayList<Debt> debts = db.getDebts();
-
-        for (Debt debt : debts) {
-            updateDebt(apiKey, debt, new SimpleCallback() {
-                @Override
-                public void onSuccess() {
-                    callback.onSuccess();
-                }
-
-                @Override
-                public void onFailure() {
-                    Log.d(Const.TAG, "Failed to update a debt");
-                    callback.onFailure();
-                }
-            });
-        }
-    }
-
-    public void getDebts(String apiKey, final SimpleCallback callback) {
-
-        client.addHeader("api-key", apiKey);
-
-        client.get(getAbsoluteUrl("debts/"), null, new JsonHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                super.onSuccess(statusCode, headers, response);
-
-                try {
-                    // Go through every debt and add it to the database if it's not already there
-                    JSONArray debtsJson = null;
-                    debtsJson = response.getJSONArray("debts");
-
-                    // Debts in the local database
-                    ArrayList offlineDebts = db.getDebts();
-
-                    if (offlineDebts.size() < debtsJson.length()) { // Update local database only if there are any new debts
-                        for (int i=0;i<debtsJson.length();i++) {
-
-                            JSONObject currencyJson = debtsJson.getJSONObject(i);
-
-                            Debt debt = debtFromJson(currencyJson);
-
-                            if (!offlineDebts.contains(debt)) {
-                                db.addOrUpdateDebt(null, debt);
-                            }
-                        }
+                        Debt onlineDebt = Debt.fromJson(onlineDebtJson);
+                        // Add every updated debt
+                        db.addDebt(onlineDebt);
                     }
 
                     callback.onSuccess();
@@ -303,45 +232,36 @@ public class ApiRestClient {
                     e.printStackTrace();
                     callback.onFailure();
                 }
-
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 super.onFailure(statusCode, headers, throwable, errorResponse);
+
+                Log.d(Const.TAG, errorResponse.toString());
                 callback.onFailure();
             }
         });
+
     }
+
 
     public void updateAll(final String apiKey, final SimpleCallback callback) {
 
         getUser(apiKey, new SimpleCallback() {
             @Override
             public void onSuccess() {
-                getDebts(apiKey, new SimpleCallback() {
+                getCurrencies(apiKey, new SimpleCallback() {
                     @Override
                     public void onSuccess() {
-                        getCurrencies(apiKey, new SimpleCallback() {
+                        updateAllDebts(apiKey, new SimpleCallback() {
                             @Override
                             public void onSuccess() {
-                                updateDebts(apiKey, new SimpleCallback() {
-                                    @Override
-                                    public void onSuccess() {
-                                        callback.onSuccess();
-                                    }
-
-                                    @Override
-                                    public void onFailure() {
-                                        Log.d(Const.TAG, "4");
-                                        callback.onFailure();
-                                    }
-                                });
+                                callback.onSuccess();
                             }
 
                             @Override
                             public void onFailure() {
-                                Log.d(Const.TAG, "3");
                                 callback.onFailure();
                             }
                         });
@@ -349,7 +269,6 @@ public class ApiRestClient {
 
                     @Override
                     public void onFailure() {
-                        Log.d(Const.TAG, "2");
                         callback.onFailure();
                     }
                 });
@@ -357,7 +276,6 @@ public class ApiRestClient {
 
             @Override
             public void onFailure() {
-                Log.d(Const.TAG, "1");
                 callback.onFailure();
             }
         });
@@ -366,70 +284,5 @@ public class ApiRestClient {
 
     private static String getAbsoluteUrl(String relativeUrl) {
         return BASE_URL + relativeUrl;
-    }
-
-    private Debt debtFromJson(JSONObject response) throws JSONException, ParseException {
-
-        final DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-        // It is necessary to convert dates strings to Date classes
-        Date paidAt = null;
-        Date deletedAt = null;
-        Date createdAt = null;
-        Date modifiedAt = null;
-        Integer creditorId = null;
-        Integer debtorId = null;
-        Integer amount = null;
-        Integer currencyId = null;
-
-        if (!response.getString("paidAt").isEmpty()) {
-            paidAt = df.parse(response.getString("paidAt"));
-        }
-
-        if (!response.getString("deletedAt").isEmpty()) {
-            deletedAt = df.parse(response.getString("deletedAt"));
-        }
-
-        if (!response.getString("createdAt").isEmpty()) {
-            createdAt = df.parse(response.getString("createdAt"));
-        }
-
-        if (!response.getString("modifiedAt").isEmpty()) {
-            modifiedAt = df.parse(response.getString("modifiedAt"));
-        }
-
-        if (!response.getString("creditorId").isEmpty()) {
-            creditorId = response.getInt("creditorId");
-        }
-
-        if (!response.getString("debtorId").isEmpty()) {
-            debtorId = response.getInt("debtorId");
-        }
-
-        if (!response.getString("amount").isEmpty()) {
-            amount = response.getInt("amount");
-        }
-
-        if (!response.getString("currencyId").isEmpty()) {
-            currencyId = response.getInt("currencyId");
-        }
-
-        Debt currentDebt = new Debt(
-                response.getInt("id"),
-                creditorId,
-                debtorId,
-                response.getString("customFriendName"),
-                amount,
-                currencyId,
-                response.getString("thingName"),
-                response.getString("note"),
-                paidAt,
-                deletedAt,
-                modifiedAt,
-                createdAt,
-                response.getInt("version")
-        );
-
-        return currentDebt;
     }
 }

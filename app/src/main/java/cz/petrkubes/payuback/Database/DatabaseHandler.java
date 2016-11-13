@@ -94,7 +94,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             DEBTS_KEY_VERSION
     };
 
-
     public DatabaseHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -571,6 +570,61 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         return list;
     }
+
+
+    /**
+     * Truncates debts table
+     */
+    public void removeOfflineDebts() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("delete from "+ TABLE_DEBTS);
+        db.close();
+    }
+
+    /**
+     * Inserts a debt into local database
+     * @param debt debt object
+     * @throws Exception
+     */
+    public void addDebt(Debt debt) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        DateFormat df = new SimpleDateFormat();
+
+        String paidAt = null;
+        String deletedAt = null;
+
+        if (debt.paidAt != null) {
+            paidAt = df.format(debt.paidAt);
+        }
+
+        if (debt.deletedAt != null) {
+            deletedAt = df.format(debt.deletedAt);
+        }
+
+        ContentValues values = new ContentValues();
+        values.put(DEBTS_KEY_ID, debt.id);
+        values.put(DEBTS_KEY_CREDITOR_ID, debt.creditorId);
+        values.put(DEBTS_KEY_DEBTOR_ID, debt.debtorId);
+        values.put(DEBTS_KEY_CUSTOM_FRIEND_NAME, debt.customFriendName);
+        values.put(DEBTS_KEY_AMOUNT, debt.amount);
+        values.put(DEBTS_KEY_CURRENCY_ID, debt.currencyId);
+        values.put(DEBTS_KEY_THING_NAME, debt.thingName);
+        values.put(DEBTS_KEY_NOTE, debt.note);
+        values.put(DEBTS_KEY_PAID_AT, paidAt);
+        values.put(DEBTS_KEY_DELETED_AT, deletedAt);
+        values.put(DEBTS_KEY_MODIFIED_AT, df.format(debt.modifiedAt));
+        values.put(DEBTS_KEY_CREATED_AT, df.format(debt.createdAt));
+        values.put(DEBTS_KEY_VERSION, debt.version);
+
+        // Insert debt into the database
+        db.insert(TABLE_DEBTS, null, values);
+
+        db.close();
+    }
+
+
+
 
     private Debt debtFromCursor(Cursor cursor) {
 

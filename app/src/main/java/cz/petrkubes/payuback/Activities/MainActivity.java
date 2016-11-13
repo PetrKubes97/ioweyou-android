@@ -92,7 +92,18 @@ public class MainActivity extends AppCompatActivity {
 
                 if (user != null) {
                     Toast.makeText(getApplicationContext(), db.getUser().apiKey, Toast.LENGTH_SHORT).show();
-                    updateAll(user.apiKey);
+                    //updateAll(user.apiKey);
+                    apiClient.updateAllDebts(user.apiKey, new SimpleCallback() {
+                        @Override
+                        public void onSuccess() {
+                            pageAdapter.notifyDataSetChanged();
+                        }
+
+                        @Override
+                        public void onFailure() {
+                            Toast.makeText(getApplicationContext(), "Something went wring. :{", Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 } else {
                     Toast.makeText(getApplicationContext(), "Neni", Toast.LENGTH_SHORT).show();
                 }
@@ -124,22 +135,11 @@ public class MainActivity extends AppCompatActivity {
 
         if (requestCode == ADD_DEBT_REQUEST && resultCode == RESULT_OK) {
             User user = db.getUser();
-            addUnaddedDebts(user.apiKey);
-            pageAdapter.notifyDataSetChanged();
-        }
-    }
 
-    public void addUnaddedDebts(String apiKey) {
-
-        // Go through each unnadded
-        ArrayList<Debt> unaddedDebts = db.getUnaddedDebts();
-
-        for (Debt debt : unaddedDebts) {
-            Log.d(Const.TAG, "Adding unadded debt.");
-            apiClient.updateDebt(apiKey, debt, new SimpleCallback() {
+            apiClient.updateAllDebts(user.apiKey, new SimpleCallback() {
                 @Override
                 public void onSuccess() {
-                    Log.d(Const.TAG, "Pridan dluh.");
+
                 }
 
                 @Override
@@ -147,22 +147,9 @@ public class MainActivity extends AppCompatActivity {
 
                 }
             });
+
+            pageAdapter.notifyDataSetChanged();
         }
     }
-
-    public void updateAll(String apiKey) {
-        apiClient.updateAll(apiKey, new SimpleCallback() {
-            @Override
-            public void onSuccess() {
-                pageAdapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onFailure() {
-                Toast.makeText(getApplicationContext(), "FAILED", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
 
 }
