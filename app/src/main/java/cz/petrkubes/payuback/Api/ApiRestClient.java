@@ -192,7 +192,7 @@ public class ApiRestClient {
             }
 
             debtsJson.put("debts", offlineDebtsJson);
-            entity = new StringEntity(debtsJson.toString());
+            entity = new StringEntity(debtsJson.toString(), "UTF-8");
 
         } catch (Exception e) {
             e.printStackTrace();
