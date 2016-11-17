@@ -59,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
     private TabLayout tabLayout;
 
     private ApiRestClient apiClient;
+    private User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,15 +85,13 @@ public class MainActivity extends AppCompatActivity {
 
         // Setup api client for synchronization
         apiClient = new ApiRestClient(getApplicationContext());
+        user = db.getUser();
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                User user = db.getUser();
-
                 if (user != null) {
-                    Toast.makeText(getApplicationContext(), db.getUser().apiKey, Toast.LENGTH_SHORT).show();
-                    //updateAll(user.apiKey);
+
                     apiClient.updateAllDebts(user.apiKey, new SimpleCallback() {
                         @Override
                         public void onSuccess() {
@@ -134,22 +133,22 @@ public class MainActivity extends AppCompatActivity {
         Log.d(Const.TAG, "Returned to the main activity" + String.valueOf(requestCode) + String.valueOf(resultCode));
 
         if (requestCode == ADD_DEBT_REQUEST && resultCode == RESULT_OK) {
-            User user = db.getUser();
-
-            apiClient.updateAllDebts(user.apiKey, new SimpleCallback() {
-                @Override
-                public void onSuccess() {
-
-                }
-
-                @Override
-                public void onFailure() {
-
-                }
-            });
-
-            pageAdapter.notifyDataSetChanged();
+            updateDebts();
         }
+    }
+
+    public void updateDebts() {
+        apiClient.updateAllDebts(user.apiKey, new SimpleCallback() {
+            @Override
+            public void onSuccess() {
+                pageAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onFailure() {
+
+            }
+        });
     }
 
 }

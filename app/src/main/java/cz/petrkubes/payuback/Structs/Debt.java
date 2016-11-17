@@ -36,6 +36,7 @@ public class Debt {
     public String who;
     public String what;
     public String status;
+    public String currencyString;
 
     public Debt(Integer id, Integer creditorId, Integer debtorId,
                 String customFriendName, Integer amount, Integer currencyId,
@@ -54,6 +55,11 @@ public class Debt {
         this.modifiedAt = modifiedAt;
         this.createdAt = createdAt;
         this.version = version;
+    }
+
+    public String createdAtString() {
+        DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        return df.format(this.createdAt);
     }
 
     public JSONObject toJson() throws JSONException {

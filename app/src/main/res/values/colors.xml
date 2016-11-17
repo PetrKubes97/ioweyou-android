@@ -12,5 +12,8 @@
     <color name="facebook_lighter">#ccdcff</color>
     <color name="white">#ffffff</color>
     <color name="black">#000000</color>
+
+    <color name="green">#009747</color>
+    <color name="red">#ff3737</color>
 </resources>
 

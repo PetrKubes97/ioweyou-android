@@ -35,14 +35,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cz.petrkubes.payuback.Adapters.FriendsSuggestionAdapter;
-import cz.petrkubes.payuback.Api.ApiRestClient;
 import cz.petrkubes.payuback.Const;
 import cz.petrkubes.payuback.Database.DatabaseHandler;
 import cz.petrkubes.payuback.R;
 import cz.petrkubes.payuback.Structs.Currency;
 import cz.petrkubes.payuback.Structs.Debt;
 import cz.petrkubes.payuback.Structs.Friend;
-import cz.petrkubes.payuback.Structs.User;
 
 /**
  * Created by petr on 24.10.16.
@@ -75,7 +73,7 @@ public class DebtActivity extends AppCompatActivity {
         getSupportActionBar().setElevation(0);
 
         txtName = (AutoCompleteTextView) findViewById(R.id.txt_name);
-        txtWhat = (EditText) findViewById(R.id.txt_what);
+        txtWhat = (EditText) findViewById(R.id.txt_who);
         spnCurrency = (Spinner) findViewById(R.id.spn_currency);
         rdioMyDebt = (RadioButton) findViewById(R.id.rdio_my_debt);
         rdioTheirDebt = (RadioButton) findViewById(R.id.rdio_their_debt);

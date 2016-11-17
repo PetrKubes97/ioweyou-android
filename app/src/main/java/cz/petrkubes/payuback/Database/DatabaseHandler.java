@@ -22,7 +22,7 @@ import cz.petrkubes.payuback.Structs.User;
 public class DatabaseHandler extends SQLiteOpenHelper {
 
     // Database Version
-    private static final int DATABASE_VERSION = 19;
+    private static final int DATABASE_VERSION = 20;
 
     // Database Name
     private static final String DATABASE_NAME = "payUBack.db";
@@ -120,10 +120,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 DEBTS_KEY_ID + " INTEGER PRIMARY KEY, " +
                 DEBTS_KEY_CREDITOR_ID + " INTEGER, " +
                 DEBTS_KEY_DEBTOR_ID + " INTEGER, " +
-                DEBTS_KEY_CUSTOM_FRIEND_NAME + " TEXT, " +
+                DEBTS_KEY_CUSTOM_FRIEND_NAME + " TEXT NULL, " +
                 DEBTS_KEY_AMOUNT + " NUMERIC, " +
                 DEBTS_KEY_CURRENCY_ID + " INTEGER, " +
-                DEBTS_KEY_THING_NAME + " TEXT, " +
+                DEBTS_KEY_THING_NAME + " TEXT NULL, " +
                 DEBTS_KEY_NOTE + " TEXT, " +
                 DEBTS_KEY_PAID_AT + " NUMERIC, " +
                 DEBTS_KEY_DELETED_AT + " NUMERIC, " +
@@ -457,7 +457,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             }
         }
 
-
+        // Convert date to string
         String paidAt = null;
         String deletedAt = null;
 
@@ -508,9 +508,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         Cursor cursor = null;
 
         if (my) {
-            cursor = db.query(TABLE_DEBTS, debtProjection, DEBTS_KEY_DEBTOR_ID + "=?", new String[] {String.valueOf(userId)}, null, null, DEBTS_KEY_CREATED_AT + " DESC");
+            cursor = db.query(TABLE_DEBTS, debtProjection, DEBTS_KEY_DEBTOR_ID + "=? AND " + DEBTS_KEY_PAID_AT + " IS NULL AND "+DEBTS_KEY_DELETED_AT + " IS NULL", new String[] {String.valueOf(userId)}, null, null, DEBTS_KEY_CREATED_AT + " DESC");
         } else {
-            cursor = db.query(TABLE_DEBTS, debtProjection, DEBTS_KEY_CREDITOR_ID + "=?", new String[] {String.valueOf(userId)}, null, null, DEBTS_KEY_CREATED_AT + " DESC");
+            cursor = db.query(TABLE_DEBTS, debtProjection, DEBTS_KEY_CREDITOR_ID + "=? AND " + DEBTS_KEY_PAID_AT + " IS NULL AND "+DEBTS_KEY_DELETED_AT + " IS NULL", new String[] {String.valueOf(userId)}, null, null, DEBTS_KEY_CREATED_AT + " DESC");
         }
 
         if (cursor.moveToFirst())
@@ -547,8 +547,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 }
 
                 // 2. money or thing that is owed
-                if (debt.amount != 0) {
-                    debt.what = String.valueOf(debt.amount) + " " + String.valueOf(getCurrency(debt.currencyId));
+                if (debt.amount != null) {
+                    debt.currencyString = String.valueOf(getCurrency(debt.currencyId));
+                    debt.what = String.valueOf(debt.amount) + " " + debt.currencyString;
                 } else {
                     debt.what = debt.thingName;
                 }
@@ -581,6 +582,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.close();
     }
 
+    // TODO merge this function to addOrUpdate
     /**
      * Inserts a debt into local database
      * @param debt debt object
@@ -624,8 +626,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
 
-
-
     private Debt debtFromCursor(Cursor cursor) {
 
         DateFormat df = new SimpleDateFormat();
@@ -634,6 +634,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         Date deletedAt = null;
         Date modifiedAt = null;
         Date createdAt = null;
+
+        Integer amount = null;
+
 
         try {
             if (cursor.getString(8) != null) {
@@ -652,12 +655,16 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 createdAt = df.parse(cursor.getString(11));
             }
 
+            if (cursor.getInt(4) != 0) {
+                amount = cursor.getInt(4);
+            }
+
             return new Debt(
                     cursor.getInt(0),
                     cursor.getInt(1),
                     cursor.getInt(2),
                     cursor.getString(3),
-                    cursor.getInt(4),
+                    amount,
                     cursor.getInt(5),
                     cursor.getString(6),
                     cursor.getString(7),
