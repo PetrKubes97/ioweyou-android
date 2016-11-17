@@ -1,7 +1,6 @@
 package cz.petrkubes.payuback.Adapters;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,8 +13,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import cz.petrkubes.payuback.Api.ApiRestClient;
-import cz.petrkubes.payuback.Fragments.UpdateableFragment;
 import cz.petrkubes.payuback.R;
 import cz.petrkubes.payuback.Structs.Debt;
 
@@ -26,10 +23,12 @@ import cz.petrkubes.payuback.Structs.Debt;
 public class DebtsAdapter extends ArrayAdapter<Debt> {
 
     ArrayList<Debt> debts;
+    boolean myDebts = true;
 
-    public DebtsAdapter(Context context, List<Debt> debts) {
+    public DebtsAdapter(Context context, List<Debt> debts, boolean myDebts) {
         super(context, R.layout.item_debt, debts);
         this.debts = (ArrayList<Debt>) debts;
+        this.myDebts = myDebts;
     }
 
     @Override
@@ -47,7 +46,7 @@ public class DebtsAdapter extends ArrayAdapter<Debt> {
             convertView = inflater.inflate(R.layout.item_debt, parent, false);
 
             viewHolder.txtName = (TextView) convertView.findViewById(R.id.txt_name);
-            viewHolder.txtWhat = (TextView) convertView.findViewById(R.id.txt_what);
+            viewHolder.txtWhat = (TextView) convertView.findViewById(R.id.txt_who);
             viewHolder.txtNote = (TextView) convertView.findViewById(R.id.txt_note);
             viewHolder.txtDate = (TextView) convertView.findViewById(R.id.txt_date);
             viewHolder.txtStatus = (TextView) convertView.findViewById(R.id.txt_status);
@@ -66,6 +65,13 @@ public class DebtsAdapter extends ArrayAdapter<Debt> {
         viewHolder.txtNote.setText(debt.note);
         viewHolder.txtDate.setText(df.format(debt.createdAt));
         viewHolder.txtStatus.setText(debt.status);
+
+        // Set color of owned items
+        if (myDebts) {
+            viewHolder.txtWhat.setTextColor(getContext().getResources().getColor(R.color.red));
+        } else {
+            viewHolder.txtWhat.setTextColor(getContext().getResources().getColor(R.color.green));
+        }
 
         // Return the completed view to render on screen
         return convertView;

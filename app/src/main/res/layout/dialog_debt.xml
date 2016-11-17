@@ -7,81 +7,111 @@
         android:text="Jmeno Prijemni"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/textView3"
+        android:id="@+id/txt_who"
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
         android:textSize="18sp"
         android:textColor="?attr/colorPrimaryDark"
-        android:layout_alignBottom="@+id/textView6"
         android:gravity="left|center"
-        android:layout_toStartOf="@+id/textView6" />
-
-    <TextView
-        android:text="Poznamka o dluhu, tohlke muze byt celkem dlouhy..."
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/textView3"
-        android:layout_alignParentStart="true"
-        android:id="@+id/textView5"
-        android:layout_marginTop="10dp" />
+        android:layout_toStartOf="@+id/txt_what"
+        android:minHeight="40dp"
+        android:layout_marginBottom="5dp" />
 
     <TextView
         android:text="50 Kč"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:id="@+id/textView6"
+        android:id="@+id/txt_what"
         android:gravity="right|center"
         android:textSize="24sp"
         android:textColor="@color/accent"
         android:textStyle="normal|bold"
-        android:layout_alignParentEnd="true" />
-
-    <TextView
-        android:text="2012.12.12 12:05:54"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/textView5"
-        android:layout_alignStart="@+id/textView5"
-        android:id="@+id/textView7"
-        android:textSize="10sp"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp" />
-
-    <SeekBar
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/textView7"
-        android:layout_alignStart="@+id/textView7"
-        android:id="@+id/seekBar"
-        android:layout_alignEnd="@+id/textView6"
-        android:max="200" />
-
-    <Button
-        android:text="Pay all"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/seekBar"
-        android:layout_alignEnd="@+id/seekBar"
-        android:id="@+id/button2"
-        style="@style/Widget.AppCompat.Button.Borderless.Colored" />
-
-    <Button
-        android:text="cancel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/seekBar"
-        android:layout_alignStart="@+id/seekBar"
-        android:id="@+id/button3"
-        style="@style/Widget.AppCompat.Button.Borderless.Colored" />
+        android:layout_alignParentEnd="true"
+        android:layout_alignBottom="@+id/txt_who" />
 
     <Button
         android:text="Edit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/button4"
+        android:id="@+id/btn_edit"
         style="@style/Widget.AppCompat.Button.Borderless.Colored"
-        android:layout_alignBaseline="@+id/button3"
-        android:layout_alignBottom="@+id/button3"
-        android:layout_toEndOf="@+id/button3" />
+        android:layout_alignBaseline="@+id/btn_cancel"
+        android:layout_alignBottom="@+id/btn_cancel"
+        android:layout_toEndOf="@+id/btn_cancel" />
+
+    <Button
+        android:text="cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_cancel"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_alignBaseline="@+id/btn_pay"
+        android:layout_alignBottom="@+id/btn_pay"
+        android:layout_alignParentStart="true" />
+
+    <SeekBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/skbr_payment"
+        android:max="50"
+        android:progress="25"
+        android:layout_below="@+id/txt_who"
+        android:layout_alignBottom="@+id/btn_plus"
+        android:layout_toEndOf="@+id/btn_minus"
+        android:layout_toStartOf="@+id/btn_plus" />
+
+    <Button
+        android:text="-"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_minus"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:minWidth="35dp"
+        android:minHeight="35dp"
+        android:padding="0dp"
+        android:layout_below="@+id/txt_who"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:text="2012.12.12 12:05:54"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/txt_date"
+        android:textSize="10sp"
+        android:layout_marginTop="15dp"
+        android:layout_below="@+id/txt_note"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:text="Pay all"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_pay"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_below="@+id/txt_date"
+        android:layout_alignParentEnd="true" />
+
+    <TextView
+        android:text="Poznamka o dluhu, tohlke muze byt celkem dlouhy..."
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/txt_note"
+        android:layout_below="@+id/skbr_payment"
+        android:layout_alignParentStart="true"
+        android:visibility="visible" />
+
+    <Button
+        android:text="+"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_plus"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:minWidth="35dp"
+        android:minHeight="35dp"
+        android:padding="0dp"
+        android:layout_alignBaseline="@+id/btn_minus"
+        android:layout_alignBottom="@+id/btn_minus"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="0dp" />
 </RelativeLayout>
