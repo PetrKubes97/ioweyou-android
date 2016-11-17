@@ -13,6 +13,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.InputType;
@@ -60,10 +61,14 @@ public class DebtActivity extends AppCompatActivity {
     private EditText txtNote;
     private FloatingActionButton btnAddDebt;
     private DatabaseHandler db;
-    private TextInputLayout txtIL;
+    private TextInputLayout txtILWhat;
+    private TextInputLayout txtILWho;
 
     private Integer tempFacebookFriendId = null;
     private ArrayList<Currency> currencies = null;
+    private ArrayList<Friend> friends = null;
+
+    private ArrayAdapter<Friend> friendsAdapter = null;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -72,6 +77,7 @@ public class DebtActivity extends AppCompatActivity {
         // Remove actionbar shadow
         getSupportActionBar().setElevation(0);
 
+        // Setup all widgets
         txtName = (AutoCompleteTextView) findViewById(R.id.txt_name);
         txtWhat = (EditText) findViewById(R.id.txt_who);
         spnCurrency = (Spinner) findViewById(R.id.spn_currency);
@@ -81,7 +87,8 @@ public class DebtActivity extends AppCompatActivity {
         rdioMoney = (RadioButton) findViewById(R.id.rdio_money);
         txtNote = (EditText) findViewById(R.id.txt_note);
         btnAddDebt = (FloatingActionButton) findViewById(R.id.btn_add_debt);
-        txtIL = (TextInputLayout) findViewById(R.id.txtIL_what);
+        txtILWhat = (TextInputLayout) findViewById(R.id.txtIL_what);
+        txtILWho = (TextInputLayout) findViewById(R.id.txtIL_who);
 
         // Set the hint after the animation completes, workaround for Android bug
         txtNote.setHint(getResources().getString(R.string.note));
@@ -90,14 +97,14 @@ public class DebtActivity extends AppCompatActivity {
 
         // Array of all friends who will be suggested
         // 1) facebook friends
-        ArrayList<Friend> friends = db.getFriends();
+        friends = db.getFriends();
         // 2) contacts
         for (String contact : getContacts()) {
             friends.add(new Friend(null, contact, ""));
         }
 
         // Create the adapter to convert the array to views
-        FriendsSuggestionAdapter friendsAdapter = new FriendsSuggestionAdapter(this, friends);
+        friendsAdapter = new FriendsSuggestionAdapter(this, friends);
 
         // Setup autocomplete
         txtName.setAdapter(friendsAdapter);
@@ -126,6 +133,7 @@ public class DebtActivity extends AppCompatActivity {
         spnCurrency.setAdapter(currenciesAdapter);
 
         // Delete facebook friend info, when user types anything into the box
+        // Also hide error messages
         txtName.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -136,6 +144,25 @@ public class DebtActivity extends AppCompatActivity {
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 tempFacebookFriendId = null;
                 txtName.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.white));
+                txtILWho.setError(null);
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+
+        // Remove error messages
+        txtWhat.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                txtILWhat.setError(null);
             }
 
             @Override
@@ -161,11 +188,11 @@ public class DebtActivity extends AppCompatActivity {
                 if (b) {
                     spnCurrency.setVisibility(View.GONE);
                     txtWhat.setInputType(InputType.TYPE_CLASS_TEXT);
-                    txtIL.setHint(getResources().getString(R.string.thing));
+                    txtILWhat.setHint(getResources().getString(R.string.thing));
                 } else {
                     spnCurrency.setVisibility(View.VISIBLE);
                     txtWhat.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
-                    txtIL.setHint(getResources().getString(R.string.amount));
+                    txtILWhat.setHint(getResources().getString(R.string.amount));
                 }
             }
         });
@@ -210,6 +237,7 @@ public class DebtActivity extends AppCompatActivity {
             }
 
             cursor.close();
+
         }
         // empty list is returned, when permission isn't granted
         return contacts;
@@ -227,7 +255,18 @@ public class DebtActivity extends AppCompatActivity {
         if (requestCode == PERMISSIONS_REQUEST_READ_CONTACTS) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Permission is granted
-                getContacts();
+
+                // Reset friends array and create it again
+                friends.clear();
+                // 1) facebook friends
+                friends.addAll(db.getFriends());
+                // 2) contacts
+                for (String contact : getContacts()) {
+                    friends.add(new Friend(null, contact, ""));
+                }
+
+                friendsAdapter.notifyDataSetChanged();
+
             } else {
                 Toast.makeText(this, "We won't be able to suggest you people from your contacts. :(", Toast.LENGTH_LONG).show();
             }
@@ -246,13 +285,14 @@ public class DebtActivity extends AppCompatActivity {
         Integer amount = null;
         Integer currencyId = null;
 
-        // Interpret add debt form
+        // Set user
         if (rdioMyDebt.isChecked()) {
             debtorId = db.getUser().id;
         } else {
             creditorId = db.getUser().id;
         }
 
+        // Set the other person taking part in this debt
         if (tempFacebookFriendId != null) {
             if (rdioMyDebt.isChecked()) {
                 creditorId = tempFacebookFriendId;
@@ -263,11 +303,35 @@ public class DebtActivity extends AppCompatActivity {
             customFriendName = txtName.getText().toString();
         }
 
+        // Check if both sides of debt are set
+        if ((creditorId == null || debtorId == null) && (customFriendName == null || customFriendName.isEmpty())) {
+            txtILWho.setError("This field can't be empty.");
+            return;
+        }
+
         if (rdioThing.isChecked()) {
             thingName = txtWhat.getText().toString();
+
+            if (thingName.isEmpty()) {
+                txtILWhat.setError("This field can't be empty.");
+                return;
+            }
+
         } else {
-            amount = Integer.parseInt(txtWhat.getText().toString());
+
+            try {
+                amount = Integer.parseInt(txtWhat.getText().toString());
+            } catch (NumberFormatException e) {
+                txtILWhat.setError("This field can't be empty.");
+                return;
+            }
+
             currencyId = currencies.get(spnCurrency.getSelectedItemPosition()).id;
+
+            if (amount < 1) {
+                txtILWhat.setError("Sorry, you can't owe someone 0 money. :-)");
+                return;
+            }
         }
 
         Log.d(Const.TAG, "Adding debt to database: " + String.valueOf(tempFacebookFriendId));
