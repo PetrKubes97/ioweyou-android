@@ -12,8 +12,12 @@
     <string name="add_debt">Add debt!</string>
     <string name="transition_button">transitionButton</string>
     <string name="note">Note</string>
-
     <string name="loading_login">Logging user in…</string>
     <string name="loading_getting_user">Synchronizing with Facebook…</string>
     <string name="loading_other">Almost there…</string>
+    <string name="mark_as_paid">Mark as paid</string>
+    <string name="mark_as_unpaid">Mark as unpaid</string>
+    <string name="no">No</string>
+    <string name="delete">Delete</string>
+    <string name="restore">Restore</string>
 </resources>

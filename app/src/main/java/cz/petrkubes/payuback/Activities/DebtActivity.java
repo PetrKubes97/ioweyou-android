@@ -13,7 +13,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.InputType;
@@ -24,24 +23,40 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
+import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
+import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
+
+import org.parceler.Parcels;
+import org.w3c.dom.Text;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 
 import cz.petrkubes.payuback.Adapters.FriendsSuggestionAdapter;
 import cz.petrkubes.payuback.Const;
 import cz.petrkubes.payuback.Database.DatabaseHandler;
+import cz.petrkubes.payuback.Fragments.DebtsFragment;
 import cz.petrkubes.payuback.R;
 import cz.petrkubes.payuback.Structs.Currency;
 import cz.petrkubes.payuback.Structs.Debt;
 import cz.petrkubes.payuback.Structs.Friend;
+import cz.petrkubes.payuback.Structs.User;
 
 /**
  * Created by petr on 24.10.16.
@@ -63,12 +78,23 @@ public class DebtActivity extends AppCompatActivity {
     private DatabaseHandler db;
     private TextInputLayout txtILWhat;
     private TextInputLayout txtILWho;
+    private Button btnCreatedAt;
+    private Button btnPaidUnpaid;
+    private Button btnDeleteRestore;
+    private TextView txtvPaid;
+    private TextView txtvDeleted;
+    private TextView txtvPaidLabel;
+    private TextView txtvDeletedLabel;
 
     private Integer tempFacebookFriendId = null;
     private ArrayList<Currency> currencies = null;
     private ArrayList<Friend> friends = null;
 
     private ArrayAdapter<Friend> friendsAdapter = null;
+
+    private User user;
+    private Date createdAt;
+    private Debt debtToEdit;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -89,11 +115,21 @@ public class DebtActivity extends AppCompatActivity {
         btnAddDebt = (FloatingActionButton) findViewById(R.id.btn_add_debt);
         txtILWhat = (TextInputLayout) findViewById(R.id.txtIL_what);
         txtILWho = (TextInputLayout) findViewById(R.id.txtIL_who);
+        btnCreatedAt = (Button) findViewById(R.id.btn_created_at);
+        btnPaidUnpaid = (Button) findViewById(R.id.btn_paid_unpaid);
+        btnDeleteRestore = (Button) findViewById(R.id.btn_delete_restore);
+        txtvPaid = (TextView) findViewById(R.id.txtv_paid);
+        txtvDeleted = (TextView) findViewById(R.id.txtv_deleted);
+        txtvPaidLabel = (TextView) findViewById(R.id.txtv_paid_label);
+        txtvDeletedLabel = (TextView) findViewById(R.id.txtv_deleted_label);
 
         // Set the hint after the animation completes, workaround for Android bug
         txtNote.setHint(getResources().getString(R.string.note));
 
         db = new DatabaseHandler(getApplicationContext());
+
+        // Get current user
+        user = db.getUser();
 
         // Array of all friends who will be suggested
         // 1) facebook friends
@@ -171,15 +207,6 @@ public class DebtActivity extends AppCompatActivity {
             }
         });
 
-        // Add debt button
-        btnAddDebt.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(getApplicationContext(), String.valueOf(tempFacebookFriendId), Toast.LENGTH_SHORT).show();
-                addDebt();
-            }
-        });
-
         // Change input fields if user chooses a thing or money
         rdioThing.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -197,18 +224,128 @@ public class DebtActivity extends AppCompatActivity {
             }
         });
 
-
-        // Show keyboard - it is necessary to wait for the animation to finish
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
+        // Created at button
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        btnCreatedAt.setText(df.format(new Date()));
+        btnCreatedAt.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void run() {
-                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.showSoftInput(txtName, InputMethodManager.SHOW_IMPLICIT);
+            public void onClick(View view) {
+                showDatePickerDialog();
+            }
+        });
+
+        // Set paid/unpaid button
+        btnPaidUnpaid.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (debtToEdit.paidAt == null) {
+                    debtToEdit.paidAt = new Date();
+                } else {
+                    debtToEdit.paidAt = null;
+                }
+                stylePaidUnpaid();
+            }
+        });
+
+        // Set delete button
+        btnDeleteRestore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (debtToEdit.deletedAt == null) {
+                    debtToEdit.deletedAt = new Date();
+                } else {
+                    debtToEdit.deletedAt = null;
+                }
+                styleDeleteRestore();
+            }
+        });
+
+        // If there is a debt to be edited, pre-fill text edits
+        debtToEdit = Parcels.unwrap(getIntent().getParcelableExtra(DebtsFragment.DEBT_TO_EDIT));
+        if (debtToEdit != null) {
+
+            txtName.setText(debtToEdit.who);
+            txtNote.setText(debtToEdit.note);
+            btnCreatedAt.setText(debtToEdit.createdAtString());
+
+            if (debtToEdit.paidAt != null) {
+                txtvPaid.setText(debtToEdit.paidAtString());
+            } else {
+                txtvPaid.setText(getResources().getString(R.string.no));
             }
 
-        }, 400);
+            if (debtToEdit.deletedAt != null) {
+                Log.d(Const.TAG, "123456");
+                txtvDeleted.setText(debtToEdit.deletedAtString());
+            } else {
+                txtvDeleted.setText(getResources().getString(R.string.no));
+            }
 
+            // Mark facebook friend
+            if ((debtToEdit.creditorId != null && debtToEdit.debtorId != null)) {
+                txtName.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.facebook_lighter));
+
+                if (debtToEdit.creditorId.equals(user.id)) {
+                    tempFacebookFriendId = debtToEdit.debtorId;
+                } else {
+                    tempFacebookFriendId = debtToEdit.creditorId;
+                }
+            }
+
+
+            // Check radio buttons
+            if (debtToEdit.thingName != null && !debtToEdit.thingName.isEmpty()) {
+                rdioThing.setChecked(true);
+                txtWhat.setText(debtToEdit.what);
+            } else {
+                rdioMoney.setChecked(true);
+                txtWhat.setText(String.valueOf(debtToEdit.amount));
+
+                // For some reason I can't use functions like indexOf or getPosition ¯\_(ツ)_/¯
+                for (Currency currency : currencies) {
+                    if (db.getCurrency(debtToEdit.currencyId).id == (currency.id)) {
+                        spnCurrency.setSelection(currenciesAdapter.getPosition(currency));
+                    }
+                }
+            }
+
+            if (debtToEdit.creditorId.equals(user.id)) {
+                rdioMyDebt.setChecked(false);
+            }
+
+            // Style buttons for deleting and marking debt as paid
+            stylePaidUnpaid();
+            styleDeleteRestore();
+
+        } else {
+            // hide buttons which have no use for a new debt
+            btnPaidUnpaid.setVisibility(View.GONE);
+            btnDeleteRestore.setVisibility(View.GONE);
+            txtvPaid.setVisibility(View.GONE);
+            txtvPaidLabel.setVisibility(View.GONE);
+            txtvDeleted.setVisibility(View.GONE);
+            txtvDeletedLabel.setVisibility(View.GONE);
+
+            // Show keyboard - it is necessary to wait for the animation to finish
+            txtName.requestFocus();
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.showSoftInput(txtName, InputMethodManager.SHOW_IMPLICIT);
+                }
+            }, 400);
+        }
+
+        // Add debt button
+        btnAddDebt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getApplicationContext(), String.valueOf(tempFacebookFriendId), Toast.LENGTH_SHORT).show();
+                addDebt();
+            }
+        });
     }
 
     /**
@@ -216,7 +353,6 @@ public class DebtActivity extends AppCompatActivity {
      *
      * @return List<String> contacts
      */
-    // TODO Refresh list after user accepts contacts permission
     private List<String> getContacts() {
 
         List<String> contacts = new ArrayList<>();
@@ -278,18 +414,30 @@ public class DebtActivity extends AppCompatActivity {
      */
     public void addDebt() {
 
+        Integer id = null;
         Integer creditorId = null;
         Integer debtorId = null;
         String customFriendName = null;
         String thingName = null;
         Integer amount = null;
         Integer currencyId = null;
+        Date paidAt = null;
+        Date deletedAt = null;
+        Integer version = 0;
+
+        // set 'invisible' variables if editing a debt
+        if (debtToEdit != null) {
+            id = debtToEdit.id;
+            paidAt = debtToEdit.paidAt;
+            deletedAt = debtToEdit.deletedAt;
+            version = debtToEdit.version +1;
+        }
 
         // Set user
         if (rdioMyDebt.isChecked()) {
-            debtorId = db.getUser().id;
+            debtorId = user.id;
         } else {
-            creditorId = db.getUser().id;
+            creditorId = user.id;
         }
 
         // Set the other person taking part in this debt
@@ -322,7 +470,7 @@ public class DebtActivity extends AppCompatActivity {
             try {
                 amount = Integer.parseInt(txtWhat.getText().toString());
             } catch (NumberFormatException e) {
-                txtILWhat.setError("This field can't be empty.");
+                txtILWhat.setError("This field has to be a number.");
                 return;
             }
 
@@ -334,10 +482,15 @@ public class DebtActivity extends AppCompatActivity {
             }
         }
 
+        // Set createdAt
+        if (createdAt == null) {
+            createdAt = new Date();
+        }
+
         Log.d(Const.TAG, "Adding debt to database: " + String.valueOf(tempFacebookFriendId));
 
         Debt debt = new Debt(
-                null,
+                id,
                 creditorId,
                 debtorId,
                 customFriendName,
@@ -345,17 +498,86 @@ public class DebtActivity extends AppCompatActivity {
                 currencyId,
                 thingName,
                 txtNote.getText().toString(),
-                null,
-                null,
+                paidAt,
+                deletedAt,
                 new Date(),
-                new Date(),
-                0
+                createdAt,
+                version
         );
 
         // Add debt into the local database
-        db.addOrUpdateDebt(null, debt);
+        db.addOrUpdateDebt(id, debt);
 
         setResult(RESULT_OK);
         finish();
+    }
+
+    private void showDatePickerDialog() {
+        Calendar now = Calendar.getInstance();
+        DatePickerDialog dpd = DatePickerDialog.newInstance(
+                new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
+                        showTimePickerDialog(year, monthOfYear, dayOfMonth);
+                    }
+                },
+                now.get(Calendar.YEAR),
+                now.get(Calendar.MONTH),
+                now.get(Calendar.DAY_OF_MONTH)
+        );
+        dpd.show(getFragmentManager(), "Datepickerdialog");
+    }
+
+    private void showTimePickerDialog(final int year, final int monthOfYear, final int dayOfMonth) {
+
+        Calendar now = Calendar.getInstance();
+        TimePickerDialog tpd = TimePickerDialog.newInstance(
+                new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(RadialPickerLayout view, int hourOfDay, int minute, int second) {
+                        btnCreatedAt.setText(
+                                String.valueOf(year) + "/"
+                                + String.valueOf(monthOfYear) + "/"
+                                + String.valueOf(dayOfMonth) + " "
+                                + String.format(Locale.getDefault(), "%02d", hourOfDay) + ":"
+                                + String.format(Locale.getDefault(), "%02d", minute) + ":"
+                                + String.format(Locale.getDefault(), "%02d", second)
+                        );
+
+                        Calendar cal = Calendar.getInstance();
+                        cal.set(year, monthOfYear, dayOfMonth, hourOfDay, minute, second);
+                        createdAt = cal.getTime();
+
+                    }
+                },
+                now.get(Calendar.HOUR_OF_DAY),
+                now.get(Calendar.SECOND),
+                true
+        );
+        tpd.show(getFragmentManager(), "Datepickerdialog");
+    }
+
+    private void stylePaidUnpaid() {
+        if (debtToEdit != null && debtToEdit.paidAt == null) {
+            btnPaidUnpaid.setText(getResources().getString(R.string.mark_as_paid));
+            btnPaidUnpaid.setBackgroundTintList(ContextCompat.getColorStateList(getApplicationContext(), R.color.green));
+            txtvPaid.setText(getResources().getString(R.string.no));
+        } else {
+            btnPaidUnpaid.setText(getResources().getString(R.string.mark_as_unpaid));
+            btnPaidUnpaid.setBackgroundTintList(ContextCompat.getColorStateList(getApplicationContext(), R.color.red));
+            txtvPaid.setText(debtToEdit.paidAtString());
+        }
+    }
+
+    private void styleDeleteRestore() {
+        if (debtToEdit != null && debtToEdit.deletedAt == null) {
+            btnDeleteRestore.setText(getResources().getString(R.string.delete));
+            btnDeleteRestore.setBackgroundTintList(ContextCompat.getColorStateList(getApplicationContext(), R.color.red));
+            txtvDeleted.setText(getResources().getString(R.string.no));
+        } else {
+            btnDeleteRestore.setText(getResources().getString(R.string.restore));
+            btnDeleteRestore.setBackgroundTintList(ContextCompat.getColorStateList(getApplicationContext(), R.color.green));
+            txtvDeleted.setText(debtToEdit.deletedAtString());
+        }
     }
 }

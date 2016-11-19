@@ -2,12 +2,15 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@android:color/white"
     android:elevation="0dp"
-    android:clipToPadding="true">
+    android:clipToPadding="true"
+    android:descendantFocusability="beforeDescendants"
+    android:focusableInTouchMode="true">
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/contraintLayout"
@@ -132,10 +135,9 @@
 
         <RadioButton
             android:text="@string/thing"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/rdio_thing"
-            android:layout_weight="1" />
+            android:id="@+id/rdio_thing" />
     </RadioGroup>
 
     <android.support.design.widget.TextInputLayout
@@ -170,6 +172,107 @@
         android:elevation="24dp"
         app:elevation="24dp"
         app:borderWidth="0dp"/>
+
+    <TextView
+        android:text="Created at:"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/txt_created_at_label"
+        android:textColor="@color/black"
+        android:gravity="right|center"
+        android:layout_alignBottom="@+id/btn_created_at"
+        android:layout_alignTop="@+id/btn_created_at"
+        android:layout_alignStart="@+id/radioGroup"
+        android:layout_toStartOf="@+id/textInputLayout3" />
+
+    <Button
+        android:text="2017/12/12 24:12:00"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_created_at"
+        android:textAppearance="@style/TextAppearance.AppCompat.Button"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_below="@+id/textInputLayout3"
+        android:layout_alignEnd="@+id/textInputLayout3"
+        android:layout_marginTop="15dp"
+        android:layout_alignStart="@+id/textInputLayout3" />
+
+    <TextView
+        android:text="Paid:"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txt_created_at_label"
+        android:layout_alignStart="@+id/txt_created_at_label"
+        android:id="@+id/txtv_paid_label"
+        android:layout_toStartOf="@+id/textInputLayout3"
+        android:textColor="@color/black"
+        android:gravity="right|center"
+        android:layout_alignEnd="@+id/txt_created_at_label"
+        android:layout_alignBottom="@+id/btn_paid_unpaid" />
+
+    <Button
+        android:text="Mark as paid"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_paid_unpaid"
+        style="@style/Widget.AppCompat.Button.Small"
+        android:backgroundTint="@color/green"
+        android:textColor="@color/white"
+        android:layout_below="@+id/btn_created_at"
+        android:layout_alignEnd="@+id/btn_created_at" />
+
+    <TextView
+        android:text="Deleted:"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@+id/txtv_paid_label"
+        android:id="@+id/txtv_deleted_label"
+        android:layout_alignStart="@+id/txtv_paid_label"
+        android:textColor="@color/black"
+        android:layout_alignBottom="@+id/btn_delete_restore"
+        android:layout_below="@+id/txtv_paid_label"
+        android:gravity="right|center" />
+
+    <Button
+        android:text="Delete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_delete_restore"
+        style="@style/Widget.AppCompat.Button.Small"
+        android:layout_below="@+id/btn_paid_unpaid"
+        android:layout_alignEnd="@+id/btn_paid_unpaid"
+        android:layout_toEndOf="@+id/txtv_paid_label"
+        android:layout_alignStart="@+id/btn_paid_unpaid"
+        android:textColor="@color/white"
+        android:backgroundTint="@color/red" />
+
+    <TextView
+        android:text="No"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/txtv_paid"
+        android:layout_alignStart="@+id/btn_created_at"
+        android:layout_toStartOf="@+id/btn_paid_unpaid"
+        android:layout_below="@+id/btn_created_at"
+        android:layout_above="@+id/btn_delete_restore"
+        android:gravity="center"
+        android:textStyle="normal|bold"
+        android:textSize="12sp"
+        android:textColor="@color/black" />
+
+    <TextView
+        android:text="No"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/txtv_deleted"
+        android:gravity="center"
+        android:textStyle="normal|bold"
+        android:textSize="12sp"
+        android:textColor="@color/black"
+        android:layout_below="@+id/btn_paid_unpaid"
+        android:layout_alignStart="@+id/txtv_paid"
+        android:layout_alignBottom="@+id/btn_delete_restore"
+        android:layout_toStartOf="@+id/btn_paid_unpaid" />
 
 </RelativeLayout>
 

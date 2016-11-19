@@ -20,11 +20,14 @@ import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import org.parceler.Parcels;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import cz.petrkubes.payuback.Activities.DebtActivity;
 import cz.petrkubes.payuback.Activities.MainActivity;
 import cz.petrkubes.payuback.Adapters.DebtsAdapter;
 import cz.petrkubes.payuback.Api.ApiRestClient;
@@ -39,6 +42,8 @@ import cz.petrkubes.payuback.Structs.User;
 public class DebtsFragment extends Fragment implements UpdateableFragment {
 
     public static final String ARG_MY = "argMy";
+    public static final String DEBT_TO_EDIT = "debtToEdit";
+
     private DatabaseHandler db;
     private ListView lstDebts;
     private User user;
@@ -279,6 +284,17 @@ public class DebtsFragment extends Fragment implements UpdateableFragment {
                 db.addOrUpdateDebt(debt.id, debt);
 
                 ((MainActivity) getActivity()).updateDebts();
+                dialog.cancel();
+            }
+        });
+
+        // Edit button
+        btnDialogEdit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getContext(), DebtActivity.class);
+                intent.putExtra(DEBT_TO_EDIT, Parcels.wrap(debt));
+                getActivity().startActivityForResult(intent, MainActivity.ADD_DEBT_REQUEST);
                 dialog.cancel();
             }
         });

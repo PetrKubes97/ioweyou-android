@@ -47,7 +47,7 @@ import cz.petrkubes.payuback.Structs.User;
 
 public class MainActivity extends AppCompatActivity {
 
-    static final int ADD_DEBT_REQUEST = 0;
+    public static final int ADD_DEBT_REQUEST = 0;
 
     private TextView textView;
     private Button button;
@@ -124,13 +124,14 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        Log.d(Const.TAG, "Returned to the main activity" + String.valueOf(requestCode) + String.valueOf(resultCode));
+        Log.d(Const.TAG, "Returned to the main activity " + String.valueOf(requestCode) + String.valueOf(resultCode));
 
         if (requestCode == ADD_DEBT_REQUEST && resultCode == RESULT_OK) {
             updateDebts();
@@ -138,9 +139,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void updateDebts() {
+        // Refresh offline changes
+        pageAdapter.notifyDataSetChanged();
+
         apiClient.updateAllDebts(user.apiKey, new SimpleCallback() {
             @Override
             public void onSuccess() {
+                // Refresh online changes
                 pageAdapter.notifyDataSetChanged();
             }
 

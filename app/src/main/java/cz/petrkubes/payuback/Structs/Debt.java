@@ -5,6 +5,7 @@ import android.content.ContentValues;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.parceler.Parcel;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -15,6 +16,7 @@ import java.util.Date;
  * Created by petr on 4.11.16.
  */
 
+@Parcel
 public class Debt {
 
     // Variables which are synchronized
@@ -38,6 +40,9 @@ public class Debt {
     public String status;
     public String currencyString;
 
+    // Empty constructor for Parceler
+    public Debt() {};
+
     public Debt(Integer id, Integer creditorId, Integer debtorId,
                 String customFriendName, Integer amount, Integer currencyId,
                 String thingName, String note, Date paidAt,
@@ -60,6 +65,16 @@ public class Debt {
     public String createdAtString() {
         DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm");
         return df.format(this.createdAt);
+    }
+
+    public String deletedAtString() {
+        DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        return df.format(this.deletedAt);
+    }
+
+    public String paidAtString() {
+        DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        return df.format(this.paidAt);
     }
 
     public JSONObject toJson() throws JSONException {

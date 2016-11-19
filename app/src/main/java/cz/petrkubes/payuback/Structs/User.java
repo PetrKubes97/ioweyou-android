@@ -8,13 +8,13 @@ import java.util.Date;
 
 public class User {
 
-    public int id;
+    public Integer id;
     public String apiKey;
     public String email;
     public String name;
     public Date registredAt;
 
-    public User(int id, String apiKey, String email, String name, Date registredAt) {
+    public User(Integer id, String apiKey, String email, String name, Date registredAt) {
         this.id = id;
         this.apiKey = apiKey;
         this.email = email;

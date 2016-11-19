@@ -200,6 +200,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
 
         cursor.close();
+        db.close();
 
         return user;
     }
@@ -254,6 +255,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
 
         cursor.close();
+        db.close();
 
         return list;
     }
@@ -279,6 +281,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
 
         cursor.close();
+        db.close();
 
         return friend;
     }
@@ -331,6 +334,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
 
         cursor.close();
+        db.close();
 
         return list;
     }
@@ -355,33 +359,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
 
         cursor.close();
+        db.close();
 
         return currency;
-    }
-
-
-    /**
-     * Returns list of debts, which were not added into the online database yet
-     * @return ArrayList<Debt>
-     */
-    public ArrayList<Debt> getUnaddedDebts() {
-        ArrayList<Debt> list = new ArrayList<>();
-        DateFormat df = new SimpleDateFormat();
-
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.query(TABLE_DEBTS, debtProjection, DEBTS_KEY_ID+"< 0", null, null, null, null);
-
-        if (cursor.moveToFirst())
-        {
-            do {
-                list.add(debtFromCursor(cursor));
-            } while (cursor.moveToNext());
-
-        }
-
-        cursor.close();
-
-        return list;
     }
 
     /**
@@ -390,7 +370,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
      */
     public ArrayList<Debt> getDebts() {
         ArrayList<Debt> list = new ArrayList<>();
-        DateFormat df = new SimpleDateFormat();
 
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(TABLE_DEBTS, debtProjection, null, null, null, null, null);
@@ -404,7 +383,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
 
         cursor.close();
-
+        db.close();
         return list;
     }
 
@@ -568,6 +547,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
 
         cursor.close();
+        db.close();
 
         return list;
     }
@@ -621,7 +601,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         // Insert debt into the database
         db.insert(TABLE_DEBTS, null, values);
-
         db.close();
     }
 
