@@ -15,6 +15,7 @@ import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -103,8 +104,12 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_debt);
-        // Remove actionbar shadow
-        getSupportActionBar().setElevation(0);
+
+        // Setup actionbar
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.debt_toolbar);
+        setSupportActionBar(myToolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         // Setup all widgets
         txtName = (AutoCompleteTextView) findViewById(R.id.txt_name);
@@ -279,7 +284,6 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
             }
 
             if (debtToEdit.deletedAt != null) {
-                Log.d(Const.TAG, "123456");
                 txtvDeleted.setText(debtToEdit.deletedAtString());
             } else {
                 txtvDeleted.setText(getResources().getString(R.string.no));
@@ -294,6 +298,9 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
                 } else {
                     tempFacebookFriendId = debtToEdit.creditorId;
                 }
+            } else {
+                tempFacebookFriendId = null;
+                txtName.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.white));
             }
 
 
@@ -313,8 +320,10 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
                 }
             }
 
-            if (debtToEdit.creditorId.equals(user.id)) {
+            if (debtToEdit.creditorId != null && debtToEdit.creditorId.equals(user.id)) {
                 rdioMyDebt.setChecked(false);
+            } else {
+                rdioMyDebt.setChecked(true);
             }
 
             // Style buttons for deleting and marking debt as paid
@@ -515,52 +524,6 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
         setResult(RESULT_OK);
         finish();
     }
-
-    /*
-    private void showDatePickerDialog() {
-        Calendar now = Calendar.getInstance();
-        DatePickerDialog dpd = DatePickerDialog.newInstance(
-                new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
-                        showTimePickerDialog(year, monthOfYear, dayOfMonth);
-                    }
-                },
-                now.get(Calendar.YEAR),
-                now.get(Calendar.MONTH),
-                now.get(Calendar.DAY_OF_MONTH)
-        );
-        dpd.show(getFragmentManager(), "Datepickerdialog");
-    }
-
-    private void showTimePickerDialog(final int year, final int monthOfYear, final int dayOfMonth) {
-
-        Calendar now = Calendar.getInstance();
-        TimePickerDialog tpd = TimePickerDialog.newInstance(
-                new TimePickerDialog.OnTimeSetListener() {
-                    @Override
-                    public void onTimeSet(RadialPickerLayout view, int hourOfDay, int minute, int second) {
-                        btnCreatedAt.setText(
-                                String.valueOf(year) + "/"
-                                + String.valueOf(monthOfYear) + "/"
-                                + String.valueOf(dayOfMonth) + " "
-                                + String.format(Locale.getDefault(), "%02d", hourOfDay) + ":"
-                                + String.format(Locale.getDefault(), "%02d", minute) + ":"
-                                + String.format(Locale.getDefault(), "%02d", second)
-                        );
-
-                        Calendar cal = Calendar.getInstance();
-                        cal.set(year, monthOfYear, dayOfMonth, hourOfDay, minute, second);
-                        createdAt = cal.getTime();
-
-                    }
-                },
-                now.get(Calendar.HOUR_OF_DAY),
-                now.get(Calendar.SECOND),
-                true
-        );
-        tpd.show(getFragmentManager(), "Datepickerdialog");
-    }*/
 
     private void stylePaidUnpaid() {
         if (debtToEdit != null && debtToEdit.paidAt == null) {

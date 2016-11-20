@@ -47,9 +47,6 @@ public class LoginActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_login);
 
-        // Remove actionbar shadow
-        getSupportActionBar().setElevation(0);
-
         loginButton = (LoginButton) this.findViewById(R.id.login_button);
         prgLoader = (ProgressBar) this.findViewById(R.id.prg_loader);
         txtLoadingDescription = (TextView) this.findViewById(R.id.txt_loading_description);

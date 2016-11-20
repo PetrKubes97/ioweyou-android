@@ -498,10 +498,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 Debt debt = debtFromCursor(cursor);
 
                 // Set additional variables
-
                 // 1. Name of person
                 if (my) {
-                    if (debt.creditorId == 0) {
+                    if (debt.creditorId == null) {
                         debt.who = debt.customFriendName;
                     } else {
                         Friend friend = getFriend(debt.creditorId);
@@ -513,7 +512,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                     }
                 } else {
-                    if (debt.debtorId == 0) {
+                    if (debt.debtorId == null) {
                         debt.who = debt.customFriendName;
                     } else {
                         Friend friend = getFriend(debt.debtorId);
@@ -562,49 +561,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.close();
     }
 
-    // TODO merge this function to addOrUpdate
-    /**
-     * Inserts a debt into local database
-     * @param debt debt object
-     * @throws Exception
-     */
-    public void addDebt(Debt debt) {
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        DateFormat df = new SimpleDateFormat();
-
-        String paidAt = null;
-        String deletedAt = null;
-
-        if (debt.paidAt != null) {
-            paidAt = df.format(debt.paidAt);
-        }
-
-        if (debt.deletedAt != null) {
-            deletedAt = df.format(debt.deletedAt);
-        }
-
-        ContentValues values = new ContentValues();
-        values.put(DEBTS_KEY_ID, debt.id);
-        values.put(DEBTS_KEY_CREDITOR_ID, debt.creditorId);
-        values.put(DEBTS_KEY_DEBTOR_ID, debt.debtorId);
-        values.put(DEBTS_KEY_CUSTOM_FRIEND_NAME, debt.customFriendName);
-        values.put(DEBTS_KEY_AMOUNT, debt.amount);
-        values.put(DEBTS_KEY_CURRENCY_ID, debt.currencyId);
-        values.put(DEBTS_KEY_THING_NAME, debt.thingName);
-        values.put(DEBTS_KEY_NOTE, debt.note);
-        values.put(DEBTS_KEY_PAID_AT, paidAt);
-        values.put(DEBTS_KEY_DELETED_AT, deletedAt);
-        values.put(DEBTS_KEY_MODIFIED_AT, df.format(debt.modifiedAt));
-        values.put(DEBTS_KEY_CREATED_AT, df.format(debt.createdAt));
-        values.put(DEBTS_KEY_VERSION, debt.version);
-
-        // Insert debt into the database
-        db.insert(TABLE_DEBTS, null, values);
-        db.close();
-    }
-
-
     private Debt debtFromCursor(Cursor cursor) {
 
         DateFormat df = new SimpleDateFormat();
@@ -615,22 +571,24 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         Date createdAt = null;
 
         Integer amount = null;
-
+        Integer creditorId = null;
+        Integer debtorId = null;
+        Integer currencyId = null;
 
         try {
-            if (cursor.getString(8) != null) {
+            if (!cursor.isNull(8)) {
                     paidAt = df.parse(cursor.getString(8));
             }
 
-            if (cursor.getString(9) != null) {
+            if (!cursor.isNull(9)) {
                 deletedAt = df.parse(cursor.getString(9));
             }
 
-            if (cursor.getString(10) != null) {
+            if (!cursor.isNull(10)) {
                 modifiedAt = df.parse(cursor.getString(10));
             }
 
-            if (cursor.getString(11) != null) {
+            if (!cursor.isNull(11)) {
                 createdAt = df.parse(cursor.getString(11));
             }
 
@@ -638,13 +596,27 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 amount = cursor.getInt(4);
             }
 
+            if (!cursor.isNull(1)) {
+                creditorId = cursor.getInt(1);
+            }
+
+            if (!cursor.isNull(2)) {
+                debtorId = cursor.getInt(2);
+            }
+
+            if (!cursor.isNull(5)) {
+                currencyId = cursor.getInt(5);
+            }
+
+
+
             return new Debt(
                     cursor.getInt(0),
-                    cursor.getInt(1),
-                    cursor.getInt(2),
+                    creditorId,
+                    debtorId,
                     cursor.getString(3),
                     amount,
-                    cursor.getInt(5),
+                    currencyId,
                     cursor.getString(6),
                     cursor.getString(7),
                     paidAt,

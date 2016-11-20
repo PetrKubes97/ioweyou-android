@@ -1,28 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout
+<RelativeLayout xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main_content"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/my_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/primary"
+        android:elevation="0dp"
+        app:theme="@style/ToolBarStyle" />
 
     <LinearLayout android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <TextView
-            android:text="TextView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/textView"
-            android:textIsSelectable="true" />
-
-        <Button
-            android:text="Refresh"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/btn_main" />
+        android:orientation="vertical"
+        android:layout_below="@+id/my_toolbar">
 
 
         <android.support.v4.view.ViewPager
@@ -37,7 +32,8 @@
                 android:id="@+id/tabs"
                 android:background="@color/primary"
                 app:tabTextColor="@android:color/white"
-                app:tabSelectedTextColor="@android:color/white"/>
+                app:tabSelectedTextColor="@android:color/white"
+                app:tabIndicatorColor="@color/accent" />
 
         </android.support.v4.view.ViewPager>
     </LinearLayout>
@@ -47,8 +43,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
         android:clickable="true"
         android:src="@drawable/ic_add_white_24dp"
-        android:transitionName="@string/transition_button"/>
-</android.support.design.widget.CoordinatorLayout>
+        android:transitionName="@string/transition_button"
+        android:layout_marginRight="24dp"
+        android:layout_marginBottom="24dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        app:elevation="4dp" />
+</RelativeLayout>

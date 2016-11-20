@@ -223,7 +223,7 @@ public class ApiRestClient {
 
                         Debt onlineDebt = Debt.fromJson(onlineDebtJson);
                         // Add every updated debt
-                        db.addDebt(onlineDebt);
+                        db.addOrUpdateDebt(onlineDebt.id, onlineDebt);
                     }
 
                     callback.onSuccess();

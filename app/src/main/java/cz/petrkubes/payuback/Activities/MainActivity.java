@@ -9,9 +9,13 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.accessibility.AccessibilityManagerCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -49,9 +53,6 @@ public class MainActivity extends AppCompatActivity {
 
     public static final int ADD_DEBT_REQUEST = 0;
 
-    private TextView textView;
-    private Button button;
-
     private FloatingActionButton btnAddDebt;
     private DatabaseHandler db;
     private FragmentsAdapter pageAdapter;
@@ -66,11 +67,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         Stetho.initializeWithDefaults(this);
         setContentView(R.layout.activity_main);
+        // Setup actionbar
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
+        setSupportActionBar(myToolbar);
 
         // Setup views and buttons
-        textView = (TextView) findViewById(R.id.textView);
-        button = (Button) findViewById(R.id.btn_main);
-
         btnAddDebt = (FloatingActionButton) findViewById(R.id.btn_add_debt);
         tabLayout = (TabLayout) findViewById(R.id.tabs);
 
@@ -87,15 +88,16 @@ public class MainActivity extends AppCompatActivity {
         apiClient = new ApiRestClient(getApplicationContext());
         user = db.getUser();
 
-        button.setOnClickListener(new View.OnClickListener() {
+        /*
+        swpLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
-            public void onClick(View v) {
+            public void onRefresh() {
                 if (user != null) {
-
-                    apiClient.updateAllDebts(user.apiKey, new SimpleCallback() {
+                    apiClient.updateAll(user.apiKey, new SimpleCallback() {
                         @Override
                         public void onSuccess() {
                             pageAdapter.notifyDataSetChanged();
+                            swpLayout.setRefreshing(false);
                         }
 
                         @Override
@@ -108,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+        */
 
         // Start a new activity in which user adds debts
         btnAddDebt.setOnClickListener(new View.OnClickListener() {
@@ -154,6 +157,47 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    // Handle action bar actions
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                // User chose the "Settings" item, show the app settings UI...
+                return true;
+
+            case R.id.action_refresh:
+                // Refresh everything
+                if (user != null) {
+                    apiClient.updateAll(user.apiKey, new SimpleCallback() {
+                        @Override
+                        public void onSuccess() {
+                            pageAdapter.notifyDataSetChanged();
+                        }
+
+                        @Override
+                        public void onFailure() {
+                            Toast.makeText(getApplicationContext(), "Something went wring. :{", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                } else {
+                    Toast.makeText(getApplicationContext(), "Neni", Toast.LENGTH_SHORT).show();
+                }
+                return true;
+
+            default:
+                // If we got here, the user's action was not recognized.
+                // Invoke the superclass to handle it.
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    // Inflate action bar
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+        return true;
     }
 
 }

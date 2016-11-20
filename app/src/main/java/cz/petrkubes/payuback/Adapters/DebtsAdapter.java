@@ -2,6 +2,7 @@ package cz.petrkubes.payuback.Adapters;
 
 import android.content.Context;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,8 +14,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import cz.petrkubes.payuback.Const;
 import cz.petrkubes.payuback.R;
 import cz.petrkubes.payuback.Structs.Debt;
+import cz.petrkubes.payuback.Tools.Tools;
 
 /**
  * Created by petr on 5.11.16.
@@ -56,14 +59,12 @@ public class DebtsAdapter extends ArrayAdapter<Debt> {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-
         // Populate the data from the data object via the viewHolder object
         // into the template view.
         viewHolder.txtName.setText(debt.who);
         viewHolder.txtWhat.setText(debt.what);
         viewHolder.txtNote.setText(debt.note);
-        viewHolder.txtDate.setText(df.format(debt.createdAt));
+        viewHolder.txtDate.setText(Tools.formatDateTime(debt.createdAt));
         viewHolder.txtStatus.setText(debt.status);
 
         // Set color of owned items

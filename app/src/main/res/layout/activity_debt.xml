@@ -11,6 +11,13 @@
     android:clipToPadding="true"
     android:descendantFocusability="beforeDescendants"
     android:focusableInTouchMode="true">
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/debt_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/primary"
+        android:elevation="8dp"
+        app:theme="@style/ToolBarStyle" />
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/contraintLayout"
@@ -18,7 +25,7 @@
         android:layout_height="wrap_content"
         android:background="@color/primary"
         android:elevation="8dp"
-        android:layout_alignParentTop="true"
+        android:layout_below="@+id/debt_toolbar"
         android:layout_alignParentStart="true"
         android:clipToPadding="true"
         android:paddingBottom="10dp">
