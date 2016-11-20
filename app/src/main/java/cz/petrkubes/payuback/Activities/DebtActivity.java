@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.CalendarContract;
 import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -31,10 +32,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
-import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
-import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
-import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
+import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialogFragment;
+import com.codetroopers.betterpickers.radialtimepicker.RadialTimePickerDialogFragment;
 
 import org.parceler.Parcels;
 import org.w3c.dom.Text;
@@ -57,14 +56,17 @@ import cz.petrkubes.payuback.Structs.Currency;
 import cz.petrkubes.payuback.Structs.Debt;
 import cz.petrkubes.payuback.Structs.Friend;
 import cz.petrkubes.payuback.Structs.User;
+import cz.petrkubes.payuback.Tools.Tools;
 
 /**
  * Created by petr on 24.10.16.
  */
 
-public class DebtActivity extends AppCompatActivity {
+public class DebtActivity extends AppCompatActivity implements CalendarDatePickerDialogFragment.OnDateSetListener, RadialTimePickerDialogFragment.OnTimeSetListener {
 
     private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 100;
+    private static final String FRAG_TAG_DATE_PICKER = "fragment_date_picker_created_at";
+    private static final String FRAG_TAG_TIME_PICKER = "fragment_time_picker_created_at";
 
     private AutoCompleteTextView txtName;
     private EditText txtWhat;
@@ -95,6 +97,7 @@ public class DebtActivity extends AppCompatActivity {
     private User user;
     private Date createdAt;
     private Debt debtToEdit;
+    private Calendar createdAtCal;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -233,6 +236,7 @@ public class DebtActivity extends AppCompatActivity {
                 showDatePickerDialog();
             }
         });
+        createdAtCal = Calendar.getInstance();
 
         // Set paid/unpaid button
         btnPaidUnpaid.setOnClickListener(new View.OnClickListener() {
@@ -512,6 +516,7 @@ public class DebtActivity extends AppCompatActivity {
         finish();
     }
 
+    /*
     private void showDatePickerDialog() {
         Calendar now = Calendar.getInstance();
         DatePickerDialog dpd = DatePickerDialog.newInstance(
@@ -555,7 +560,7 @@ public class DebtActivity extends AppCompatActivity {
                 true
         );
         tpd.show(getFragmentManager(), "Datepickerdialog");
-    }
+    }*/
 
     private void stylePaidUnpaid() {
         if (debtToEdit != null && debtToEdit.paidAt == null) {
@@ -579,5 +584,35 @@ public class DebtActivity extends AppCompatActivity {
             btnDeleteRestore.setBackgroundTintList(ContextCompat.getColorStateList(getApplicationContext(), R.color.green));
             txtvDeleted.setText(debtToEdit.deletedAtString());
         }
+    }
+
+    private void showDatePickerDialog() {
+        createdAtCal.clear();
+
+        CalendarDatePickerDialogFragment cdp = new CalendarDatePickerDialogFragment()
+                .setOnDateSetListener(DebtActivity.this);
+        cdp.show(getSupportFragmentManager(), FRAG_TAG_DATE_PICKER);
+    }
+
+    private void showTimePickerDialog() {
+        RadialTimePickerDialogFragment rtpd = new RadialTimePickerDialogFragment()
+                .setOnTimeSetListener(DebtActivity.this);
+        rtpd.show(getSupportFragmentManager(), FRAG_TAG_TIME_PICKER);
+    }
+
+
+    // Dialogs for choosing the date of a debt
+    @Override
+    public void onDateSet(CalendarDatePickerDialogFragment dialog, int year, int monthOfYear, int dayOfMonth) {
+        createdAtCal.set(year, monthOfYear, dayOfMonth);
+        showTimePickerDialog();
+    }
+
+    @Override
+    public void onTimeSet(RadialTimePickerDialogFragment dialog, int hourOfDay, int minute) {
+        createdAtCal.set(Calendar.HOUR, hourOfDay);
+        createdAtCal.set(Calendar.MINUTE, minute);
+        createdAt = createdAtCal.getTime();
+        btnCreatedAt.setText(Tools.formatDateTime(createdAt));
     }
 }

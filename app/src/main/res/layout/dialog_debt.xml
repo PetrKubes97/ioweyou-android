@@ -1,34 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent" android:layout_height="match_parent"
-    android:padding="15dp">
+    android:padding="5dp">
 
     <TextView
         android:text="Jmeno Prijemni"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:id="@+id/txt_who"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true"
         android:textSize="18sp"
         android:textColor="?attr/colorPrimaryDark"
         android:gravity="left|center"
-        android:layout_toStartOf="@+id/txt_what"
         android:minHeight="40dp"
-        android:layout_marginBottom="5dp" />
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginStart="16dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/txt_what"
+        android:layout_marginEnd="8dp" />
 
     <TextView
         android:text="50 Kč"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
         android:id="@+id/txt_what"
         android:gravity="right|center"
         android:textSize="24sp"
         android:textColor="@color/accent"
         android:textStyle="normal|bold"
-        android:layout_alignParentEnd="true"
-        android:layout_alignBottom="@+id/txt_who" />
+        app:layout_constraintTop_toTopOf="@+id/txt_who"
+        app:layout_constraintBottom_toBottomOf="@+id/txt_who"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintRight_toRightOf="parent" />
 
     <Button
         android:text="Edit"
@@ -36,42 +41,10 @@
         android:layout_height="wrap_content"
         android:id="@+id/btn_edit"
         style="@style/Widget.AppCompat.Button.Borderless.Colored"
-        android:layout_alignBaseline="@+id/btn_cancel"
-        android:layout_alignBottom="@+id/btn_cancel"
-        android:layout_toEndOf="@+id/btn_cancel" />
-
-    <Button
-        android:text="cancel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/btn_cancel"
-        style="@style/Widget.AppCompat.Button.Borderless.Colored"
-        android:layout_alignBaseline="@+id/btn_pay"
-        android:layout_alignBottom="@+id/btn_pay"
-        android:layout_alignParentStart="true" />
-
-    <SeekBar
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/skbr_payment"
-        android:max="50"
-        android:progress="25"
-        android:layout_below="@+id/txt_who"
-        android:layout_alignBottom="@+id/btn_plus"
-        android:layout_toEndOf="@+id/btn_minus"
-        android:layout_toStartOf="@+id/btn_plus" />
-
-    <Button
-        android:text="-"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/btn_minus"
-        style="@style/Widget.AppCompat.Button.Borderless"
-        android:minWidth="35dp"
-        android:minHeight="35dp"
-        android:padding="0dp"
-        android:layout_below="@+id/txt_who"
-        android:layout_alignParentStart="true" />
+        app:layout_constraintTop_toTopOf="@+id/btn_pay"
+        app:layout_constraintBottom_toBottomOf="@+id/btn_pay"
+        app:layout_constraintLeft_toRightOf="@+id/btn_cancel"
+        android:minWidth="60dip" />
 
     <TextView
         android:text="2012.12.12 12:05:54"
@@ -79,39 +52,71 @@
         android:layout_height="wrap_content"
         android:id="@+id/txt_date"
         android:textSize="10sp"
-        android:layout_marginTop="15dp"
-        android:layout_below="@+id/txt_note"
-        android:layout_alignParentStart="true" />
-
-    <Button
-        android:text="Pay all"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/btn_pay"
-        style="@style/Widget.AppCompat.Button.Borderless.Colored"
-        android:layout_below="@+id/txt_date"
-        android:layout_alignParentEnd="true" />
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@+id/txt_note"
+        android:layout_marginStart="16dp"
+        app:layout_constraintLeft_toLeftOf="parent" />
 
     <TextView
-        android:text="Poznamka o dluhu, tohlke muze byt celkem dlouhy..."
+        android:text="P dlouhy..."
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/txt_note"
-        android:layout_below="@+id/skbr_payment"
-        android:layout_alignParentStart="true"
-        android:visibility="visible" />
+        android:visibility="visible"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@+id/txt_who"
+        android:layout_marginStart="16dp"
+        app:layout_constraintLeft_toLeftOf="parent" />
 
     <Button
-        android:text="+"
-        android:layout_width="wrap_content"
+        android:text="cancel"
+        android:layout_width="79dp"
         android:layout_height="wrap_content"
-        android:id="@+id/btn_plus"
-        style="@style/Widget.AppCompat.Button.Borderless"
-        android:minWidth="35dp"
-        android:minHeight="35dp"
-        android:padding="0dp"
-        android:layout_alignBaseline="@+id/btn_minus"
-        android:layout_alignBottom="@+id/btn_minus"
-        android:layout_alignParentEnd="true"
-        android:layout_margin="0dp" />
-</RelativeLayout>
+        android:id="@+id/btn_cancel"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        app:layout_constraintTop_toTopOf="@+id/btn_edit"
+        app:layout_constraintBottom_toBottomOf="@+id/btn_edit"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:minWidth="60dip"
+        app:layout_constraintVertical_bias="1.0"
+        android:layout_marginStart="8dp" />
+
+    <Button
+        android:text="Pay"
+        android:layout_width="62dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_pay"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:minWidth="60dip"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@+id/view" />
+
+    <Switch
+        android:text="Partial payment"
+        android:layout_width="0dp"
+        android:layout_height="44dp"
+        android:id="@+id/swtch_payment"
+        android:textSize="8sp"
+        app:layout_constraintRight_toLeftOf="@+id/btn_pay"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintBottom_toBottomOf="@+id/btn_pay"
+        app:layout_constraintTop_toTopOf="@+id/btn_pay"
+        android:layout_marginStart="8dp"
+        app:layout_constraintLeft_toRightOf="@+id/btn_edit"
+        android:gravity="center_vertical|end" />
+
+    <View
+        android:layout_width="wrap_content"
+        android:layout_height="1dp"
+        android:background="@android:color/darker_gray"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@+id/txt_date"
+        android:layout_marginStart="16dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintRight_toRightOf="parent"
+        android:id="@+id/view" />
+
+</android.support.constraint.ConstraintLayout>

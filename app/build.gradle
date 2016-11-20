@@ -27,15 +27,15 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:25.0.0'
-    compile 'com.android.support:design:25.0.0'
+    compile 'com.android.support:appcompat-v7:25.0.1'
+    compile 'com.android.support:design:25.0.1'
     compile 'com.facebook.android:facebook-android-sdk:4.16.1'
     compile 'com.loopj.android:android-async-http:1.4.9'
     compile 'com.facebook.stetho:stetho:1.4.1'
     compile 'com.facebook.stetho:stetho-urlconnection:1.4.1'
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support.constraint:constraint-layout:1.0.0-beta1'
     compile 'org.parceler:parceler-api:1.1.6'
     apt 'org.parceler:parceler:1.1.6'
-    compile 'com.wdullaer:materialdatetimepicker:2.5.0'
+    compile 'com.code-troopers.betterpickers:library:3.0.1'
+    compile 'com.android.support.constraint:constraint-layout:1.0.0-beta4'
 }

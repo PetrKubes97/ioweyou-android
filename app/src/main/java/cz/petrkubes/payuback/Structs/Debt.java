@@ -12,6 +12,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import cz.petrkubes.payuback.Tools.Tools;
+
 /**
  * Created by petr on 4.11.16.
  */
@@ -63,18 +65,15 @@ public class Debt {
     }
 
     public String createdAtString() {
-        DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-        return df.format(this.createdAt);
+        return Tools.formatDateTime(this.createdAt);
     }
 
     public String deletedAtString() {
-        DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-        return df.format(this.deletedAt);
+        return Tools.formatDateTime(this.deletedAt);
     }
 
     public String paidAtString() {
-        DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-        return df.format(this.paidAt);
+        return Tools.formatDateTime(this.paidAt);
     }
 
     public JSONObject toJson() throws JSONException {

@@ -18,10 +18,16 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SeekBar;
+import android.widget.Switch;
 import android.widget.TextView;
+
+import com.codetroopers.betterpickers.numberpicker.NumberPickerBuilder;
+import com.codetroopers.betterpickers.numberpicker.NumberPickerDialogFragment;
 
 import org.parceler.Parcels;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Timer;
@@ -56,17 +62,14 @@ public class DebtsFragment extends Fragment implements UpdateableFragment {
     private Button btnDialogPay;
     private Button btnDialogEdit;
     private Button btnDialogCancel;
-    private Button btnDialogPlus;
-    private Button btnDialogMinus;
     private TextView txtDialogWho;
     private TextView txtDialogWhat;
     private TextView txtDialogNote;
     private TextView txtDialogDate;
-    private SeekBar skbrDialogPayment;
+    private Switch swtchPayment;
 
     // Dialog variables
     private Integer amount;
-    private Handler dialogHandler;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -108,9 +111,6 @@ public class DebtsFragment extends Fragment implements UpdateableFragment {
             }
         });
 
-        // This handler is used for updating amount when user holds plus or minus button
-        dialogHandler = new Handler();
-
         return rootView;
     }
 
@@ -137,128 +137,27 @@ public class DebtsFragment extends Fragment implements UpdateableFragment {
         builder.setView(debtDialogView);
         final AlertDialog dialog = builder.create();
 
-        // Set up buttons, text views and seekbar
+        // Set up buttons, text views and switch
         btnDialogPay = (Button) debtDialogView.findViewById(R.id.btn_pay);
         btnDialogCancel = (Button) debtDialogView.findViewById(R.id.btn_cancel);
         btnDialogEdit = (Button) debtDialogView.findViewById(R.id.btn_edit);
-        btnDialogPlus = (Button) debtDialogView.findViewById(R.id.btn_plus);
-        btnDialogMinus = (Button) debtDialogView.findViewById(R.id.btn_minus);
+        swtchPayment = (Switch) debtDialogView.findViewById(R.id.swtch_payment);
 
         txtDialogWhat = (TextView)  debtDialogView.findViewById(R.id.txt_what);
         txtDialogWho = (TextView)  debtDialogView.findViewById(R.id.txt_who);
         txtDialogNote = (TextView)  debtDialogView.findViewById(R.id.txt_note);
         txtDialogDate = (TextView) debtDialogView.findViewById(R.id.txt_date);
 
-        skbrDialogPayment = (SeekBar) debtDialogView.findViewById(R.id.skbr_payment);
-
         txtDialogWhat.setText(debt.what);
         txtDialogWho.setText(debt.who);
         txtDialogNote.setText(debt.note);
         txtDialogDate.setText(debt.createdAtString());
-
-        Log.d(Const.TAG, "AMounte " + String.valueOf(debt.amount));
-
-        if (debt.amount == null) {
-            skbrDialogPayment.setVisibility(View.GONE);
-            btnDialogPlus.setVisibility(View.GONE);
-            btnDialogMinus.setVisibility(View.GONE);
-        } else {
-            skbrDialogPayment.setVisibility(View.VISIBLE);
-            btnDialogPlus.setVisibility(View.VISIBLE);
-            btnDialogMinus.setVisibility(View.VISIBLE);
-
-            skbrDialogPayment.setMax(debt.amount/5);
-            skbrDialogPayment.setProgress(debt.amount);
-
-        }
 
         if (debt.note.isEmpty()) {
             txtDialogNote.setVisibility(View.GONE);
         }
 
         amount = debt.amount;
-
-        // Update payment while user hold plus or minus button
-        final Runnable runnablePlus = new Runnable() {
-            public void run() {
-                amount += 1;
-
-                btnDialogPay.setText("PAY " + String.valueOf(amount) + " " + debt.currencyString);
-                dialogHandler.postDelayed(this, 150);
-
-                if (amount % 5 == 0) {
-                    skbrDialogPayment.setProgress(amount/5);
-                }
-            }
-        };
-
-        final Runnable runnableMinus = new Runnable() {
-            public void run() {
-                amount -= 1;
-
-                btnDialogPay.setText("PAY " + String.valueOf(amount) + " " + debt.currencyString);
-                dialogHandler.postDelayed(this, 150);
-
-                if (amount % 5 == 0) {
-                    skbrDialogPayment.setProgress(amount/5);
-                }
-            }
-        };
-
-        // Setup seekbar
-        skbrDialogPayment.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-
-                if (i == seekBar.getMax()) {
-                    btnDialogPay.setText("PAY ALL");
-                } else {
-                    amount = i * (debt.amount/seekBar.getMax());
-
-                    btnDialogPay.setText("PAY " + String.valueOf(amount) + " " + debt.currencyString);
-                }
-
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
-
-        // Set up plus and minus buttons
-        btnDialogPlus.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-
-                if (motionEvent.getAction() == motionEvent.ACTION_UP) {
-                    dialogHandler.removeCallbacks(runnablePlus);
-                } else if (motionEvent.getAction() == motionEvent.ACTION_DOWN) {
-                    runnablePlus.run();
-                }
-
-                return false;
-            }
-        });
-
-        btnDialogMinus.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-
-                if (motionEvent.getAction() == motionEvent.ACTION_UP) {
-                    dialogHandler.removeCallbacks(runnableMinus);
-                } else if (motionEvent.getAction() == motionEvent.ACTION_DOWN) {
-                    runnableMinus.run();
-                }
-
-                return false;
-            }
-        });
 
         // Cancel button
         btnDialogCancel.setOnClickListener(new View.OnClickListener() {
@@ -273,18 +172,31 @@ public class DebtsFragment extends Fragment implements UpdateableFragment {
             @Override
             public void onClick(View view) {
 
-                if (amount.equals(debt.amount)) { // a) Pay back the whole debt
+                if (!swtchPayment.isChecked()) { // a) Pay back the whole debt
                     debt.paidAt = new Date();
-                } else { // b) Decrease payment amount TODO: separate table for payments
-                    debt.amount = debt.amount - amount;
+                    payDebt(debt);
+                    dialog.cancel();
+                } else {
+                    // Show payment dialog
+                    NumberPickerBuilder npb = new NumberPickerBuilder()
+                            .setFragmentManager(getFragmentManager())
+                            .setStyleResId(R.style.BetterPickersDialogFragment)
+                            .setMaxNumber(BigDecimal.valueOf(debt.amount))
+                            .setPlusMinusVisibility(View.GONE)
+                            .setMinNumber(BigDecimal.ONE)
+                            .setDecimalVisibility(View.GONE)
+                            .addNumberPickerDialogHandler(new NumberPickerDialogFragment.NumberPickerDialogHandlerV2() {
+                                @Override
+                                public void onDialogNumberSet(int reference, BigInteger number, double decimal, boolean isNegative, BigDecimal fullNumber) {
+                                    debt.amount -= Integer.parseInt(number.toString());
+                                    payDebt(debt);
+                                    dialog.cancel();
+                                }
+                            });
+                    npb.show();
                 }
 
-                debt.version += 1;
 
-                db.addOrUpdateDebt(debt.id, debt);
-
-                ((MainActivity) getActivity()).updateDebts();
-                dialog.cancel();
             }
         });
 
@@ -301,5 +213,11 @@ public class DebtsFragment extends Fragment implements UpdateableFragment {
 
         // display dialog
         dialog.show();
+    }
+
+    private void payDebt(Debt debt) {
+        debt.version += 1;
+        db.addOrUpdateDebt(debt.id, debt);
+        ((MainActivity) getActivity()).updateDebts();
     }
 }
