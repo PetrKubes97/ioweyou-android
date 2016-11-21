@@ -97,6 +97,4 @@ public class DebtsAdapter extends ArrayAdapter<Debt> {
         TextView txtDate;
         TextView txtStatus;
     }
-
-
 }

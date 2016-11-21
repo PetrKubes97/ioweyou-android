@@ -3,7 +3,6 @@ package cz.petrkubes.payuback.Adapters;
 import android.content.Context;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,7 +29,7 @@ public class FriendsSuggestionAdapter extends ArrayAdapter<Friend> implements Fi
     private Filter filter = new CustomFilter();
 
     public FriendsSuggestionAdapter(Context context, ArrayList<Friend> friends) {
-        super(context, R.layout.item_friend, friends);
+        super(context, R.layout.item_friend_suggestion, friends);
         this.context = context;
         this.originalList = friends;
     }
@@ -48,7 +47,7 @@ public class FriendsSuggestionAdapter extends ArrayAdapter<Friend> implements Fi
             // If there's no view to re-use, inflate a brand new view for row
             viewHolder = new ViewHolder();
             LayoutInflater inflater = LayoutInflater.from(context);
-            convertView = inflater.inflate(R.layout.item_friend, parent, false);
+            convertView = inflater.inflate(R.layout.item_friend_suggestion, parent, false);
 
             viewHolder.layout = (LinearLayout) convertView.findViewById(R.id.item_layout);
             viewHolder.name = (TextView) convertView.findViewById(R.id.txt_name);

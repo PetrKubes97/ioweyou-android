@@ -74,7 +74,6 @@ public class DebtsFragment extends Fragment implements UpdateableFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         // Create new database instance
         db = new DatabaseHandler(getContext());
         // Get user
@@ -116,7 +115,7 @@ public class DebtsFragment extends Fragment implements UpdateableFragment {
 
     @Override
     public void update() {
-        Log.d(Const.TAG, "UPDATING FRAgMENT");
+        Log.d(Const.TAG, "UPDATING FRAGMENT");
 
         if (user != null) {
             debts = db.getExtendedDebts(myDebts, user.id);
@@ -188,15 +187,20 @@ public class DebtsFragment extends Fragment implements UpdateableFragment {
                             .addNumberPickerDialogHandler(new NumberPickerDialogFragment.NumberPickerDialogHandlerV2() {
                                 @Override
                                 public void onDialogNumberSet(int reference, BigInteger number, double decimal, boolean isNegative, BigDecimal fullNumber) {
-                                    debt.amount -= Integer.parseInt(number.toString());
+                                    Integer payment = Integer.parseInt(number.toString());
+
+                                    if (debt.amount - payment <= 0) {
+                                        debt.paidAt = new Date();
+                                    } else {
+                                        debt.amount -= payment;
+                                    }
+
                                     payDebt(debt);
                                     dialog.cancel();
                                 }
                             });
                     npb.show();
                 }
-
-
             }
         });
 

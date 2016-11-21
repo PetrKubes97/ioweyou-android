@@ -12,6 +12,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 
 import cz.petrkubes.payuback.Const;
 import cz.petrkubes.payuback.Structs.Currency;
@@ -259,6 +261,81 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         return list;
     }
+
+    /**
+     * Returns list of friends who are currenctly debtors or creditors with set variable 'stuff'
+     * @return ArrayList<Friend>
+     */
+    public ArrayList<Friend> getExtendedFriendsWhoAreCreditorsOrDebtors(int userId) {
+
+        ArrayList<Friend> list = new ArrayList<>();
+        HashMap<String, Friend> hashMap = new HashMap<>();
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+
+        // Get all current debts
+        cursor = db.query(TABLE_DEBTS, debtProjection, DEBTS_KEY_PAID_AT + " IS NULL AND "+DEBTS_KEY_DELETED_AT + " IS NULL", null, null, null, DEBTS_KEY_CREATED_AT + " DESC");
+
+
+        if (cursor.moveToFirst())
+        {
+            do {
+
+                Debt debt = debtFromCursor(cursor);
+
+                // Try to get a friend who is already added in the hashmap
+                Friend friend = hashMap.get(getFriendHashFromDebt(debt, userId));
+                if (friend == null) { // Friend doesn't exists in the current hash map yet
+                    // Add friend
+                    if (debt.customFriendName != null) {
+                        friend = new Friend(null, debt.customFriendName, "");
+                        hashMap.put(String.valueOf(debt.debtorId), friend);
+                    } else if (userId == debt.creditorId && debt.debtorId > 0) {
+                        friend = getFriend(debt.debtorId);
+                        hashMap.put(String.valueOf(debt.debtorId), friend);
+                    } else if (userId == debt.debtorId && debt.creditorId > 0) {
+                        friend = getFriend(debt.creditorId);
+                        hashMap.put(String.valueOf(debt.debtorId), friend);
+                    }
+                }
+
+                // The stuff that is owned
+                if (debt.amount != null) {
+                    friend.stuff += String.valueOf(debt.amount) + " " + String.valueOf(getCurrency(debt.currencyId));
+                } else {
+                    friend.stuff += debt.thingName;
+                }
+
+                // Update hash map
+                hashMap.put(getFriendHashFromDebt(debt, userId), friend);
+            } while (cursor.moveToNext());
+        }
+
+        list.addAll(hashMap.values());
+
+        cursor.close();
+        db.close();
+
+        Log.d(Const.TAG, list.toString());
+
+        return list;
+    }
+
+    private String getFriendHashFromDebt(Debt debt, int userId) {
+
+        if (debt.customFriendName != null) {
+            return String.valueOf(debt.customFriendName);
+        } else if (userId == debt.creditorId && debt.debtorId != null) {
+            return String.valueOf(debt.debtorId);
+        } else if (userId == debt.debtorId && debt.creditorId != null) {
+            return String.valueOf(debt.creditorId);
+        } else {
+            return null;
+        }
+    }
+
+
 
     /**
      * Get friend by id

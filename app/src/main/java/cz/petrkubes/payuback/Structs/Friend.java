@@ -10,6 +10,9 @@ public class Friend {
     public String name;
     public String email;
 
+    // Variables used for displaying friends
+    public String stuff;
+
     public Friend(Integer id, String name, String email) {
         this.id = id;
         this.name = name;
