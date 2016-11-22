@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import java.text.DateFormat;
@@ -16,12 +17,15 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import cz.petrkubes.payuback.Const;
+import cz.petrkubes.payuback.R;
 import cz.petrkubes.payuback.Structs.Currency;
 import cz.petrkubes.payuback.Structs.Debt;
 import cz.petrkubes.payuback.Structs.Friend;
 import cz.petrkubes.payuback.Structs.User;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
+
+    private Context context;
 
     // Database Version
     private static final int DATABASE_VERSION = 20;
@@ -98,6 +102,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     public DatabaseHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        this.context = context;
     }
 
     @Override
@@ -277,7 +282,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         // Get all current debts
         cursor = db.query(TABLE_DEBTS, debtProjection, DEBTS_KEY_PAID_AT + " IS NULL AND "+DEBTS_KEY_DELETED_AT + " IS NULL", null, null, null, DEBTS_KEY_CREATED_AT + " DESC");
 
-
         if (cursor.moveToFirst())
         {
             do {
@@ -286,19 +290,36 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                 // Try to get a friend who is already added in the hashmap
                 Friend friend = hashMap.get(getFriendHashFromDebt(debt, userId));
+
+                Log.d(Const.TAG, getFriendHashFromDebt(debt, userId));
+
                 if (friend == null) { // Friend doesn't exists in the current hash map yet
                     // Add friend
                     if (debt.customFriendName != null) {
                         friend = new Friend(null, debt.customFriendName, "");
-                        hashMap.put(String.valueOf(debt.debtorId), friend);
                     } else if (userId == debt.creditorId && debt.debtorId > 0) {
                         friend = getFriend(debt.debtorId);
-                        hashMap.put(String.valueOf(debt.debtorId), friend);
                     } else if (userId == debt.debtorId && debt.creditorId > 0) {
                         friend = getFriend(debt.creditorId);
-                        hashMap.put(String.valueOf(debt.debtorId), friend);
                     }
+
+                    friend.stuff = "";
                 }
+
+                // Add commas
+                if (friend.stuff.length()>0) {
+                    friend.stuff += ", ";
+                }
+
+                // color
+                if (debt.creditorId != null && debt.creditorId == userId) {
+                    //noinspection ResourceType
+                    friend.stuff += "<font color='#009747'>";
+                } else {
+                    //noinspection ResourceType
+                    friend.stuff += "<font color='#ff3737'>";
+                }
+
 
                 // The stuff that is owned
                 if (debt.amount != null) {
@@ -306,6 +327,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 } else {
                     friend.stuff += debt.thingName;
                 }
+
+                // color end tag
+                friend.stuff += "</font>";
 
                 // Update hash map
                 hashMap.put(getFriendHashFromDebt(debt, userId), friend);
@@ -317,6 +341,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         cursor.close();
         db.close();
 
+        Log.d(Const.TAG, hashMap.keySet().toString());
         Log.d(Const.TAG, list.toString());
 
         return list;
@@ -326,12 +351,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         if (debt.customFriendName != null) {
             return String.valueOf(debt.customFriendName);
-        } else if (userId == debt.creditorId && debt.debtorId != null) {
+        } else if (userId == debt.creditorId && debt.debtorId != null && debt.debtorId > 0) {
             return String.valueOf(debt.debtorId);
-        } else if (userId == debt.debtorId && debt.creditorId != null) {
+        } else if (userId == debt.debtorId && debt.creditorId != null && debt.creditorId > 0) {
             return String.valueOf(debt.creditorId);
         } else {
-            return null;
+            return "error";
         }
     }
 
@@ -652,6 +677,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         Integer debtorId = null;
         Integer currencyId = null;
 
+        String customFriendName = null;
+        String note = null;
+        String thing = null;
+
         try {
             if (!cursor.isNull(8)) {
                     paidAt = df.parse(cursor.getString(8));
@@ -685,17 +714,27 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 currencyId = cursor.getInt(5);
             }
 
+            if (!cursor.isNull(3)) {
+                customFriendName = cursor.getString(3);
+            }
 
+            if (!cursor.isNull(6)) {
+                thing = cursor.getString(6);
+            }
+
+            if (!cursor.isNull(7)) {
+                note = cursor.getString(7);
+            }
 
             return new Debt(
                     cursor.getInt(0),
                     creditorId,
                     debtorId,
-                    cursor.getString(3),
+                    customFriendName,
                     amount,
                     currencyId,
-                    cursor.getString(6),
-                    cursor.getString(7),
+                    thing,
+                    note,
                     paidAt,
                     deletedAt,
                     modifiedAt,

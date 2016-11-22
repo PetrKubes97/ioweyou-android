@@ -130,6 +130,9 @@ public class Debt {
         Integer debtorId = null;
         Integer amount = null;
         Integer currencyId = null;
+        String customFriendName = null;
+        String thingName = null;
+        String note = null;
 
         if (!response.getString("paidAt").isEmpty()) {
             paidAt = df.parse(response.getString("paidAt"));
@@ -163,15 +166,27 @@ public class Debt {
             currencyId = response.getInt("currencyId");
         }
 
+        if (!response.getString("customFriendName").isEmpty()) {
+            customFriendName = response.getString("customFriendName");
+        }
+
+        if (!response.getString("thingName").isEmpty()) {
+            thingName = response.getString("thingName");
+        }
+
+        if (!response.getString("note").isEmpty()) {
+            note = response.getString("note");
+        }
+
         return new Debt(
                 response.getInt("id"),
                 creditorId,
                 debtorId,
-                response.getString("customFriendName"),
+                customFriendName,
                 amount,
                 currencyId,
-                response.getString("thingName"),
-                response.getString("note"),
+                thingName,
+                note,
                 paidAt,
                 deletedAt,
                 modifiedAt,

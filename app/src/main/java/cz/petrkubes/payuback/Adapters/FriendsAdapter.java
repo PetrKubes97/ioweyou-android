@@ -1,7 +1,11 @@
 package cz.petrkubes.payuback.Adapters;
 
 import android.content.Context;
+import android.os.Build;
 import android.support.annotation.Nullable;
+import android.text.Html;
+import android.text.Spanned;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +15,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import cz.petrkubes.payuback.Const;
 import cz.petrkubes.payuback.R;
 import cz.petrkubes.payuback.Structs.Friend;
 
@@ -53,7 +58,8 @@ public class  FriendsAdapter extends ArrayAdapter<Friend> {
         // into the template view.
         if (friend != null) {
             viewHolder.txtName.setText(friend.name);
-            viewHolder.txtStuff.setText(friend.stuff);
+            viewHolder.txtStuff.setText(fromHtml(friend.stuff));
+            Log.d(Const.TAG, friend.stuff);
         }
 
         // Return the completed view to render on screen
@@ -75,5 +81,15 @@ public class  FriendsAdapter extends ArrayAdapter<Friend> {
     private static class ViewHolder {
         TextView txtName;
         TextView txtStuff;
+    }
+
+    // I don't even have a comment for this...
+    @SuppressWarnings("deprecation")
+    private Spanned fromHtml(String source) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            return Html.fromHtml(source, Html.FROM_HTML_MODE_LEGACY);
+        } else {
+            return Html.fromHtml(source);
+        }
     }
 }

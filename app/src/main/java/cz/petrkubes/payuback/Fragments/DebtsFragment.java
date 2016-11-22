@@ -152,7 +152,7 @@ public class DebtsFragment extends Fragment implements UpdateableFragment {
         txtDialogNote.setText(debt.note);
         txtDialogDate.setText(debt.createdAtString());
 
-        if (debt.note.isEmpty()) {
+        if (debt.note == null) {
             txtDialogNote.setVisibility(View.GONE);
         }
 
