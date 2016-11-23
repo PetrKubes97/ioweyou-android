@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import java.text.DateFormat;
@@ -14,14 +13,12 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 
 import cz.petrkubes.payuback.Const;
-import cz.petrkubes.payuback.R;
-import cz.petrkubes.payuback.Structs.Currency;
-import cz.petrkubes.payuback.Structs.Debt;
-import cz.petrkubes.payuback.Structs.Friend;
-import cz.petrkubes.payuback.Structs.User;
+import cz.petrkubes.payuback.Pojos.Currency;
+import cz.petrkubes.payuback.Pojos.Debt;
+import cz.petrkubes.payuback.Pojos.Friend;
+import cz.petrkubes.payuback.Pojos.User;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 
@@ -241,7 +238,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     /**
-     * Get list of friends from the database
+     * Get a list of friends from the database
      * @return ArrayList<Friend>
      */
     public ArrayList<Friend> getFriends() {
@@ -268,10 +265,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     /**
-     * Returns list of friends who are currenctly debtors or creditors with set variable 'stuff'
+     * Returns a list of friends who are currenctly debtors or creditors with set variable 'debtsString'
      * @return ArrayList<Friend>
      */
-    public ArrayList<Friend> getExtendedFriendsWhoAreCreditorsOrDebtors(int userId) {
+    public ArrayList<Friend> getExtendedFriendsWhoAreCreditorsOrDebtors(Integer userId) {
 
         ArrayList<Friend> list = new ArrayList<>();
         HashMap<String, Friend> hashMap = new HashMap<>();
@@ -287,11 +284,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             do {
 
                 Debt debt = debtFromCursor(cursor);
+                // Get additional variables, so that it can be displayed
+                debt = getDebtWithAdditionalVariables(debt, userId);
 
                 // Try to get a friend who is already added in the hashmap
                 Friend friend = hashMap.get(getFriendHashFromDebt(debt, userId));
-
-                Log.d(Const.TAG, getFriendHashFromDebt(debt, userId));
 
                 if (friend == null) { // Friend doesn't exists in the current hash map yet
                     // Add friend
@@ -303,33 +300,36 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                         friend = getFriend(debt.creditorId);
                     }
 
-                    friend.stuff = "";
+                    friend.debtsString = "";
+                    friend.debts = new ArrayList<Debt>();
                 }
 
+                friend.debts.add(debt);
+
+                // Debt String
                 // Add commas
-                if (friend.stuff.length()>0) {
-                    friend.stuff += ", ";
+                if (friend.debtsString.length()>0) {
+                    friend.debtsString += ", ";
                 }
 
                 // color
                 if (debt.creditorId != null && debt.creditorId == userId) {
                     //noinspection ResourceType
-                    friend.stuff += "<font color='#009747'>";
+                    friend.debtsString += "<font color='#009747'>";
                 } else {
                     //noinspection ResourceType
-                    friend.stuff += "<font color='#ff3737'>";
+                    friend.debtsString += "<font color='#ff3737'>";
                 }
 
-
-                // The stuff that is owned
+                // add a thing or money to the string
                 if (debt.amount != null) {
-                    friend.stuff += String.valueOf(debt.amount) + " " + String.valueOf(getCurrency(debt.currencyId));
+                    friend.debtsString += String.valueOf(debt.amount) + " " + String.valueOf(getCurrency(debt.currencyId));
                 } else {
-                    friend.stuff += debt.thingName;
+                    friend.debtsString += debt.thingName;
                 }
 
                 // color end tag
-                friend.stuff += "</font>";
+                friend.debtsString += "</font>";
 
                 // Update hash map
                 hashMap.put(getFriendHashFromDebt(debt, userId), friend);
@@ -340,9 +340,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         cursor.close();
         db.close();
-
-        Log.d(Const.TAG, hashMap.keySet().toString());
-        Log.d(Const.TAG, list.toString());
 
         return list;
     }
@@ -582,7 +579,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
      * @param my If true, returns only debts which user owes, otherwise debts he will collect
      * @return ArrayList<Debt>
      */
-    public ArrayList<Debt> getExtendedDebts(boolean my, int userId) {
+    public ArrayList<Debt> getExtendedDebts(boolean my, Integer userId) {
         ArrayList<Debt> list = new ArrayList<>();
 
         SQLiteDatabase db = this.getReadableDatabase();
@@ -601,45 +598,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                 // Set additional variables
                 // 1. Name of person
-                if (my) {
-                    if (debt.creditorId == null) {
-                        debt.who = debt.customFriendName;
-                    } else {
-                        Friend friend = getFriend(debt.creditorId);
-                        if (friend != null) {
-                            debt.who = friend.name;
-                        } else {
-                            debt.who = "Error :-(";
-                        }
-
-                    }
-                } else {
-                    if (debt.debtorId == null) {
-                        debt.who = debt.customFriendName;
-                    } else {
-                        Friend friend = getFriend(debt.debtorId);
-                        if (friend != null) {
-                            debt.who = friend.name;
-                        } else {
-                            debt.who = "Error :-(";
-                        }
-                    }
-                }
-
-                // 2. money or thing that is owed
-                if (debt.amount != null) {
-                    debt.currencyString = String.valueOf(getCurrency(debt.currencyId));
-                    debt.what = String.valueOf(debt.amount) + " " + debt.currencyString;
-                } else {
-                    debt.what = debt.thingName;
-                }
-
-                // 3. status
-                if (debt.id < 0) {
-                    debt.status = "not synced";
-                } else {
-                    debt.status = "synced";
-                }
+                debt = getDebtWithAdditionalVariables(debt, userId);
 
                 list.add(debt);
 
@@ -651,6 +610,50 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.close();
 
         return list;
+    }
+
+    private Debt getDebtWithAdditionalVariables(Debt debt, Integer userId) {
+        if (debt.creditorId != null && debt.creditorId.equals(userId)) {
+            if (debt.debtorId == null) {
+                debt.who = debt.customFriendName;
+            } else {
+                Friend friend = getFriend(debt.debtorId);
+                if (friend != null) {
+                    debt.who = friend.name;
+                } else {
+                    debt.who = "Error :-(";
+                }
+            }
+        } else {
+            if (debt.creditorId == null) {
+                debt.who = debt.customFriendName;
+            } else {
+                Friend friend = getFriend(debt.creditorId);
+                if (friend != null) {
+                    debt.who = friend.name;
+                } else {
+                    debt.who = "Error :-(";
+                }
+
+            }
+        }
+
+        // 2. money or thing that is owed
+        if (debt.amount != null) {
+            debt.currencyString = String.valueOf(getCurrency(debt.currencyId));
+            debt.what = String.valueOf(debt.amount) + " " + debt.currencyString;
+        } else {
+            debt.what = debt.thingName;
+        }
+
+        // 3. status
+        if (debt.id < 0) {
+            debt.status = "not synced";
+        } else {
+            debt.status = "synced";
+        }
+
+        return debt;
     }
 
 

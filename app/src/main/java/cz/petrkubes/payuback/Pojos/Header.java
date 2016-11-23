@@ -1,4 +1,4 @@
-package cz.petrkubes.payuback.Structs;
+package cz.petrkubes.payuback.Pojos;
 
 /**
  * Created by petr on 30.10.16.

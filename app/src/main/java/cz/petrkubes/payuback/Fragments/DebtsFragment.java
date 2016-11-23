@@ -1,23 +1,17 @@
 package cz.petrkubes.payuback.Fragments;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -30,19 +24,15 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import cz.petrkubes.payuback.Activities.DebtActivity;
 import cz.petrkubes.payuback.Activities.MainActivity;
 import cz.petrkubes.payuback.Adapters.DebtsAdapter;
-import cz.petrkubes.payuback.Api.ApiRestClient;
-import cz.petrkubes.payuback.Api.SimpleCallback;
 import cz.petrkubes.payuback.Const;
 import cz.petrkubes.payuback.Database.DatabaseHandler;
 import cz.petrkubes.payuback.R;
-import cz.petrkubes.payuback.Structs.Debt;
-import cz.petrkubes.payuback.Structs.User;
+import cz.petrkubes.payuback.Pojos.Debt;
+import cz.petrkubes.payuback.Pojos.User;
 
 
 public class DebtsFragment extends Fragment implements UpdateableFragment {

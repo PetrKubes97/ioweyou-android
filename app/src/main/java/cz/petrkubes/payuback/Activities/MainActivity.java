@@ -1,49 +1,28 @@
 package cz.petrkubes.payuback.Activities;
 
-import android.app.Activity;
 import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
-import android.support.v4.view.accessibility.AccessibilityManagerCompat;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.stetho.Stetho;
-import com.loopj.android.http.JsonHttpResponseHandler;
-import com.loopj.android.http.RequestParams;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-
-import cz.msebera.android.httpclient.Header;
 import cz.petrkubes.payuback.Adapters.FragmentsAdapter;
 import cz.petrkubes.payuback.Api.ApiRestClient;
 import cz.petrkubes.payuback.Api.SimpleCallback;
 import cz.petrkubes.payuback.Const;
 import cz.petrkubes.payuback.Database.DatabaseHandler;
 import cz.petrkubes.payuback.R;
-import cz.petrkubes.payuback.Structs.Currency;
-import cz.petrkubes.payuback.Structs.Debt;
-import cz.petrkubes.payuback.Structs.Friend;
-import cz.petrkubes.payuback.Structs.User;
+import cz.petrkubes.payuback.Pojos.User;
 
 /**
  * Created by petr on 16.10.16.

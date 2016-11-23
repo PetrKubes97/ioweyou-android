@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="8dp">
+
+
+    <TextView
+        android:text="Tohle je poznamka ktera je docela dlouha"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/txt_note"
+        android:maxWidth="92dp"
+        android:ellipsize="end"
+        android:gravity="center|start"
+        app:layout_constraintRight_toLeftOf="@+id/txt_created_at"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="16dp"
+        app:layout_constraintLeft_toRightOf="@+id/txt_what"
+        app:layout_constraintBottom_toBottomOf="@+id/txt_what"
+        app:layout_constraintTop_toTopOf="@+id/txt_what" />
+
+    <TextView
+        android:text="5000 Kč"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_alignTop="@+id/txt_note"
+        android:layout_alignParentEnd="true"
+        android:id="@+id/txt_what"
+        android:textSize="18sp"
+        android:textColor="@color/black"
+        app:layout_constraintTop_toTopOf="parent"
+        android:gravity="center"
+        app:layout_constraintLeft_toLeftOf="parent" />
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="41dp"
+        android:layout_height="36dp"
+        android:id="@+id/txt_created_at"
+        android:textSize="8sp"
+        android:gravity="center|end"
+        app:layout_constraintBottom_toBottomOf="@+id/txt_what"
+        app:layout_constraintTop_toTopOf="@+id/txt_what"
+        android:minLines="2"
+        android:maxLines="2"
+        app:layout_constraintVertical_bias="0.0"
+        app:layout_constraintRight_toLeftOf="@+id/checkBox"
+        android:layout_marginEnd="8dp" />
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/checkBox"
+        app:layout_constraintTop_toTopOf="@+id/txt_what"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/txt_what" />
+</android.support.constraint.ConstraintLayout>

@@ -1,4 +1,4 @@
-package cz.petrkubes.payuback.Structs;
+package cz.petrkubes.payuback.Pojos;
 
 import java.util.Date;
 

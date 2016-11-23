@@ -15,7 +15,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import cz.petrkubes.payuback.R;
-import cz.petrkubes.payuback.Structs.Friend;
+import cz.petrkubes.payuback.Pojos.Friend;
 
 /**
  * Created by petr on 28.10.16.

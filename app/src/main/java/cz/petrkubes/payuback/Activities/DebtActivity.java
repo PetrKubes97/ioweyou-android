@@ -7,7 +7,6 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
-import android.provider.CalendarContract;
 import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -37,26 +36,23 @@ import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialo
 import com.codetroopers.betterpickers.radialtimepicker.RadialTimePickerDialogFragment;
 
 import org.parceler.Parcels;
-import org.w3c.dom.Text;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 
 import cz.petrkubes.payuback.Adapters.FriendsSuggestionAdapter;
 import cz.petrkubes.payuback.Const;
 import cz.petrkubes.payuback.Database.DatabaseHandler;
 import cz.petrkubes.payuback.Fragments.DebtsFragment;
 import cz.petrkubes.payuback.R;
-import cz.petrkubes.payuback.Structs.Currency;
-import cz.petrkubes.payuback.Structs.Debt;
-import cz.petrkubes.payuback.Structs.Friend;
-import cz.petrkubes.payuback.Structs.User;
+import cz.petrkubes.payuback.Pojos.Currency;
+import cz.petrkubes.payuback.Pojos.Debt;
+import cz.petrkubes.payuback.Pojos.Friend;
+import cz.petrkubes.payuback.Pojos.User;
 import cz.petrkubes.payuback.Tools.Tools;
 
 /**

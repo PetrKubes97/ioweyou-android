@@ -1,7 +1,6 @@
 package cz.petrkubes.payuback.Api;
 
 import android.content.Context;
-import android.content.Intent;
 import android.util.Log;
 
 import com.loopj.android.http.AsyncHttpClient;
@@ -12,10 +11,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Array;
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -24,10 +20,10 @@ import cz.msebera.android.httpclient.Header;
 import cz.msebera.android.httpclient.entity.StringEntity;
 import cz.petrkubes.payuback.Const;
 import cz.petrkubes.payuback.Database.DatabaseHandler;
-import cz.petrkubes.payuback.Structs.Currency;
-import cz.petrkubes.payuback.Structs.Debt;
-import cz.petrkubes.payuback.Structs.Friend;
-import cz.petrkubes.payuback.Structs.User;
+import cz.petrkubes.payuback.Pojos.Currency;
+import cz.petrkubes.payuback.Pojos.Debt;
+import cz.petrkubes.payuback.Pojos.Friend;
+import cz.petrkubes.payuback.Pojos.User;
 
 public class ApiRestClient {
 

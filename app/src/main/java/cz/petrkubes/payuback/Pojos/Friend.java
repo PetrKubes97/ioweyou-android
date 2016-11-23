@@ -1,4 +1,6 @@
-package cz.petrkubes.payuback.Structs;
+package cz.petrkubes.payuback.Pojos;
+
+import java.util.ArrayList;
 
 /**
  * Created by petr on 21.10.16.
@@ -11,7 +13,8 @@ public class Friend {
     public String email;
 
     // Variables used for displaying friends
-    public String stuff;
+    public String debtsString;
+    public ArrayList<Debt> debts;
 
     public Friend(Integer id, String name, String email) {
         this.id = id;

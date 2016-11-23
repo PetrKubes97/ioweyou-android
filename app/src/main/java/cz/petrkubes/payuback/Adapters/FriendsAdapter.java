@@ -17,7 +17,7 @@ import java.util.List;
 
 import cz.petrkubes.payuback.Const;
 import cz.petrkubes.payuback.R;
-import cz.petrkubes.payuback.Structs.Friend;
+import cz.petrkubes.payuback.Pojos.Friend;
 
 /**
  * Created by petr on 21.11.16.
@@ -58,8 +58,8 @@ public class  FriendsAdapter extends ArrayAdapter<Friend> {
         // into the template view.
         if (friend != null) {
             viewHolder.txtName.setText(friend.name);
-            viewHolder.txtStuff.setText(fromHtml(friend.stuff));
-            Log.d(Const.TAG, friend.stuff);
+            viewHolder.txtStuff.setText(fromHtml(friend.debtsString));
+            Log.d(Const.TAG, friend.debtsString);
         }
 
         // Return the completed view to render on screen

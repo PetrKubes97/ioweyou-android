@@ -1,14 +1,11 @@
-package cz.petrkubes.payuback.Structs;
+package cz.petrkubes.payuback.Pojos;
 
-
-import android.content.ContentValues;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.parceler.Parcel;
 
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
