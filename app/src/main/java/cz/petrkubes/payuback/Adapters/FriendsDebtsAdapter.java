@@ -8,6 +8,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -25,20 +27,21 @@ public class FriendsDebtsAdapter extends ArrayAdapter<Debt> {
 
     private ArrayList<Debt> debts;
     private Integer userId;
-
+    private ArrayList<Debt> selectedDebts;
 
     public FriendsDebtsAdapter(Context context, ArrayList<Debt> objects, Integer userId) {
         super(context, R.layout.item_friends_debts,  objects);
         this.debts = objects;
         this.userId = userId;
+        selectedDebts = new ArrayList<Debt>();
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
-        Debt debt = getItem(position);
+        final Debt debt = getItem(position);
 
-        FriendsDebtsAdapter.ViewHolder viewHolder;
+        final FriendsDebtsAdapter.ViewHolder viewHolder;
 
         if (convertView == null) {
 
@@ -50,6 +53,8 @@ public class FriendsDebtsAdapter extends ArrayAdapter<Debt> {
             viewHolder.txtWhat = (TextView) convertView.findViewById(R.id.txt_what);
             viewHolder.txtCreatedAt = (TextView) convertView.findViewById(R.id.txt_created_at);
             viewHolder.txtNote = (TextView) convertView.findViewById(R.id.txt_note);
+            viewHolder.chckbSelected = (CheckBox) convertView.findViewById(R.id.chck_selected);
+            viewHolder.layout = convertView.findViewById(R.id.friend_debt_item_layout);
 
             convertView.setTag(viewHolder);
         } else {
@@ -58,10 +63,24 @@ public class FriendsDebtsAdapter extends ArrayAdapter<Debt> {
 
         // Populate the data from the data object via the viewHolder object
         // into the template view.
-        Log.d(Const.TAG, debt.what);
         viewHolder.txtWhat.setText(debt.what);
         viewHolder.txtNote.setText(debt.note);
         viewHolder.txtCreatedAt.setText(Tools.formatDateTime(debt.createdAt));
+        viewHolder.chckbSelected.setChecked(selectedDebts.contains(debt));
+
+        viewHolder.layout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if (!selectedDebts.contains(debt)) {
+                    selectedDebts.add(debt);
+                    viewHolder.chckbSelected.setChecked(true);
+                } else {
+                    selectedDebts.remove(debt);
+                    viewHolder.chckbSelected.setChecked(false);
+                }
+            }
+        });
 
         // Set color of owned items
         if (debt.creditorId != null && debt.creditorId.equals(userId)) {
@@ -90,6 +109,12 @@ public class FriendsDebtsAdapter extends ArrayAdapter<Debt> {
         TextView txtCreatedAt;
         TextView txtWhat;
         TextView txtNote;
+        CheckBox chckbSelected;
+        View layout;
+    }
+
+    public ArrayList<Debt> getSelectedDebts() {
+        return selectedDebts;
     }
 
 }

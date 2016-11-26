@@ -1,11 +1,14 @@
 package cz.petrkubes.payuback.Pojos;
 
+import org.parceler.Parcel;
+
 import java.util.ArrayList;
 
 /**
  * Created by petr on 21.10.16.
  */
 
+@Parcel
 public class Friend {
 
     public Integer id;
@@ -15,6 +18,9 @@ public class Friend {
     // Variables used for displaying friends
     public String debtsString;
     public ArrayList<Debt> debts;
+
+    // Empty constructor for Parceler
+    public Friend() {};
 
     public Friend(Integer id, String name, String email) {
         this.id = id;

@@ -146,6 +146,10 @@ public class DebtsFragment extends Fragment implements UpdateableFragment {
             txtDialogNote.setVisibility(View.GONE);
         }
 
+        if (debt.amount == null) {
+            swtchPayment.setVisibility(View.GONE);
+        }
+
         amount = debt.amount;
 
         // Cancel button

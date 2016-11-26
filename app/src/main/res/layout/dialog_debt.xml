@@ -19,7 +19,8 @@
         android:layout_marginStart="16dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toLeftOf="@+id/txt_what"
-        android:layout_marginEnd="8dp" />
+        android:layout_marginEnd="8dp"
+        android:minLines="1" />
 
     <TextView
         android:text="50 Kč"
@@ -33,7 +34,10 @@
         app:layout_constraintTop_toTopOf="@+id/txt_who"
         app:layout_constraintBottom_toBottomOf="@+id/txt_who"
         android:layout_marginEnd="16dp"
-        app:layout_constraintRight_toRightOf="parent" />
+        app:layout_constraintRight_toRightOf="parent"
+        android:maxWidth="160dp"
+        android:ellipsize="end"
+        android:maxLines="1" />
 
     <Button
         android:text="@string/edit"

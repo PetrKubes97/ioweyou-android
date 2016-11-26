@@ -194,14 +194,14 @@ public class ApiRestClient {
             e.printStackTrace();
         }
 
-        Log.d(Const.TAG, debtsJson.toString());
+        Log.d(Const.TAG, "Sending: " + debtsJson.toString());
 
         client.post(context, getAbsoluteUrl("debts/update"), entity, "application/json", new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
 
-                Log.d(Const.TAG, response.toString());
+                Log.d(Const.TAG, "Receiving: " + response.toString());
                 // Go through every currency and add it to the database
                 try {
 

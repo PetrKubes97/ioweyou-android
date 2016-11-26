@@ -31,6 +31,7 @@ import cz.petrkubes.payuback.Pojos.User;
 public class MainActivity extends AppCompatActivity {
 
     public static final int ADD_DEBT_REQUEST = 0;
+    public static final String MY_DEBT = "myDebt";
 
     private FloatingActionButton btnAddDebt;
     private DatabaseHandler db;
@@ -67,38 +68,21 @@ public class MainActivity extends AppCompatActivity {
         apiClient = new ApiRestClient(getApplicationContext());
         user = db.getUser();
 
-        /*
-        swpLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                if (user != null) {
-                    apiClient.updateAll(user.apiKey, new SimpleCallback() {
-                        @Override
-                        public void onSuccess() {
-                            pageAdapter.notifyDataSetChanged();
-                            swpLayout.setRefreshing(false);
-                        }
-
-                        @Override
-                        public void onFailure() {
-                            Toast.makeText(getApplicationContext(), "Something went wring. :{", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                } else {
-                    Toast.makeText(getApplicationContext(), "Neni", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-        */
-
         // Start a new activity in which user adds debts
         btnAddDebt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), DebtActivity.class);
 
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP){
+                // put extra boolean to the intent, so that DebtActivity knows which radio button to check
+                boolean myDebt = true;
+                if (viewPager.getCurrentItem() == 1) {
+                    myDebt = false;
+                }
 
+                intent.putExtra(MY_DEBT, myDebt);
+
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP){
                     ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(MainActivity.this, btnAddDebt, getString(R.string.transition_button));
                     startActivityForResult(intent, ADD_DEBT_REQUEST, options.toBundle());
                 } else{
@@ -157,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
 
                         @Override
                         public void onFailure() {
-                            Toast.makeText(getApplicationContext(), "Something went wring. :{", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), "Something went wrong. :(", Toast.LENGTH_SHORT).show();
                         }
                     });
                 } else {

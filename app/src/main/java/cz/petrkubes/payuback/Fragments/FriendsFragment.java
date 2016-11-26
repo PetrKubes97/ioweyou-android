@@ -1,9 +1,11 @@
 package cz.petrkubes.payuback.Fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -17,11 +19,17 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import org.parceler.Parcels;
+
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
+import cz.petrkubes.payuback.Activities.DebtActivity;
+import cz.petrkubes.payuback.Activities.MainActivity;
 import cz.petrkubes.payuback.Adapters.FriendsAdapter;
 import cz.petrkubes.payuback.Adapters.FriendsDebtsAdapter;
+import cz.petrkubes.payuback.Const;
 import cz.petrkubes.payuback.Database.DatabaseHandler;
 import cz.petrkubes.payuback.R;
 import cz.petrkubes.payuback.Pojos.Debt;
@@ -33,6 +41,8 @@ import cz.petrkubes.payuback.Pojos.User;
  */
 
 public class FriendsFragment extends Fragment implements UpdateableFragment {
+
+    public static final String ADD_TO_FRIEND = "addToFriend";
 
     private DatabaseHandler db;
     private User user;
@@ -85,7 +95,7 @@ public class FriendsFragment extends Fragment implements UpdateableFragment {
 
     }
 
-    private void showDialog(Friend friend) {
+    private void showDialog(final Friend friend) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         // Get the layout inflater
@@ -105,34 +115,45 @@ public class FriendsFragment extends Fragment implements UpdateableFragment {
         // Set name
         txtDialogName.setText(friend.name);
 
-        FriendsDebtsAdapter adapter = new FriendsDebtsAdapter(getContext(), friend.debts, user.id);
-        lstDialogDebts.setAdapter(adapter);
-        lstDialogDebts.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+        final FriendsDebtsAdapter friendsDebtsAdapter = new FriendsDebtsAdapter(getContext(), friend.debts, user.id);
+        lstDialogDebts.setAdapter(friendsDebtsAdapter);
 
-        lstDialogDebts.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
+        btnDialogPay.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onItemCheckedStateChanged(ActionMode actionMode, int i, long l, boolean b) {
+            public void onClick(View view) {
+                Log.d(Const.TAG, "-------------------");
+                // Mark every selected debt as paid and notify adapter
+                for (Debt debt : friendsDebtsAdapter.getSelectedDebts() ) {
+                    Log.d(Const.TAG, "Marking debt: " + debt.what);
+                    friendsDebtsAdapter.remove(debt);
+                    debt.paidAt = new Date();
+                    debt.version += 1;
+                    db.addOrUpdateDebt(debt.id, debt);
+                    friendsDebtsAdapter.notifyDataSetChanged();
+                }
+                // Update friends adapter
+                adapter.clear();
+                adapter.addAll(db.getExtendedFriendsWhoAreCreditorsOrDebtors(user.id));
+                adapter.notifyDataSetChanged();
 
+                dialog.cancel();
             }
+        });
 
+        btnDialogCancel.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
-                return false;
+            public void onClick(View view) {
+                dialog.cancel();
             }
+        });
 
+        btnDialogAdd.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
-                return false;
-            }
-
-            @Override
-            public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
-                return false;
-            }
-
-            @Override
-            public void onDestroyActionMode(ActionMode actionMode) {
-
+            public void onClick(View view) {
+                Intent intent = new Intent(getContext(), DebtActivity.class);
+                intent.putExtra(ADD_TO_FRIEND, Parcels.wrap(friend));
+                getActivity().startActivityForResult(intent, MainActivity.ADD_DEBT_REQUEST);
+                dialog.cancel();
             }
         });
 

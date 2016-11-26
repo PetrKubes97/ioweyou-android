@@ -511,7 +511,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         if (currentId == null || cursor.getCount() < 1) {
 
             if (debt.id != null) { // It's a debt from the web
-                Log.d(Const.TAG, "Adding a downloaded debt");
                 // Checks if debt doesn't already exist
                 cursor = db.query(TABLE_DEBTS, new String[] {DEBTS_KEY_ID}, DEBTS_KEY_ID + "= ?",
                         new String[] {String.valueOf(debt.id)}, null, null, null);

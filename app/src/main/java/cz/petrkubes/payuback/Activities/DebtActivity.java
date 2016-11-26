@@ -48,6 +48,7 @@ import cz.petrkubes.payuback.Adapters.FriendsSuggestionAdapter;
 import cz.petrkubes.payuback.Const;
 import cz.petrkubes.payuback.Database.DatabaseHandler;
 import cz.petrkubes.payuback.Fragments.DebtsFragment;
+import cz.petrkubes.payuback.Fragments.FriendsFragment;
 import cz.petrkubes.payuback.R;
 import cz.petrkubes.payuback.Pojos.Currency;
 import cz.petrkubes.payuback.Pojos.Debt;
@@ -265,7 +266,24 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
             }
         });
 
-        // If there is a debt to be edited, pre-fill text edits
+
+        // --------------------- Pre-filling widgets ----------------------------
+        // Check my or their debt
+        if (getIntent().getBooleanExtra(MainActivity.MY_DEBT, true)) {
+            rdioMyDebt.setChecked(true);
+        } else {
+            rdioTheirDebt.setChecked(true);
+        }
+
+        // Add a new debt to a friend
+        Friend friend = Parcels.unwrap(getIntent().getParcelableExtra(FriendsFragment.ADD_TO_FRIEND));
+        if (friend != null) {
+            txtName.setText(friend.name);
+            tempFacebookFriendId = friend.id;
+        }
+
+
+        // Edit debt
         debtToEdit = Parcels.unwrap(getIntent().getParcelableExtra(DebtsFragment.DEBT_TO_EDIT));
         if (debtToEdit != null) {
 
@@ -336,13 +354,19 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
             txtvDeletedLabel.setVisibility(View.GONE);
 
             // Show keyboard - it is necessary to wait for the animation to finish
-            txtName.requestFocus();
+
+            if (txtName.getText().length() > 0) {
+                txtWhat.requestFocus();
+            } else {
+                txtName.requestFocus();
+            }
+
             Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                    imm.showSoftInput(txtName, InputMethodManager.SHOW_IMPLICIT);
+                    imm.showSoftInput(getCurrentFocus(), InputMethodManager.SHOW_IMPLICIT);
                 }
             }, 400);
         }
