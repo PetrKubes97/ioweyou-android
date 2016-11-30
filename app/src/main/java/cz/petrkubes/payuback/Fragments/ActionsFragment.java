@@ -5,6 +5,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 
 import cz.petrkubes.payuback.R;
 
@@ -12,15 +13,17 @@ import cz.petrkubes.payuback.R;
  * Created by petr on 27.10.16.
  */
 
-public class FeedFragment extends Fragment {
-    public static final String ARG_OBJECT = "object";
+public class ActionsFragment extends Fragment {
+
+    ListView lstActions;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View rootView = inflater.inflate(R.layout.fragment_feed, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_actions, container, false);
+        lstActions = (ListView) rootView.findViewById(R.id.lst_actions);
 
-        Bundle args = getArguments();
+
 
         return rootView;
     }

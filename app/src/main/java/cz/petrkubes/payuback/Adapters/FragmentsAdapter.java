@@ -3,13 +3,12 @@ package cz.petrkubes.payuback.Adapters;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.util.Log;
 
 import cz.petrkubes.payuback.Const;
 import cz.petrkubes.payuback.Fragments.DebtsFragment;
-import cz.petrkubes.payuback.Fragments.FeedFragment;
+import cz.petrkubes.payuback.Fragments.ActionsFragment;
 import cz.petrkubes.payuback.Fragments.FriendsFragment;
 import cz.petrkubes.payuback.Fragments.UpdateableFragment;
 
@@ -44,7 +43,7 @@ public class FragmentsAdapter extends FragmentStatePagerAdapter {
                 fragment.setArguments(args);
                 return fragment;
             case 2:
-                fragment = new FeedFragment();
+                fragment = new ActionsFragment();
                 return fragment;
             case 3:
                 fragment = new FriendsFragment();

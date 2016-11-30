@@ -62,15 +62,15 @@ public class Debt {
     }
 
     public String createdAtString() {
-        return Tools.formatDateTime(this.createdAt);
+        return Tools.formatDate(this.createdAt);
     }
 
     public String deletedAtString() {
-        return Tools.formatDateTime(this.deletedAt);
+        return Tools.formatDate(this.deletedAt);
     }
 
     public String paidAtString() {
-        return Tools.formatDateTime(this.paidAt);
+        return Tools.formatDate(this.paidAt);
     }
 
     public JSONObject toJson() throws JSONException {

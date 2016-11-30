@@ -596,6 +596,6 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
         createdAtCal.set(Calendar.HOUR, hourOfDay);
         createdAtCal.set(Calendar.MINUTE, minute);
         createdAt = createdAtCal.getTime();
-        btnCreatedAt.setText(Tools.formatDateTime(createdAt));
+        btnCreatedAt.setText(Tools.formatDate(createdAt));
     }
 }

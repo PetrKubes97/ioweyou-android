@@ -60,7 +60,7 @@ public class DebtsAdapter extends ArrayAdapter<Debt> {
         viewHolder.txtName.setText(debt.who);
         viewHolder.txtWhat.setText(debt.what);
         viewHolder.txtNote.setText(debt.note);
-        viewHolder.txtDate.setText(Tools.formatDateTime(debt.createdAt));
+        viewHolder.txtDate.setText(Tools.formatDate(debt.createdAt));
         viewHolder.txtStatus.setText(debt.status);
 
         // Set color of owned items

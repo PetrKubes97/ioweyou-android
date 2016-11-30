@@ -20,6 +20,7 @@ import cz.msebera.android.httpclient.Header;
 import cz.msebera.android.httpclient.entity.StringEntity;
 import cz.petrkubes.payuback.Const;
 import cz.petrkubes.payuback.Database.DatabaseHandler;
+import cz.petrkubes.payuback.Pojos.Action;
 import cz.petrkubes.payuback.Pojos.Currency;
 import cz.petrkubes.payuback.Pojos.Debt;
 import cz.petrkubes.payuback.Pojos.Friend;
@@ -141,11 +142,11 @@ public class ApiRestClient {
 
                 try {
                     // Go through every currency and add it to the database
-                    JSONArray friendsJson = response.getJSONArray("currencies");
+                    JSONArray currenciesJson = response.getJSONArray("currencies");
 
-                    for (int i=0;i<friendsJson.length();i++) {
+                    for (int i=0;i<currenciesJson.length();i++) {
 
-                        JSONObject currencyJson = friendsJson.getJSONObject(i);
+                        JSONObject currencyJson = currenciesJson.getJSONObject(i);
 
                         Currency currency = new Currency(
                                 currencyJson.getInt("id"),
@@ -241,6 +242,40 @@ public class ApiRestClient {
 
     }
 
+    public void getActions(String apiKey, final SimpleCallback callback) {
+
+        // Login
+        client.addHeader("api-key", apiKey);
+
+        client.get(getAbsoluteUrl("actions/"), null, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+
+                try {
+                    // Go through every friend and add him to database
+                    JSONArray actionsJson = response.getJSONArray("actions");
+
+                    for (int i=0;i<actionsJson.length();i++) {
+                        JSONObject actionJson = actionsJson.getJSONObject(i);
+                        Action action = Action.fromJson(actionJson);
+                        db.addAction(action);
+                    }
+
+                } catch (Exception e) {
+                    callback.onFailure();
+                }
+                callback.onSuccess();
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                super.onFailure(statusCode, headers, throwable, errorResponse);
+                callback.onFailure();
+            }
+        });
+
+    }
 
     public void updateAll(final String apiKey, final SimpleCallback callback) {
 
@@ -250,10 +285,21 @@ public class ApiRestClient {
                 getCurrencies(apiKey, new SimpleCallback() {
                     @Override
                     public void onSuccess() {
-                        updateAllDebts(apiKey, new SimpleCallback() {
+
+                        getActions(apiKey, new SimpleCallback() {
                             @Override
                             public void onSuccess() {
-                                callback.onSuccess();
+                                updateAllDebts(apiKey, new SimpleCallback() {
+                                    @Override
+                                    public void onSuccess() {
+                                        callback.onSuccess();
+                                    }
+
+                                    @Override
+                                    public void onFailure() {
+                                        callback.onFailure();
+                                    }
+                                });
                             }
 
                             @Override
@@ -275,7 +321,6 @@ public class ApiRestClient {
                 callback.onFailure();
             }
         });
-
     }
 
     private static String getAbsoluteUrl(String relativeUrl) {

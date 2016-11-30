@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -14,11 +13,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
-import cz.petrkubes.payuback.Const;
+import cz.petrkubes.payuback.Pojos.Action;
 import cz.petrkubes.payuback.Pojos.Currency;
 import cz.petrkubes.payuback.Pojos.Debt;
 import cz.petrkubes.payuback.Pojos.Friend;
 import cz.petrkubes.payuback.Pojos.User;
+import cz.petrkubes.payuback.Tools.Tools;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 
@@ -35,6 +35,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String TABLE_DEBTS = "debts";
     private static final String TABLE_FRIENDS = "friends";
     private static final String TABLE_CURRENCIES = "currencies";
+    private static final String TABLE_ACTIONS = "actions";
 
     // Table column names
     private static final String USERS_KEY_ID = "id";
@@ -63,6 +64,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String DEBTS_KEY_MODIFIED_AT = "modified_at";
     private static final String DEBTS_KEY_CREATED_AT = "created_at";
     private static final String DEBTS_KEY_VERSION = "version";
+
+    private static final String ACTIONS_KEY_ID = "id";
+    private static final String ACTIONS_KEY_TYPE = "type";
+    private static final String ACTIONS_KEY_DEBT_ID = "debt_id";
+    private static final String ACTIONS_KEY_USER_ID = "user_id";
+    private static final String ACTIONS_KEY_NOTE = "note";
+    private static final String ACTIONS_KEY_DATE = "date";
+
 
     // Strings including all columns
     private String[] userProjection = new String[] {
@@ -95,6 +104,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             DEBTS_KEY_MODIFIED_AT,
             DEBTS_KEY_CREATED_AT,
             DEBTS_KEY_VERSION
+    };
+
+    private String[] actionProjection = new String[] {
+            ACTIONS_KEY_ID,
+            ACTIONS_KEY_TYPE,
+            ACTIONS_KEY_DEBT_ID,
+            ACTIONS_KEY_USER_ID,
+            ACTIONS_KEY_NOTE,
+            ACTIONS_KEY_DATE
     };
 
     public DatabaseHandler(Context context) {
@@ -135,10 +153,20 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 DEBTS_KEY_MODIFIED_AT + " NUMERIC, " +
                 DEBTS_KEY_VERSION +" INTEGER);";
 
+        String CREATE_ACTIONS_TABLE = "CREATE TABLE " + TABLE_ACTIONS + " (" +
+                ACTIONS_KEY_ID + " INTEGER PRIMARY KEY, " +
+                ACTIONS_KEY_TYPE + " TEXT, " +
+                ACTIONS_KEY_DEBT_ID + " INTEGER, " +
+                ACTIONS_KEY_USER_ID + " INTEGER, " +
+                ACTIONS_KEY_NOTE + " TEXT, " +
+                ACTIONS_KEY_DATE + " NUMERIC);";
+
+
         db.execSQL(CREATE_DEBTS_TABLE);
         db.execSQL(CREATE_FRIENDS_TABLE);
         db.execSQL(CREATE_USERS_TABLE);
         db.execSQL(CREATE_CURRENCIES_TABLE);
+        db.execSQL(CREATE_ACTIONS_TABLE);
     }
 
     @Override
@@ -148,6 +176,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_DEBTS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_CURRENCIES);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ACTIONS);
 
         // Create tables again
         onCreate(db);
@@ -655,6 +684,70 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return debt;
     }
 
+
+    /**
+     * Inserts an action into the local database
+     * @param action received from the web
+     * @throws Exception
+     */
+
+    public void addAction (Action action) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Checks if action doesn't already exist
+        Cursor cursor = db.query(TABLE_ACTIONS, new String[] {ACTIONS_KEY_ID}, ACTIONS_KEY_ID + "=?",
+                new String[] {String.valueOf(action.id)}, null, null, null);
+
+        if (cursor.getCount() > 0) {
+            return;
+        }
+
+        // Add action into the database
+        ContentValues values = new ContentValues();
+        values.put(ACTIONS_KEY_ID, action.id);
+        values.put(ACTIONS_KEY_TYPE, action.type);
+        values.put(ACTIONS_KEY_DEBT_ID, action.debtId);
+        values.put(ACTIONS_KEY_USER_ID, action.userId);
+        values.put(ACTIONS_KEY_NOTE, action.note);
+        values.put(ACTIONS_KEY_DATE, Tools.formatDate(action.date));
+
+        db.insert(TABLE_ACTIONS, null, values);
+
+        db.close();
+        cursor.close();
+    }
+
+    /**
+     * Returns list of actions in local database
+     * @return ArrayList<Action>
+     */
+    public ArrayList<Action> getActions() {
+        ArrayList<Action> list = new ArrayList<>();
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_ACTIONS, actionProjection, null, null, null, null, null);
+
+        if (cursor.moveToFirst())
+        {
+            do {
+
+                list.add(new Action(
+                        cursor.getInt(0),
+                        cursor.getString(1),
+                        cursor.getInt(2),
+                        cursor.getInt(3),
+                        cursor.getString(4),
+                        Tools.parseDate(cursor.getString(5))
+                        ));
+            } while (cursor.moveToNext());
+
+        }
+
+        cursor.close();
+        db.close();
+
+        return list;
+    }
 
     /**
      * Truncates debts table
