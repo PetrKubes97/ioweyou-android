@@ -16,10 +16,11 @@ import cz.petrkubes.payuback.R;
  * Created by petr on 27.10.16.
  */
 
-public class ActionsFragment extends Fragment {
+public class ActionsFragment extends Fragment implements UpdateableFragment {
 
     private ListView lstActions;
     private DatabaseHandler db;
+    private ActionsAdapter adapter;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -34,9 +35,16 @@ public class ActionsFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_actions, container, false);
         lstActions = (ListView) rootView.findViewById(R.id.lst_actions);
 
-        ActionsAdapter adapter = new ActionsAdapter(getContext(), db.getExtendedActions());
+        adapter = new ActionsAdapter(getContext(), db.getExtendedActions());
         lstActions.setAdapter(adapter);
 
         return rootView;
+    }
+
+    @Override
+    public void update() {
+        adapter.clear();
+        adapter.addAll(db.getExtendedActions());
+        adapter.notifyDataSetChanged();
     }
 }

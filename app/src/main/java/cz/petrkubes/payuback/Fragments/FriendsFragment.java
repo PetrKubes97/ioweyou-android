@@ -93,7 +93,14 @@ public class FriendsFragment extends Fragment implements UpdateableFragment {
     @Override
     public void update() {
 
+        if (user != null) {
+            friends = db.getExtendedFriendsWhoAreCreditorsOrDebtors(user.id);
+        }
+        adapter.clear();
+        adapter.addAll(friends);
+        adapter.notifyDataSetChanged();
     }
+
 
     private void showDialog(final Friend friend) {
 

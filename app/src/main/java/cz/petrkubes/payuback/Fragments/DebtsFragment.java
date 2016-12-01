@@ -105,7 +105,6 @@ public class DebtsFragment extends Fragment implements UpdateableFragment {
 
     @Override
     public void update() {
-        Log.d(Const.TAG, "UPDATING FRAGMENT");
 
         if (user != null) {
             debts = db.getExtendedDebts(myDebts, user.id);

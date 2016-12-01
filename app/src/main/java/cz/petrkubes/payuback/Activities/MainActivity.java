@@ -12,9 +12,11 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.facebook.stetho.Stetho;
+import com.facebook.stetho.common.Predicate;
 
 import cz.petrkubes.payuback.Adapters.FragmentsAdapter;
 import cz.petrkubes.payuback.Api.ApiRestClient;
@@ -38,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
     private FragmentsAdapter pageAdapter;
     private ViewPager viewPager;
     private TabLayout tabLayout;
+    private ProgressBar toolbarPragressBar;
 
     private ApiRestClient apiClient;
     private User user;
@@ -50,6 +53,8 @@ public class MainActivity extends AppCompatActivity {
         // Setup actionbar
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
+        toolbarPragressBar = (ProgressBar) findViewById(R.id.toolbar_progress_bar);
+        toolbarPragressBar.setVisibility(View.GONE);
 
         // Setup views and buttons
         btnAddDebt = (FloatingActionButton) findViewById(R.id.btn_add_debt);
@@ -124,24 +129,32 @@ public class MainActivity extends AppCompatActivity {
 
     // Handle action bar actions
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_settings:
                 // User chose the "Settings" item, show the app settings UI...
                 return true;
 
             case R.id.action_refresh:
+
+                item.setVisible(false);
+                toolbarPragressBar.setVisibility(View.VISIBLE);
+
                 // Refresh everything
                 if (user != null) {
                     apiClient.updateAll(user.apiKey, new SimpleCallback() {
                         @Override
                         public void onSuccess() {
+                            item.setVisible(true);
                             pageAdapter.notifyDataSetChanged();
+                            toolbarPragressBar.setVisibility(View.GONE);
                         }
 
                         @Override
                         public void onFailure() {
                             Toast.makeText(getApplicationContext(), "Something went wrong. :(", Toast.LENGTH_SHORT).show();
+                            item.setVisible(true);
+                            toolbarPragressBar.setVisibility(View.GONE);
                         }
                     });
                 } else {

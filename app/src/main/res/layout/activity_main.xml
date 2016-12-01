@@ -12,7 +12,19 @@
         android:layout_height="?attr/actionBarSize"
         android:background="@color/primary"
         android:elevation="0dp"
-        app:theme="@style/ToolBarStyle" />
+        app:theme="@style/ToolBarStyle" >
+        <ProgressBar
+            android:id="@+id/toolbar_progress_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:progressTint="@color/white"
+            android:indeterminateTint="#ffffff"
+            android:indeterminateTintMode="src_in"
+            android:visibility="visible"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp" />
+    </android.support.v7.widget.Toolbar>
 
     <LinearLayout android:layout_width="match_parent"
         android:layout_height="match_parent"
