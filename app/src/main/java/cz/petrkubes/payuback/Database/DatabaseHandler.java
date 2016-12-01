@@ -721,24 +721,34 @@ public class DatabaseHandler extends SQLiteOpenHelper {
      * Returns list of actions in local database
      * @return ArrayList<Action>
      */
-    public ArrayList<Action> getActions() {
+    public ArrayList<Action> getExtendedActions() {
         ArrayList<Action> list = new ArrayList<>();
 
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.query(TABLE_ACTIONS, actionProjection, null, null, null, null, null);
+        Cursor cursor = db.query(TABLE_ACTIONS, actionProjection, null, null, null, null, ACTIONS_KEY_DATE + " DESC");
 
         if (cursor.moveToFirst())
         {
             do {
 
-                list.add(new Action(
+                Action action = new Action(
                         cursor.getInt(0),
                         cursor.getString(1),
                         cursor.getInt(2),
                         cursor.getInt(3),
                         cursor.getString(4),
                         Tools.parseDate(cursor.getString(5))
-                        ));
+                );
+
+                Friend friend = getFriend(action.userId);
+                if (friend != null) {
+                    action.userName = friend.name;
+                } else {
+                    action.userName = "You";
+                }
+
+                list.add(action);
+
             } while (cursor.moveToNext());
 
         }
