@@ -28,7 +28,6 @@ public class FragmentsAdapter extends FragmentStatePagerAdapter {
     @Override
     public Fragment getItem(int i) {
 
-
         switch (i) {
             case 0:
                 fragment = new DebtsFragment();
@@ -50,8 +49,7 @@ public class FragmentsAdapter extends FragmentStatePagerAdapter {
                 return fragment;
         }
 
-        Fragment fragment = new DebtsFragment();
-        return fragment;
+        return null;
     }
 
     @Override
@@ -65,7 +63,7 @@ public class FragmentsAdapter extends FragmentStatePagerAdapter {
             Log.d(Const.TAG, "Calling update in adapter");
             ((UpdateableFragment) object).update();
         }
-        //don't return POSITION_NONE, avoid fragment recreation.
+
         return super.getItemPosition(object);
     }
 

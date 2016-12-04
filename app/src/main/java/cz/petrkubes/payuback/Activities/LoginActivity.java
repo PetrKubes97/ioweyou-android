@@ -26,12 +26,13 @@ import cz.petrkubes.payuback.Const;
 import cz.petrkubes.payuback.Database.DatabaseHandler;
 import cz.petrkubes.payuback.R;
 
-
 public class LoginActivity extends AppCompatActivity {
 
+    // Widgets
     private LoginButton loginButton;
     private ProgressBar prgLoader;
     private TextView txtLoadingDescription;
+
     private ApiRestClient apiClient;
     private DatabaseHandler db;
     private CallbackManager callbackManager;
@@ -76,10 +77,8 @@ public class LoginActivity extends AppCompatActivity {
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
-
                 // Starts loading tasks
                 loginUser(loginResult.getAccessToken().getUserId(), loginResult.getAccessToken().getToken());
-
             }
 
             @Override
@@ -101,7 +100,12 @@ public class LoginActivity extends AppCompatActivity {
     }
 
 
-    public void loginUser(String facebookId, final String facebookToken) {
+    /**
+     * Displays progress bar, logs user in, and starts main activity
+     * @param facebookId user's facebook id
+     * @param facebookToken user's facebook token
+     */
+    private void loginUser(String facebookId, final String facebookToken) {
 
         loginButton.setVisibility(View.GONE);
         prgLoader.setVisibility(View.VISIBLE);

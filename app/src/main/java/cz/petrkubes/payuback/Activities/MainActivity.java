@@ -39,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
     public static final int ADD_DEBT_REQUEST = 0;
     public static final String MY_DEBT = "myDebt";
 
+    // Widgets
     private FloatingActionButton btnAddDebt;
     private DatabaseHandler db;
     private FragmentsAdapter pageAdapter;
@@ -108,11 +109,15 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Synces debts after user adds/updates a debt
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
-        Log.d(Const.TAG, "Returned to the main activity " + String.valueOf(requestCode) + String.valueOf(resultCode));
 
         if (requestCode == ADD_DEBT_REQUEST && resultCode == RESULT_OK) {
             updateDebts();
@@ -146,14 +151,20 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    // Handle action bar actions
+    /**
+     * Handles toolbar actions
+     * @param item
+     * @return
+     */
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_logout:
 
-                // Logout facebook
+                // Logout from facebook
                 LoginManager.getInstance().logOut();
+
+                // TODO empty api key on server
 
                 // Truncate db
                 db.truncate();
@@ -190,8 +201,6 @@ public class MainActivity extends AppCompatActivity {
                 return true;
 
             default:
-                // If we got here, the user's action was not recognized.
-                // Invoke the superclass to handle it.
                 return super.onOptionsItemSelected(item);
         }
     }

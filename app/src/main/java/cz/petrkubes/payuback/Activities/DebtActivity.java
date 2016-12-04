@@ -11,6 +11,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.ContactsContract;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputLayout;
@@ -60,9 +61,7 @@ import cz.petrkubes.payuback.Pojos.Friend;
 import cz.petrkubes.payuback.Pojos.User;
 import cz.petrkubes.payuback.Tools.Tools;
 
-/**
- * Created by petr on 24.10.16.
- */
+import static android.app.Activity.RESULT_OK;
 
 public class DebtActivity extends AppCompatActivity implements CalendarDatePickerDialogFragment.OnDateSetListener, RadialTimePickerDialogFragment.OnTimeSetListener {
 
@@ -70,6 +69,7 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
     private static final String FRAG_TAG_DATE_PICKER = "fragment_date_picker_created_at";
     private static final String FRAG_TAG_TIME_PICKER = "fragment_time_picker_created_at";
 
+    // Widgets
     private AutoCompleteTextView txtName;
     private EditText txtWhat;
     private Spinner spnCurrency;
@@ -122,7 +122,6 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
         txtILWho = (TextInputLayout) findViewById(R.id.txtIL_who);
         btnCreatedAt = (Button) findViewById(R.id.btn_created_at);
         btnDelete = (Button) findViewById(R.id.btn_delete);
-
 
         // Set the hint after the animation completes, workaround for Android bug
         txtNote.setHint(getResources().getString(R.string.note));
@@ -236,8 +235,7 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
         });
         createdAtCal = Calendar.getInstance();
 
-        // TODO
-        // Set delete button
+        // Init delete button
         btnDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -278,7 +276,6 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
             tempFacebookFriendId = friend.id;
         }
 
-
         // Edit debt
         debtToEdit = Parcels.unwrap(getIntent().getParcelableExtra(DebtsFragment.DEBT_TO_EDIT));
         if (debtToEdit != null) {
@@ -308,7 +305,6 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
                 txtName.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.white));
             }
 
-
             // Check radio buttons
             if (debtToEdit.thingName != null && !debtToEdit.thingName.isEmpty()) {
                 rdioThing.setChecked(true);
@@ -336,7 +332,6 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
             btnDelete.setVisibility(View.GONE);
 
             // Show keyboard - it is necessary to wait for the animation to finish
-
             if (txtName.getText().length() > 0) {
                 txtWhat.requestFocus();
             } else {
@@ -357,7 +352,6 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
         btnAddDebt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getApplicationContext(), String.valueOf(tempFacebookFriendId), Toast.LENGTH_SHORT).show();
                 addDebt();
             }
         });
@@ -396,13 +390,12 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
 
     /**
      * Handle user's answer to 'request permission' dialog
-     *
      * @param requestCode
      * @param permissions
      * @param grantResults
      */
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == PERMISSIONS_REQUEST_READ_CONTACTS) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Permission is granted
@@ -425,9 +418,10 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
     }
 
     /**
-     * Adds new debt to local database
+     * Adds a new debt to the local database or updates it
+     * Finishes activity and returns to main activity
      */
-    public void addDebt() {
+    private void addDebt() {
 
         Integer id = null;
         Integer creditorId = null;
@@ -525,6 +519,9 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
         finish();
     }
 
+    /**
+     * Shows dialog for picking a date of creation
+     */
     private void showDatePickerDialog() {
         createdAtCal.clear();
 
@@ -533,6 +530,9 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
         cdp.show(getSupportFragmentManager(), FRAG_TAG_DATE_PICKER);
     }
 
+    /**
+     * Shows dialog for picking a time of creation
+     */
     private void showTimePickerDialog() {
         RadialTimePickerDialogFragment rtpd = new RadialTimePickerDialogFragment()
                 .setOnTimeSetListener(DebtActivity.this);
@@ -540,13 +540,26 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
     }
 
 
-    // Dialogs for choosing the date of a debt
+    /**
+     * Handles date picking dialog
+     * Shows time picking dialog
+     * @param dialog
+     * @param year
+     * @param monthOfYear
+     * @param dayOfMonth
+     */
     @Override
     public void onDateSet(CalendarDatePickerDialogFragment dialog, int year, int monthOfYear, int dayOfMonth) {
         createdAtCal.set(year, monthOfYear, dayOfMonth);
         showTimePickerDialog();
     }
 
+    /**
+     * Handles time picking dialog
+     * @param dialog
+     * @param hourOfDay
+     * @param minute
+     */
     @Override
     public void onTimeSet(RadialTimePickerDialogFragment dialog, int hourOfDay, int minute) {
         createdAtCal.set(Calendar.HOUR, hourOfDay);

@@ -1,11 +1,14 @@
 package cz.petrkubes.payuback.Pojos;
 
 
+import android.database.Cursor;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.parceler.Parcel;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -190,5 +193,81 @@ public class Debt {
                 createdAt,
                 response.getLong("version")
         );
+    }
+
+    public static Debt fromCursor(Cursor cursor) {
+        Date paidAt = null;
+        Date deletedAt = null;
+        Date modifiedAt = null;
+        Date createdAt = null;
+
+        Integer amount = null;
+        Integer creditorId = null;
+        Integer debtorId = null;
+        Integer currencyId = null;
+
+        String customFriendName = null;
+        String note = null;
+        String thing = null;
+
+
+        if (!cursor.isNull(8)) {
+            paidAt = Tools.parseDate(cursor.getString(8));
+        }
+
+        if (!cursor.isNull(9)) {
+            deletedAt = Tools.parseDate(cursor.getString(9));
+        }
+
+        if (!cursor.isNull(10)) {
+            modifiedAt = Tools.parseDate(cursor.getString(10));
+        }
+
+        if (!cursor.isNull(11)) {
+            createdAt = Tools.parseDate(cursor.getString(11));
+        }
+
+        if (cursor.getInt(4) != 0) {
+            amount = cursor.getInt(4);
+        }
+
+        if (!cursor.isNull(1)) {
+            creditorId = cursor.getInt(1);
+        }
+
+        if (!cursor.isNull(2)) {
+            debtorId = cursor.getInt(2);
+        }
+
+        if (!cursor.isNull(5)) {
+            currencyId = cursor.getInt(5);
+        }
+
+        if (!cursor.isNull(3)) {
+            customFriendName = cursor.getString(3);
+        }
+
+        if (!cursor.isNull(6)) {
+            thing = cursor.getString(6);
+        }
+
+        if (!cursor.isNull(7)) {
+            note = cursor.getString(7);
+        }
+
+        return new Debt(
+                cursor.getInt(0),
+                creditorId,
+                debtorId,
+                customFriendName,
+                amount,
+                currencyId,
+                thing,
+                note,
+                paidAt,
+                deletedAt,
+                modifiedAt,
+                createdAt,
+                cursor.getLong(12));
     }
 }

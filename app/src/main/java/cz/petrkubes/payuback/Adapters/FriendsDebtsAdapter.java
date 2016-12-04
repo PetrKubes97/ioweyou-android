@@ -36,7 +36,6 @@ public class FriendsDebtsAdapter extends ArrayAdapter<Debt> {
     public View getView(int position, View convertView, ViewGroup parent) {
 
         final Debt debt = getItem(position);
-
         final FriendsDebtsAdapter.ViewHolder viewHolder;
 
         if (convertView == null) {

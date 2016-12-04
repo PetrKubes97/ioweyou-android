@@ -325,7 +325,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         {
             do {
 
-                Debt debt = debtFromCursor(cursor);
+                Debt debt = Debt.fromCursor(cursor);
                 // Get additional variables, so that it can be displayed
                 debt = getDebtWithAdditionalVariables(debt, userId);
 
@@ -518,7 +518,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         if (cursor.moveToFirst())
         {
             do {
-                list.add(debtFromCursor(cursor));
+                list.add(Debt.fromCursor(cursor));
             } while (cursor.moveToNext());
 
         }
@@ -634,7 +634,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         if (cursor.moveToFirst())
         {
             do {
-                Debt debt = debtFromCursor(cursor);
+                Debt debt = Debt.fromCursor(cursor);
 
                 // Set additional variables
                 // 1. Name of person
@@ -778,88 +778,5 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("delete from "+ TABLE_DEBTS);
         db.close();
-    }
-
-    private Debt debtFromCursor(Cursor cursor) {
-
-        DateFormat df = new SimpleDateFormat();
-
-        Date paidAt = null;
-        Date deletedAt = null;
-        Date modifiedAt = null;
-        Date createdAt = null;
-
-        Integer amount = null;
-        Integer creditorId = null;
-        Integer debtorId = null;
-        Integer currencyId = null;
-
-        String customFriendName = null;
-        String note = null;
-        String thing = null;
-
-        try {
-            if (!cursor.isNull(8)) {
-                    paidAt = df.parse(cursor.getString(8));
-            }
-
-            if (!cursor.isNull(9)) {
-                deletedAt = df.parse(cursor.getString(9));
-            }
-
-            if (!cursor.isNull(10)) {
-                modifiedAt = df.parse(cursor.getString(10));
-            }
-
-            if (!cursor.isNull(11)) {
-                createdAt = df.parse(cursor.getString(11));
-            }
-
-            if (cursor.getInt(4) != 0) {
-                amount = cursor.getInt(4);
-            }
-
-            if (!cursor.isNull(1)) {
-                creditorId = cursor.getInt(1);
-            }
-
-            if (!cursor.isNull(2)) {
-                debtorId = cursor.getInt(2);
-            }
-
-            if (!cursor.isNull(5)) {
-                currencyId = cursor.getInt(5);
-            }
-
-            if (!cursor.isNull(3)) {
-                customFriendName = cursor.getString(3);
-            }
-
-            if (!cursor.isNull(6)) {
-                thing = cursor.getString(6);
-            }
-
-            if (!cursor.isNull(7)) {
-                note = cursor.getString(7);
-            }
-
-            return new Debt(
-                    cursor.getInt(0),
-                    creditorId,
-                    debtorId,
-                    customFriendName,
-                    amount,
-                    currencyId,
-                    thing,
-                    note,
-                    paidAt,
-                    deletedAt,
-                    modifiedAt,
-                    createdAt,
-                    cursor.getLong(12));
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return null;
-        }
     }
 }

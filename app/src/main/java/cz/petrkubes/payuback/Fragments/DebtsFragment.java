@@ -108,7 +108,6 @@ public class DebtsFragment extends Fragment implements UpdateableFragment {
 
         if (user != null) {
             debts = db.getExtendedDebts(myDebts, user.id);
-            Log.d(Const.TAG, debts.toString());
         }
         adapter.clear();
         adapter.addAll(debts);
