@@ -182,6 +182,19 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         onCreate(db);
     }
 
+    /**
+     * Truncates everything
+     */
+    public void truncate() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DELETE FROM " + TABLE_FRIENDS);
+        db.execSQL("DELETE FROM " + TABLE_USERS);
+        db.execSQL("DELETE FROM " + TABLE_DEBTS);
+        db.execSQL("DELETE FROM " + TABLE_CURRENCIES);
+        db.execSQL("DELETE FROM " + TABLE_ACTIONS);
+        db.close();
+    }
+
     public void addOrUpdateUser(User user) {
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -531,7 +544,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         DateFormat df = new SimpleDateFormat();
 
-        // TODO kontrolovat verze
         // Get current debt
         Cursor cursor = db.query(TABLE_DEBTS, new String[] {DEBTS_KEY_ID}, DEBTS_KEY_ID + "=?",
                 new String[] {String.valueOf(currentId)}, null, null, null);
@@ -844,7 +856,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     deletedAt,
                     modifiedAt,
                     createdAt,
-                    cursor.getInt(12));
+                    cursor.getLong(12));
         } catch (ParseException e) {
             e.printStackTrace();
             return null;

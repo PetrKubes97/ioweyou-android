@@ -101,7 +101,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
 
-    public void loginUser(String facebookId, String facebookToken) {
+    public void loginUser(String facebookId, final String facebookToken) {
 
         loginButton.setVisibility(View.GONE);
         prgLoader.setVisibility(View.VISIBLE);
@@ -110,50 +110,23 @@ public class LoginActivity extends AppCompatActivity {
         apiClient.login(facebookId, facebookToken, new SimpleCallback() {
             @Override
             public void onSuccess() {
-                getUser(db.getUser().apiKey);
-            }
+                apiClient.updateAll(db.getUser().apiKey, new SimpleCallback() {
+                    @Override
+                    public void onSuccess() {
+                        txtLoadingDescription.setText("");
+                        prgLoader.setVisibility(View.GONE);
+                        loginButton.setVisibility(View.VISIBLE);
 
-            @Override
-            public void onFailure() {
+                        // Starts application
+                        Intent intent = new Intent(getBaseContext(), MainActivity.class);
+                        startActivity(intent);
+                    }
 
-            }
-        });
-    }
+                    @Override
+                    public void onFailure() {
 
-    public void getUser(final String apiKey) {
-
-        txtLoadingDescription.setText(getResources().getString(R.string.loading_getting_user));
-
-        apiClient.getUser(apiKey, new SimpleCallback() {
-
-            @Override
-            public void onSuccess() {
-                getCurrencies(apiKey);
-            }
-
-            @Override
-            public void onFailure() {
-
-            }
-        });
-    }
-
-    public void getCurrencies(String apiKey) {
-
-        txtLoadingDescription.setText(getResources().getString(R.string.loading_other));
-
-        apiClient.getCurrencies(apiKey, new SimpleCallback() {
-            @Override
-            public void onSuccess() {
-
-                txtLoadingDescription.setText("");
-                prgLoader.setVisibility(View.GONE);
-                loginButton.setVisibility(View.VISIBLE);
-
-                // Starts application
-                Intent intent = new Intent(getBaseContext(), MainActivity.class);
-                startActivity(intent);
-
+                    }
+                });
             }
 
             @Override

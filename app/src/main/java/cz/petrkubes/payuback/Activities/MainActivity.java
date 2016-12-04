@@ -3,7 +3,9 @@ package cz.petrkubes.payuback.Activities;
 import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -15,6 +17,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.facebook.login.LoginManager;
 import com.facebook.stetho.Stetho;
 import com.facebook.stetho.common.Predicate;
 
@@ -25,6 +28,7 @@ import cz.petrkubes.payuback.Const;
 import cz.petrkubes.payuback.Database.DatabaseHandler;
 import cz.petrkubes.payuback.R;
 import cz.petrkubes.payuback.Pojos.User;
+import cz.petrkubes.payuback.Tools.Tools;
 
 /**
  * Created by petr on 16.10.16.
@@ -41,6 +45,8 @@ public class MainActivity extends AppCompatActivity {
     private ViewPager viewPager;
     private TabLayout tabLayout;
     private ProgressBar toolbarPragressBar;
+    private Toolbar toolbar;
+    private CoordinatorLayout coordinatorLayout;
 
     private ApiRestClient apiClient;
     private User user;
@@ -51,10 +57,13 @@ public class MainActivity extends AppCompatActivity {
         Stetho.initializeWithDefaults(this);
         setContentView(R.layout.activity_main);
         // Setup actionbar
-        Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
-        setSupportActionBar(myToolbar);
+        toolbar = (Toolbar) findViewById(R.id.my_toolbar);
+        setSupportActionBar(toolbar);
         toolbarPragressBar = (ProgressBar) findViewById(R.id.toolbar_progress_bar);
         toolbarPragressBar.setVisibility(View.GONE);
+
+        // Parent view for snackbar
+        coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
 
         // Setup views and buttons
         btnAddDebt = (FloatingActionButton) findViewById(R.id.btn_add_debt);
@@ -65,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
         viewPager = (ViewPager) findViewById(R.id.pager);
         viewPager.setAdapter(pageAdapter);
         tabLayout.setupWithViewPager(viewPager);
+        pageAdapter.notifyDataSetChanged();
 
         // Setup database
         db = new DatabaseHandler(getApplicationContext());
@@ -111,18 +121,27 @@ public class MainActivity extends AppCompatActivity {
 
     public void updateDebts() {
         // Refresh offline changes
+        final MenuItem item = toolbar.getMenu().getItem(0);
+
         pageAdapter.notifyDataSetChanged();
+        item.setVisible(false);
+        toolbarPragressBar.setVisibility(View.VISIBLE);
 
         apiClient.updateAllDebts(user.apiKey, new SimpleCallback() {
             @Override
             public void onSuccess() {
                 // Refresh online changes
                 pageAdapter.notifyDataSetChanged();
+                item.setVisible(true);
+                toolbarPragressBar.setVisibility(View.GONE);
+                Snackbar.make(coordinatorLayout, getString(R.string.changes_synced), Snackbar.LENGTH_SHORT).show();
             }
 
             @Override
             public void onFailure() {
-
+                item.setVisible(true);
+                toolbarPragressBar.setVisibility(View.GONE);
+                Snackbar.make(coordinatorLayout, getString(R.string.something_went_wrong), Snackbar.LENGTH_SHORT).show();
             }
         });
     }
@@ -131,8 +150,15 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_settings:
-                // User chose the "Settings" item, show the app settings UI...
+            case R.id.action_logout:
+
+                // Logout facebook
+                LoginManager.getInstance().logOut();
+
+                // Truncate db
+                db.truncate();
+                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                startActivity(intent);
                 return true;
 
             case R.id.action_refresh:
@@ -148,13 +174,14 @@ public class MainActivity extends AppCompatActivity {
                             item.setVisible(true);
                             pageAdapter.notifyDataSetChanged();
                             toolbarPragressBar.setVisibility(View.GONE);
+                            Snackbar.make(coordinatorLayout, getString(R.string.changes_synced), Snackbar.LENGTH_SHORT).show();
                         }
 
                         @Override
                         public void onFailure() {
-                            Toast.makeText(getApplicationContext(), "Something went wrong. :(", Toast.LENGTH_SHORT).show();
                             item.setVisible(true);
                             toolbarPragressBar.setVisibility(View.GONE);
+                            Snackbar.make(coordinatorLayout, getString(R.string.something_went_wrong), Snackbar.LENGTH_SHORT).show();
                         }
                     });
                 } else {

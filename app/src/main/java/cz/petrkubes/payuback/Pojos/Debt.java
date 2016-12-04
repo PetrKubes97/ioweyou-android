@@ -31,7 +31,7 @@ public class Debt {
     public Date deletedAt;
     public Date modifiedAt;
     public Date createdAt;
-    public Integer version;
+    public Long version;
 
     // Variables used for easier displaying of debts
     public String who;
@@ -45,7 +45,7 @@ public class Debt {
     public Debt(Integer id, Integer creditorId, Integer debtorId,
                 String customFriendName, Integer amount, Integer currencyId,
                 String thingName, String note, Date paidAt,
-                Date deletedAt, Date modifiedAt, Date createdAt, Integer version) {
+                Date deletedAt, Date modifiedAt, Date createdAt, Long version) {
         this.id = id;
         this.creditorId = creditorId;
         this.debtorId = debtorId;
@@ -188,7 +188,7 @@ public class Debt {
                 deletedAt,
                 modifiedAt,
                 createdAt,
-                response.getInt("version")
+                response.getLong("version")
         );
     }
 }

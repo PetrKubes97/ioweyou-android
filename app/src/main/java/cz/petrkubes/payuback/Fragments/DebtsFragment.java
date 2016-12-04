@@ -86,7 +86,7 @@ public class DebtsFragment extends Fragment implements UpdateableFragment {
              debts = db.getExtendedDebts(myDebts, user.id);
         }
 
-        // Populate the listview
+        // Populate the list view
         adapter = new DebtsAdapter(getContext(), debts, myDebts);
         lstDebts.setAdapter(adapter);
 
@@ -213,7 +213,7 @@ public class DebtsFragment extends Fragment implements UpdateableFragment {
     }
 
     private void payDebt(Debt debt) {
-        debt.version += 1;
+        debt.version = System.currentTimeMillis();
         db.addOrUpdateDebt(debt.id, debt);
         ((MainActivity) getActivity()).updateDebts();
     }

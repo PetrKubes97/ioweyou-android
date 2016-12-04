@@ -1,54 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main_content"
+
+<android.support.design.widget.CoordinatorLayout
+    android:id="@+id/coordinatorLayout"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/my_toolbar"
+    <RelativeLayout xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/main_content"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/primary"
-        android:elevation="0dp"
-        app:theme="@style/ToolBarStyle" >
-        <ProgressBar
-            android:id="@+id/toolbar_progress_bar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="right"
-            android:progressTint="@color/white"
-            android:indeterminateTint="#ffffff"
-            android:indeterminateTintMode="src_in"
-            android:visibility="visible"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp" />
-    </android.support.v7.widget.Toolbar>
+        android:layout_height="match_parent">
 
-    <LinearLayout android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:layout_below="@+id/my_toolbar">
-
-
-        <android.support.v4.view.ViewPager
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/my_toolbar"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/pager">
-
-            <android.support.design.widget.TabLayout
-                android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/primary"
+            android:elevation="0dp"
+            app:theme="@style/ToolBarStyle" >
+            <ProgressBar
+                android:id="@+id/toolbar_progress_bar"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="top"
-                android:id="@+id/tabs"
-                android:background="@color/primary"
-                app:tabTextColor="@android:color/white"
-                app:tabSelectedTextColor="@android:color/white"
-                app:tabIndicatorColor="@color/accent" />
+                android:layout_gravity="right"
+                android:progressTint="@color/white"
+                android:indeterminateTint="#ffffff"
+                android:indeterminateTintMode="src_in"
+                android:visibility="visible"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp" />
+        </android.support.v7.widget.Toolbar>
 
-        </android.support.v4.view.ViewPager>
-    </LinearLayout>
+        <LinearLayout android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_below="@+id/my_toolbar">
+
+
+            <android.support.v4.view.ViewPager
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/pager">
+
+                <android.support.design.widget.TabLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top"
+                    android:id="@+id/tabs"
+                    android:background="@color/primary"
+                    app:tabTextColor="@android:color/white"
+                    app:tabSelectedTextColor="@android:color/white"
+                    app:tabIndicatorColor="@color/accent" />
+
+            </android.support.v4.view.ViewPager>
+        </LinearLayout>
+    </RelativeLayout>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/btn_add_debt"
@@ -58,9 +65,9 @@
         android:clickable="true"
         android:src="@drawable/ic_add_white_24dp"
         android:transitionName="@string/transition_button"
-        android:layout_marginRight="24dp"
+        android:layout_marginEnd="24dp"
         android:layout_marginBottom="24dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         app:elevation="4dp" />
-</RelativeLayout>
+</android.support.design.widget.CoordinatorLayout>

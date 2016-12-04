@@ -456,14 +456,13 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
         Integer currencyId = null;
         Date paidAt = null;
         Date deletedAt = null;
-        Integer version = 0;
+        Long version = System.currentTimeMillis();
 
         // set 'invisible' variables if editing a debt
         if (debtToEdit != null) {
             id = debtToEdit.id;
             paidAt = debtToEdit.paidAt;
             deletedAt = debtToEdit.deletedAt;
-            version = debtToEdit.version +1;
         }
 
         // Set user
