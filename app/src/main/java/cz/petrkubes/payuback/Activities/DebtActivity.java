@@ -1,10 +1,13 @@
 package cz.petrkubes.payuback.Activities;
 
 import android.Manifest;
+import android.app.Dialog;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.ContactsContract;
@@ -13,6 +16,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -79,12 +83,8 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
     private TextInputLayout txtILWhat;
     private TextInputLayout txtILWho;
     private Button btnCreatedAt;
-    private Button btnPaidUnpaid;
-    private Button btnDeleteRestore;
-    private TextView txtvPaid;
-    private TextView txtvDeleted;
-    private TextView txtvPaidLabel;
-    private TextView txtvDeletedLabel;
+    private Button btnDelete;
+
 
     private Integer tempFacebookFriendId = null;
     private ArrayList<Currency> currencies = null;
@@ -121,12 +121,8 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
         txtILWhat = (TextInputLayout) findViewById(R.id.txtIL_what);
         txtILWho = (TextInputLayout) findViewById(R.id.txtIL_who);
         btnCreatedAt = (Button) findViewById(R.id.btn_created_at);
-        btnPaidUnpaid = (Button) findViewById(R.id.btn_paid_unpaid);
-        btnDeleteRestore = (Button) findViewById(R.id.btn_delete_restore);
-        txtvPaid = (TextView) findViewById(R.id.txtv_paid);
-        txtvDeleted = (TextView) findViewById(R.id.txtv_deleted);
-        txtvPaidLabel = (TextView) findViewById(R.id.txtv_paid_label);
-        txtvDeletedLabel = (TextView) findViewById(R.id.txtv_deleted_label);
+        btnDelete = (Button) findViewById(R.id.btn_delete);
+
 
         // Set the hint after the animation completes, workaround for Android bug
         txtNote.setHint(getResources().getString(R.string.note));
@@ -240,29 +236,29 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
         });
         createdAtCal = Calendar.getInstance();
 
-        // Set paid/unpaid button
-        btnPaidUnpaid.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (debtToEdit.paidAt == null) {
-                    debtToEdit.paidAt = new Date();
-                } else {
-                    debtToEdit.paidAt = null;
-                }
-                stylePaidUnpaid();
-            }
-        });
-
+        // TODO
         // Set delete button
-        btnDeleteRestore.setOnClickListener(new View.OnClickListener() {
+        btnDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (debtToEdit.deletedAt == null) {
-                    debtToEdit.deletedAt = new Date();
-                } else {
-                    debtToEdit.deletedAt = null;
-                }
-                styleDeleteRestore();
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(DebtActivity.this);
+                builder.setMessage(R.string.do_you_want_to_delete_this_debt)
+                        .setPositiveButton(R.string.yes_delete, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                debtToEdit.deletedAt = new Date();
+                                addDebt();
+                                finish();
+                            }
+                        })
+                        .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.cancel();
+                            }
+                        });
+                builder.create().show();
             }
         });
 
@@ -287,21 +283,16 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
         debtToEdit = Parcels.unwrap(getIntent().getParcelableExtra(DebtsFragment.DEBT_TO_EDIT));
         if (debtToEdit != null) {
 
+            // disable fields, which cannot be edited
+            txtName.setFocusable(false);
+            txtName.setEnabled(false);
+            txtName.setCursorVisible(false);
+            txtName.setKeyListener(null);
+            txtName.setBackgroundColor(Color.TRANSPARENT);
+
             txtName.setText(debtToEdit.who);
             txtNote.setText(debtToEdit.note);
             btnCreatedAt.setText(debtToEdit.createdAtString());
-
-            if (debtToEdit.paidAt != null) {
-                txtvPaid.setText(debtToEdit.paidAtString());
-            } else {
-                txtvPaid.setText(getResources().getString(R.string.no));
-            }
-
-            if (debtToEdit.deletedAt != null) {
-                txtvDeleted.setText(debtToEdit.deletedAtString());
-            } else {
-                txtvDeleted.setText(getResources().getString(R.string.no));
-            }
 
             // Mark facebook friend
             if ((debtToEdit.creditorId != null && debtToEdit.debtorId != null)) {
@@ -340,18 +331,9 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
                 rdioMyDebt.setChecked(true);
             }
 
-            // Style buttons for deleting and marking debt as paid
-            stylePaidUnpaid();
-            styleDeleteRestore();
-
         } else {
             // hide buttons which have no use for a new debt
-            btnPaidUnpaid.setVisibility(View.GONE);
-            btnDeleteRestore.setVisibility(View.GONE);
-            txtvPaid.setVisibility(View.GONE);
-            txtvPaidLabel.setVisibility(View.GONE);
-            txtvDeleted.setVisibility(View.GONE);
-            txtvDeletedLabel.setVisibility(View.GONE);
+            btnDelete.setVisibility(View.GONE);
 
             // Show keyboard - it is necessary to wait for the animation to finish
 
@@ -461,7 +443,6 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
         // set 'invisible' variables if editing a debt
         if (debtToEdit != null) {
             id = debtToEdit.id;
-            paidAt = debtToEdit.paidAt;
             deletedAt = debtToEdit.deletedAt;
         }
 
@@ -542,30 +523,6 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
 
         setResult(RESULT_OK);
         finish();
-    }
-
-    private void stylePaidUnpaid() {
-        if (debtToEdit != null && debtToEdit.paidAt == null) {
-            btnPaidUnpaid.setText(getResources().getString(R.string.mark_as_paid));
-            btnPaidUnpaid.setBackgroundTintList(ContextCompat.getColorStateList(getApplicationContext(), R.color.green));
-            txtvPaid.setText(getResources().getString(R.string.no));
-        } else {
-            btnPaidUnpaid.setText(getResources().getString(R.string.mark_as_unpaid));
-            btnPaidUnpaid.setBackgroundTintList(ContextCompat.getColorStateList(getApplicationContext(), R.color.red));
-            txtvPaid.setText(debtToEdit.paidAtString());
-        }
-    }
-
-    private void styleDeleteRestore() {
-        if (debtToEdit != null && debtToEdit.deletedAt == null) {
-            btnDeleteRestore.setText(getResources().getString(R.string.delete));
-            btnDeleteRestore.setBackgroundTintList(ContextCompat.getColorStateList(getApplicationContext(), R.color.red));
-            txtvDeleted.setText(getResources().getString(R.string.no));
-        } else {
-            btnDeleteRestore.setText(getResources().getString(R.string.restore));
-            btnDeleteRestore.setBackgroundTintList(ContextCompat.getColorStateList(getApplicationContext(), R.color.green));
-            txtvDeleted.setText(debtToEdit.deletedAtString());
-        }
     }
 
     private void showDatePickerDialog() {
