@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
+import cz.petrkubes.payuback.Const;
 import cz.petrkubes.payuback.Pojos.Action;
 import cz.petrkubes.payuback.Pojos.Currency;
 import cz.petrkubes.payuback.Pojos.Debt;
@@ -542,7 +544,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
 
         SQLiteDatabase db = this.getWritableDatabase();
-        DateFormat df = new SimpleDateFormat();
 
         // Get current debt
         Cursor cursor = db.query(TABLE_DEBTS, new String[] {DEBTS_KEY_ID}, DEBTS_KEY_ID + "=?",
@@ -580,11 +581,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         String deletedAt = null;
 
         if (debt.paidAt != null) {
-            paidAt = df.format(debt.paidAt);
+            paidAt = Tools.formatDate(debt.paidAt);
         }
 
         if (debt.deletedAt != null) {
-            deletedAt = df.format(debt.deletedAt);
+            deletedAt = Tools.formatDate(debt.deletedAt);
         }
 
         ContentValues values = new ContentValues();
@@ -598,9 +599,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(DEBTS_KEY_NOTE, debt.note);
         values.put(DEBTS_KEY_PAID_AT, paidAt);
         values.put(DEBTS_KEY_DELETED_AT, deletedAt);
-        values.put(DEBTS_KEY_MODIFIED_AT, df.format(debt.modifiedAt));
-        values.put(DEBTS_KEY_CREATED_AT, df.format(debt.createdAt));
+        values.put(DEBTS_KEY_MODIFIED_AT, Tools.formatDate(debt.modifiedAt));
+        values.put(DEBTS_KEY_CREATED_AT, Tools.formatDate(debt.createdAt));
         values.put(DEBTS_KEY_VERSION, debt.version);
+
+        Log.d(Const.TAG, "DATE TO BE SAVED" + Tools.formatDate(debt.createdAt));
 
         if (currentId == null || cursor.getCount() < 1) {
             // Debt doesn't exist
