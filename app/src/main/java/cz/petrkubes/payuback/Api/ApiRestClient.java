@@ -28,7 +28,7 @@ import cz.petrkubes.payuback.Pojos.User;
 
 public class ApiRestClient {
 
-    private static final String BASE_URL = "http://192.168.2.71/payuback-api/www/api/";
+    private static final String BASE_URL = "http://34.194.114.99/payuback-api/www/api/";
     private AsyncHttpClient client;
     private DatabaseHandler db;
     private Context context;
