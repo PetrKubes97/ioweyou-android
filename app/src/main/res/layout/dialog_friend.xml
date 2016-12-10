@@ -17,6 +17,7 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:layout_marginTop="16dp"
+        android:gravity="center"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginEnd="16dp"
         app:layout_constraintRight_toRightOf="parent"
@@ -26,9 +27,9 @@
     <TextView
         android:text="Jmeno Uzivatele"
         android:layout_width="0dp"
-        android:layout_height="20dp"
+        android:layout_height="0dp"
         android:id="@+id/txt_name"
-        android:gravity="start"
+        android:gravity="center|start"
         android:textSize="18sp"
         android:textColor="@color/primary"
         android:layout_alignTop="@+id/btn_add_new_debt"
@@ -40,7 +41,8 @@
         app:layout_constraintLeft_toLeftOf="parent"
         android:ellipsize="end"
         app:layout_constraintRight_toLeftOf="@+id/btn_add_new_debt"
-        android:layout_marginEnd="8dp" />
+        android:layout_marginEnd="8dp"
+        android:paddingBottom="2dp" />
 
     <Button
         android:text="Pay selected debts"
