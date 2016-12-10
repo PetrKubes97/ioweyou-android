@@ -38,6 +38,23 @@ public class LoginActivity extends AppCompatActivity {
     private CallbackManager callbackManager;
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        // Starts application if the user is already logged in
+        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        if (accessToken != null) {
+            if (db.getUser() != null) {
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                intent.putExtra("facebookId", AccessToken.getCurrentAccessToken().getUserId());
+                intent.putExtra("facebookToken", AccessToken.getCurrentAccessToken().getToken());
+                startActivity(intent);
+            } else {
+                loginUser(accessToken.getUserId(), accessToken.getToken());
+            }
+        }
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -59,19 +76,6 @@ public class LoginActivity extends AppCompatActivity {
 
         apiClient = new ApiRestClient(getApplicationContext());
         db = new DatabaseHandler(getApplicationContext());
-
-        // Starts application if the user is already logged in
-        AccessToken accessToken = AccessToken.getCurrentAccessToken();
-        if (accessToken != null) {
-            if (db.getUser() != null) {
-                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                intent.putExtra("facebookId", AccessToken.getCurrentAccessToken().getUserId());
-                intent.putExtra("facebookToken", AccessToken.getCurrentAccessToken().getToken());
-                startActivity(intent);
-            } else {
-                loginUser(accessToken.getUserId(), accessToken.getToken());
-            }
-        }
 
         // Callback registration
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {

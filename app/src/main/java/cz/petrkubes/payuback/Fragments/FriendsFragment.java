@@ -76,6 +76,11 @@ public class FriendsFragment extends Fragment implements UpdateableFragment {
         rootView = inflater.inflate(R.layout.fragment_friends, container, false);
         lstFriends = (ListView) rootView.findViewById(R.id.lst_friends);
 
+        // Apparently OnCreateView can be called before OnCreate
+        if (user == null) {
+            user = db.getUser();
+        }
+
         friends = db.getExtendedFriendsWhoAreCreditorsOrDebtors(user.id);
         adapter = new FriendsAdapter(getContext(), friends);
         lstFriends.setAdapter(adapter);
