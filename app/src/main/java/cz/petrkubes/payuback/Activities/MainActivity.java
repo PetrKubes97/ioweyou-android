@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.facebook.FacebookSdk;
 import com.facebook.login.LoginManager;
 import com.facebook.stetho.Stetho;
 import com.facebook.stetho.common.Predicate;
@@ -81,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
         db = new DatabaseHandler(getApplicationContext());
 
         // Setup api client for synchronization
-        apiClient = new ApiRestClient(getApplicationContext());
+        apiClient = new ApiRestClient(this);
         user = db.getUser();
 
         // Start a new activity in which user adds debts
@@ -106,7 +107,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-
     }
 
     /**
@@ -124,33 +124,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void updateDebts() {
-        // Refresh offline changes
-        final MenuItem item = toolbar.getMenu().getItem(0);
-
-        pageAdapter.notifyDataSetChanged();
-        item.setVisible(false);
-        toolbarPragressBar.setVisibility(View.VISIBLE);
-
-        apiClient.updateAllDebts(user.apiKey, new SimpleCallback() {
-            @Override
-            public void onSuccess() {
-                // Refresh online changes
-                pageAdapter.notifyDataSetChanged();
-                item.setVisible(true);
-                toolbarPragressBar.setVisibility(View.GONE);
-                Snackbar.make(coordinatorLayout, getString(R.string.changes_synced), Snackbar.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onFailure() {
-                item.setVisible(true);
-                toolbarPragressBar.setVisibility(View.GONE);
-                Snackbar.make(coordinatorLayout, getString(R.string.something_went_wrong), Snackbar.LENGTH_SHORT).show();
-            }
-        });
-    }
-
     /**
      * Handles toolbar actions
      * @param item
@@ -161,40 +134,15 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.action_logout:
 
-                // Logout from facebook
-                LoginManager.getInstance().logOut();
+                logOut();
 
-                // TODO empty api key on server
-
-                // Truncate db
-                db.truncate();
-                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-                startActivity(intent);
                 return true;
 
             case R.id.action_refresh:
 
-                item.setVisible(false);
-                toolbarPragressBar.setVisibility(View.VISIBLE);
-
                 // Refresh everything
                 if (user != null) {
-                    apiClient.updateAll(user.apiKey, new SimpleCallback() {
-                        @Override
-                        public void onSuccess() {
-                            item.setVisible(true);
-                            pageAdapter.notifyDataSetChanged();
-                            toolbarPragressBar.setVisibility(View.GONE);
-                            Snackbar.make(coordinatorLayout, getString(R.string.changes_synced), Snackbar.LENGTH_SHORT).show();
-                        }
-
-                        @Override
-                        public void onFailure() {
-                            item.setVisible(true);
-                            toolbarPragressBar.setVisibility(View.GONE);
-                            Snackbar.make(coordinatorLayout, getString(R.string.something_went_wrong), Snackbar.LENGTH_SHORT).show();
-                        }
-                    });
+                    updateAll();
                 } else {
                     Toast.makeText(getApplicationContext(), "Neni", Toast.LENGTH_SHORT).show();
                 }
@@ -212,4 +160,73 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+
+    public void updateDebts() {
+        toggleLoading();
+
+        apiClient.updateAllDebts(user.apiKey, new SimpleCallback() {
+            @Override
+            public void onSuccess() {
+                toggleLoading();
+                pageAdapter.notifyDataSetChanged();
+                Snackbar.make(coordinatorLayout, getString(R.string.changes_synced), Snackbar.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure() {
+                toggleLoading();
+                Snackbar.make(coordinatorLayout, getString(R.string.something_went_wrong), Snackbar.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public void updateAll() {
+        toggleLoading();
+
+        apiClient.updateAll(user.apiKey, new SimpleCallback() {
+            @Override
+            public void onSuccess() {
+                toggleLoading();
+                pageAdapter.notifyDataSetChanged();
+                Snackbar.make(coordinatorLayout, getString(R.string.changes_synced), Snackbar.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure() {
+                toggleLoading();
+                Snackbar.make(coordinatorLayout, getString(R.string.something_went_wrong), Snackbar.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    /**
+     * Logs user out of facebook, truncates database and launches Login activity
+     */
+    public void logOut() {
+        // Logout from facebook
+        if (!FacebookSdk.isInitialized()) {
+            FacebookSdk.sdkInitialize(getApplicationContext());
+        }
+        LoginManager.getInstance().logOut();
+
+        // TODO empty api key on server
+
+        // Truncate db
+        db.truncate();
+        Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+        startActivity(intent);
+    }
+
+
+    private void toggleLoading() {
+        final MenuItem item = toolbar.getMenu().getItem(0);
+
+        if (item.isVisible()) {
+            item.setVisible(false);
+            toolbarPragressBar.setVisibility(View.VISIBLE);
+        } else {
+            item.setVisible(true);
+            toolbarPragressBar.setVisibility(View.GONE);
+        }
+    }
 }

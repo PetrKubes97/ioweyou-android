@@ -32,14 +32,18 @@ public class ApiRestClient {
     private AsyncHttpClient client;
     private DatabaseHandler db;
     private Context context;
+    private ApiFailureHandler apiFailureHandler;
 
     public ApiRestClient(Context context) {
         this.client = new AsyncHttpClient();
         this.db = new DatabaseHandler(context);
         this.context = context;
+        this.apiFailureHandler = new ApiFailureHandler(context, this.db);
     }
 
     public void getUser(String apiKey, final SimpleCallback callback) {
+
+        Log.d(Const.TAG, "Api: getUser");
 
         client.addHeader("api-key",apiKey);
 
@@ -80,7 +84,7 @@ public class ApiRestClient {
                     db.addOrUpdateUser(user);
 
                 } catch (Exception e) {
-                    callback.onFailure();
+                    apiFailureHandler.HandleFailure(statusCode, e.getMessage(), callback);
                 }
                 callback.onSuccess();
             }
@@ -88,12 +92,14 @@ public class ApiRestClient {
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 super.onFailure(statusCode, headers, throwable, errorResponse);
-                callback.onFailure();
+                apiFailureHandler.HandleFailure(statusCode, errorResponse.toString(), callback);
             }
         });
     }
 
     public void login(String facebookId, String facebookToken, final SimpleCallback callback) {
+        Log.d(Const.TAG, "Api: login");
+
         RequestParams params = new RequestParams();
         params.put("facebookToken", facebookToken);
         params.put("facebookId", facebookId);
@@ -118,21 +124,20 @@ public class ApiRestClient {
                     callback.onSuccess();
 
                 } catch (JSONException e) {
-                    e.printStackTrace();
-                    callback.onFailure();
+                    apiFailureHandler.HandleFailure(statusCode, e.getMessage(), callback);
                 }
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 super.onFailure(statusCode, headers, throwable, errorResponse);
-                callback.onFailure();
+                apiFailureHandler.HandleFailure(statusCode, errorResponse.toString(), callback);
             }
         });
     }
 
     public void getCurrencies(String apiKey, final SimpleCallback callback) {
-
+        Log.d(Const.TAG, "Api: getCurrencies");
         client.addHeader("api-key", apiKey);
 
         client.get(getAbsoluteUrl("currencies/"), null, new JsonHttpResponseHandler() {
@@ -158,20 +163,20 @@ public class ApiRestClient {
                     callback.onSuccess();
 
                 } catch (Exception e) {
-                    Log.d(Const.TAG, e.getMessage());
-                    callback.onFailure();
+                    apiFailureHandler.HandleFailure(statusCode, e.getMessage(), callback);
                 }
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 super.onFailure(statusCode, headers, throwable, errorResponse);
-                callback.onFailure();
+                apiFailureHandler.HandleFailure(statusCode, errorResponse.toString(), callback);
             }
         });
     }
 
     public void updateAllDebts (String apiKey, final SimpleCallback callback) {
+        Log.d(Const.TAG, "Api: updateAllDebts");
         // Login
         client.addHeader("api-key", apiKey);
 
@@ -192,17 +197,14 @@ public class ApiRestClient {
             entity = new StringEntity(debtsJson.toString(), "UTF-8");
 
         } catch (Exception e) {
-            e.printStackTrace();
+            apiFailureHandler.HandleFailure(0, e.getMessage(), callback);
         }
-
-        Log.d(Const.TAG, "Sending: " + debtsJson.toString());
 
         client.post(context, getAbsoluteUrl("debts/update"), entity, "application/json", new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
 
-                Log.d(Const.TAG, "Receiving: " + response.toString());
                 // Go through every currency and add it to the database
                 try {
 
@@ -226,24 +228,21 @@ public class ApiRestClient {
                     callback.onSuccess();
 
                 } catch (Exception e) {
-                    e.printStackTrace();
-                    callback.onFailure();
+                    apiFailureHandler.HandleFailure(statusCode, e.getMessage(), callback);
                 }
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 super.onFailure(statusCode, headers, throwable, errorResponse);
-
-                Log.d(Const.TAG, errorResponse.toString());
-                callback.onFailure();
+                apiFailureHandler.HandleFailure(statusCode, errorResponse.toString(), callback);
             }
         });
 
     }
 
     public void getActions(String apiKey, final SimpleCallback callback) {
-
+        Log.d(Const.TAG, "Api: getActions");
         // Login
         client.addHeader("api-key", apiKey);
 
@@ -263,7 +262,7 @@ public class ApiRestClient {
                     }
 
                 } catch (Exception e) {
-                    callback.onFailure();
+                    apiFailureHandler.HandleFailure(statusCode, e.getMessage(), callback);
                 }
                 callback.onSuccess();
             }
@@ -271,14 +270,14 @@ public class ApiRestClient {
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 super.onFailure(statusCode, headers, throwable, errorResponse);
-                callback.onFailure();
+                apiFailureHandler.HandleFailure(statusCode, errorResponse.toString(), callback);
             }
         });
 
     }
 
     public void updateAll(final String apiKey, final SimpleCallback callback) {
-
+        Log.d(Const.TAG, "Api: updateAll");
         getUser(apiKey, new SimpleCallback() {
             @Override
             public void onSuccess() {

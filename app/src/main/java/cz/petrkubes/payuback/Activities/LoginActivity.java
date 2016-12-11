@@ -48,8 +48,6 @@ public class LoginActivity extends AppCompatActivity {
                 intent.putExtra("facebookId", AccessToken.getCurrentAccessToken().getUserId());
                 intent.putExtra("facebookToken", AccessToken.getCurrentAccessToken().getToken());
                 startActivity(intent);
-            } else {
-                loginUser(accessToken.getUserId(), accessToken.getToken());
             }
         }
     }

@@ -200,7 +200,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public void addOrUpdateUser(User user) {
         SQLiteDatabase db = this.getWritableDatabase();
 
-        // Checks if user doesn't already exist
+        // Checks if user does already exist
         Cursor cursor = db.query(TABLE_USERS, new String[] {USERS_KEY_ID}, USERS_KEY_ID + "=?",
                 new String[] {String.valueOf(user.id)}, null, null, null);
 
