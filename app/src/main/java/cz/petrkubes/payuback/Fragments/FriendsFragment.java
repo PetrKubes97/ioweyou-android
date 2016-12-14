@@ -36,6 +36,8 @@ import cz.petrkubes.payuback.Pojos.Debt;
 import cz.petrkubes.payuback.Pojos.Friend;
 import cz.petrkubes.payuback.Pojos.User;
 
+import static android.view.View.GONE;
+
 /**
  * Created by petr on 27.10.16.
  */
@@ -60,6 +62,7 @@ public class FriendsFragment extends Fragment implements UpdateableFragment {
     private Button btnDialogAdd;
     private ListView lstDialogDebts;
     private TextView txtDialogName;
+    private TextView txtNote;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -75,13 +78,15 @@ public class FriendsFragment extends Fragment implements UpdateableFragment {
 
         rootView = inflater.inflate(R.layout.fragment_friends, container, false);
         lstFriends = (ListView) rootView.findViewById(R.id.lst_friends);
+        txtNote = (TextView) rootView.findViewById(R.id.txt_note);
 
-        // Apparently OnCreateView can be called before OnCreate
+        // Apparently, OnCreateView can be called before OnCreate
         if (user == null) {
             user = db.getUser();
         }
 
         friends = db.getExtendedFriendsWhoAreCreditorsOrDebtors(user.id);
+        toggleNote();
         adapter = new FriendsAdapter(getContext(), friends);
         lstFriends.setAdapter(adapter);
 
@@ -101,11 +106,20 @@ public class FriendsFragment extends Fragment implements UpdateableFragment {
         if (user != null) {
             friends = db.getExtendedFriendsWhoAreCreditorsOrDebtors(user.id);
         }
+        toggleNote();
         adapter.clear();
         adapter.addAll(friends);
         adapter.notifyDataSetChanged();
     }
 
+    public void toggleNote() {
+        // Show note
+        if (friends.size() == 0) {
+            txtNote.setVisibility(View.VISIBLE);
+        } else {
+            txtNote.setVisibility(GONE);
+        }
+    }
 
     private void showDialog(final Friend friend) {
 

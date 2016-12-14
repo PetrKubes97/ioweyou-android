@@ -34,6 +34,8 @@ import cz.petrkubes.payuback.R;
 import cz.petrkubes.payuback.Pojos.Debt;
 import cz.petrkubes.payuback.Pojos.User;
 
+import static android.view.View.GONE;
+
 
 public class DebtsFragment extends Fragment implements UpdateableFragment {
 
@@ -57,6 +59,7 @@ public class DebtsFragment extends Fragment implements UpdateableFragment {
     private TextView txtDialogNote;
     private TextView txtDialogDate;
     private Switch swtchPayment;
+    private TextView txtNote;
 
     // Dialog variables
     private Integer amount;
@@ -75,16 +78,18 @@ public class DebtsFragment extends Fragment implements UpdateableFragment {
 
         rootView = inflater.inflate(R.layout.fragment_debts, container, false);
         lstDebts = (ListView) rootView.findViewById(R.id.lst_debts);
+        txtNote = (TextView) rootView.findViewById(R.id.txt_note);
 
         Bundle args = getArguments();
 
         // Get the correct list of debts - my debts or their debts
-        debts = new ArrayList<>();
+        debts = new ArrayList<Debt>();
         myDebts = args.getBoolean(ARG_MY);
 
         if (user != null) {
              debts = db.getExtendedDebts(myDebts, user.id);
         }
+        toggleNote();
 
         // Populate the list view
         adapter = new DebtsAdapter(getContext(), debts, myDebts);
@@ -109,9 +114,24 @@ public class DebtsFragment extends Fragment implements UpdateableFragment {
         if (user != null) {
             debts = db.getExtendedDebts(myDebts, user.id);
         }
+        toggleNote();
         adapter.clear();
         adapter.addAll(debts);
         adapter.notifyDataSetChanged();
+    }
+
+    public void toggleNote() {
+        // Show note
+        if (debts.size() == 0) {
+            txtNote.setVisibility(View.VISIBLE);
+            if (myDebts) {
+                txtNote.setText(getString(R.string.you_do_not_owe_anyone));
+            } else {
+                txtNote.setText(getString(R.string.no_one_owes_you));
+            }
+        } else {
+            txtNote.setVisibility(GONE);
+        }
     }
 
     private void showDialog(final Debt debt) {

@@ -22,8 +22,8 @@
     <string name="edit">Edit</string>
     <string name="pay">Pay</string>
     <string name="friend_add_a_new_debt">Add a new debt</string>
-    <string name="changes_synced">All changes successfully synced.</string>
-    <string name="something_went_wrong">Something went wrong. :-(</string>
+    <string name="changes_synced">All changes are successfully synced.</string>
+    <string name="something_went_wrong">Something went wrong. :\'(</string>
     <string name="logout">Log out</string>
     <string name="refresh">Refresh</string>
     <string name="do_you_want_to_delete_this_debt">Do you want to delete this debt?</string>
@@ -31,4 +31,8 @@
     <string name="exit">Exit</string>
     <string name="are_you_sure_you_want_to_exit">Do you really want to close this app?</string>
     <string name="no_internet">No internet connection available.</string>
+    <string name="you_do_not_owe_anyone">You don\'t have any debts! (ง ͠° ͟ل͜ ͡°)ง</string>
+    <string name="no_one_owes_you">No one owes you any money. Or do they? (¬_¬) </string>
+    <string name="no_actions">You will find any changes that affect your debts here. </string>
+    <string name="no_friend">Hey, here you can see your friends and settle up all of their debts at once. Neat, isn\'t it?</string>
 </resources>

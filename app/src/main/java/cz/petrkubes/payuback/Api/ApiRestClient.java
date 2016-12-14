@@ -148,7 +148,7 @@ public class ApiRestClient {
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 super.onFailure(statusCode, headers, throwable, errorResponse);
-                
+
                 if (errorResponse != null) {
                     apiFailureHandler.HandleFailure(statusCode, errorResponse.toString(), callback);
                 } else {

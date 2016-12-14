@@ -7,10 +7,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.TextView;
+
+import java.util.ArrayList;
 
 import cz.petrkubes.payuback.Adapters.ActionsAdapter;
 import cz.petrkubes.payuback.Database.DatabaseHandler;
+import cz.petrkubes.payuback.Pojos.Action;
+import cz.petrkubes.payuback.Pojos.Debt;
 import cz.petrkubes.payuback.R;
+
+import static android.view.View.GONE;
 
 /**
  * Created by petr on 27.10.16.
@@ -19,6 +26,8 @@ import cz.petrkubes.payuback.R;
 public class ActionsFragment extends Fragment implements UpdateableFragment {
 
     private ListView lstActions;
+    private TextView txtNote;
+    private ArrayList<Action> actions;
     private DatabaseHandler db;
     private ActionsAdapter adapter;
 
@@ -34,8 +43,11 @@ public class ActionsFragment extends Fragment implements UpdateableFragment {
 
         View rootView = inflater.inflate(R.layout.fragment_actions, container, false);
         lstActions = (ListView) rootView.findViewById(R.id.lst_actions);
+        txtNote = (TextView) rootView.findViewById(R.id.txt_note);
 
-        adapter = new ActionsAdapter(getContext(), db.getExtendedActions());
+        actions = db.getExtendedActions();
+        toggleNote();
+        adapter = new ActionsAdapter(getContext(), actions);
         lstActions.setAdapter(adapter);
 
         return rootView;
@@ -43,8 +55,19 @@ public class ActionsFragment extends Fragment implements UpdateableFragment {
 
     @Override
     public void update() {
+        actions = db.getExtendedActions();
+        toggleNote();
         adapter.clear();
-        adapter.addAll(db.getExtendedActions());
+        adapter.addAll(actions);
         adapter.notifyDataSetChanged();
+    }
+
+    public void toggleNote() {
+        // Show note
+        if (actions.size() == 0) {
+            txtNote.setVisibility(View.VISIBLE);
+        } else {
+            txtNote.setVisibility(GONE);
+        }
     }
 }
