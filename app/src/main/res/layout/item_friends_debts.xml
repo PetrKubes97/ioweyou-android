@@ -23,7 +23,8 @@
         android:layout_marginStart="16dp"
         app:layout_constraintLeft_toRightOf="@+id/txt_what"
         app:layout_constraintBottom_toBottomOf="@+id/txt_what"
-        app:layout_constraintTop_toTopOf="@+id/txt_what" />
+        app:layout_constraintTop_toTopOf="@+id/txt_what"
+        android:maxLines="2" />
 
     <TextView
         android:text="5000 Kč"
@@ -38,7 +39,7 @@
         android:textSize="18sp"
         android:textColor="@color/black"
         app:layout_constraintTop_toTopOf="parent"
-        android:gravity="center"
+        android:gravity="start"
         app:layout_constraintLeft_toLeftOf="parent" />
 
     <TextView
