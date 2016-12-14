@@ -1,6 +1,7 @@
 package cz.petrkubes.payuback.Activities;
 
 import android.app.ActivityOptions;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
@@ -8,9 +9,9 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,16 +21,13 @@ import android.widget.Toast;
 import com.facebook.FacebookSdk;
 import com.facebook.login.LoginManager;
 import com.facebook.stetho.Stetho;
-import com.facebook.stetho.common.Predicate;
 
 import cz.petrkubes.payuback.Adapters.FragmentsAdapter;
 import cz.petrkubes.payuback.Api.ApiRestClient;
 import cz.petrkubes.payuback.Api.SimpleCallback;
-import cz.petrkubes.payuback.Const;
 import cz.petrkubes.payuback.Database.DatabaseHandler;
 import cz.petrkubes.payuback.R;
 import cz.petrkubes.payuback.Pojos.User;
-import cz.petrkubes.payuback.Tools.Tools;
 
 /**
  * Created by petr on 16.10.16.
@@ -120,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == ADD_DEBT_REQUEST && resultCode == RESULT_OK) {
-            updateDebts();
+            updateDebtsAndActions();
         }
     }
 
@@ -160,11 +158,30 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * Show an alertDialog on pressing a back button
+     */
+    @Override
+    public void onBackPressed() {
 
-    public void updateDebts() {
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+        dialogBuilder.setMessage(getString(R.string.are_you_sure_you_want_to_exit));
+        dialogBuilder.setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                finish();
+            }
+        });
+        dialogBuilder.setNegativeButton(getString(R.string.no), null);
+        dialogBuilder.show();
+
+    }
+
+    public void updateDebtsAndActions() {
+        pageAdapter.notifyDataSetChanged();
         toggleLoading();
 
-        apiClient.updateAllDebts(user.apiKey, new SimpleCallback() {
+        apiClient.updateDebtsAndActions(user.apiKey, new SimpleCallback() {
             @Override
             public void onSuccess() {
                 toggleLoading();
@@ -173,9 +190,9 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure() {
+            public void onFailure(String message) {
                 toggleLoading();
-                Snackbar.make(coordinatorLayout, getString(R.string.something_went_wrong), Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_SHORT).show();
             }
         });
     }
@@ -192,9 +209,9 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure() {
+            public void onFailure(String message) {
                 toggleLoading();
-                Snackbar.make(coordinatorLayout, getString(R.string.something_went_wrong), Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_SHORT).show();
             }
         });
     }

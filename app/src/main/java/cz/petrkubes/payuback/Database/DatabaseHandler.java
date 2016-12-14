@@ -603,8 +603,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(DEBTS_KEY_CREATED_AT, Tools.formatDate(debt.createdAt));
         values.put(DEBTS_KEY_VERSION, debt.version);
 
-        Log.d(Const.TAG, "DATE TO BE SAVED" + Tools.formatDate(debt.createdAt));
-
         if (currentId == null || cursor.getCount() < 1) {
             // Debt doesn't exist
             db.insert(TABLE_DEBTS, null, values);

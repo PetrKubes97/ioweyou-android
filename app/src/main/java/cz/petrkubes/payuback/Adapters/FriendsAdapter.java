@@ -59,7 +59,6 @@ public class  FriendsAdapter extends ArrayAdapter<Friend> {
         if (friend != null) {
             viewHolder.txtName.setText(friend.name);
             viewHolder.txtStuff.setText(fromHtml(friend.debtsString));
-            Log.d(Const.TAG, friend.debtsString);
         }
 
         // Return the completed view to render on screen

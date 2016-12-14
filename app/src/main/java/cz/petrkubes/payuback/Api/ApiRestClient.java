@@ -1,6 +1,7 @@
 package cz.petrkubes.payuback.Api;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
 import android.util.Log;
 
 import com.loopj.android.http.AsyncHttpClient;
@@ -25,6 +26,7 @@ import cz.petrkubes.payuback.Pojos.Currency;
 import cz.petrkubes.payuback.Pojos.Debt;
 import cz.petrkubes.payuback.Pojos.Friend;
 import cz.petrkubes.payuback.Pojos.User;
+import cz.petrkubes.payuback.R;
 
 public class ApiRestClient {
 
@@ -44,6 +46,11 @@ public class ApiRestClient {
     public void getUser(String apiKey, final SimpleCallback callback) {
 
         Log.d(Const.TAG, "Api: getUser");
+
+        if (!isConnected()) {
+            apiFailureHandler.HandleFailure(600, context.getString(R.string.no_internet), callback);
+            return;
+        }
 
         client.addHeader("api-key",apiKey);
 
@@ -92,13 +99,23 @@ public class ApiRestClient {
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 super.onFailure(statusCode, headers, throwable, errorResponse);
-                apiFailureHandler.HandleFailure(statusCode, errorResponse.toString(), callback);
+
+                if (errorResponse != null) {
+                    apiFailureHandler.HandleFailure(statusCode, errorResponse.toString(), callback);
+                } else {
+                    apiFailureHandler.HandleFailure(statusCode, null, callback);
+                }
             }
         });
     }
 
     public void login(String facebookId, String facebookToken, final SimpleCallback callback) {
         Log.d(Const.TAG, "Api: login");
+
+        if (!isConnected()) {
+            apiFailureHandler.HandleFailure(600, context.getString(R.string.no_internet), callback);
+            return;
+        }
 
         RequestParams params = new RequestParams();
         params.put("facebookToken", facebookToken);
@@ -131,13 +148,23 @@ public class ApiRestClient {
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 super.onFailure(statusCode, headers, throwable, errorResponse);
-                apiFailureHandler.HandleFailure(statusCode, errorResponse.toString(), callback);
+                
+                if (errorResponse != null) {
+                    apiFailureHandler.HandleFailure(statusCode, errorResponse.toString(), callback);
+                } else {
+                    apiFailureHandler.HandleFailure(statusCode, null, callback);
+                }
             }
         });
     }
 
     public void getCurrencies(String apiKey, final SimpleCallback callback) {
         Log.d(Const.TAG, "Api: getCurrencies");
+        if (!isConnected()) {
+            apiFailureHandler.HandleFailure(600, context.getString(R.string.no_internet), callback);
+            return;
+        }
+
         client.addHeader("api-key", apiKey);
 
         client.get(getAbsoluteUrl("currencies/"), null, new JsonHttpResponseHandler() {
@@ -170,13 +197,24 @@ public class ApiRestClient {
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 super.onFailure(statusCode, headers, throwable, errorResponse);
-                apiFailureHandler.HandleFailure(statusCode, errorResponse.toString(), callback);
+
+                if (errorResponse != null) {
+                    apiFailureHandler.HandleFailure(statusCode, errorResponse.toString(), callback);
+                } else {
+                    apiFailureHandler.HandleFailure(statusCode, null, callback);
+                }
             }
         });
     }
 
     public void updateAllDebts (String apiKey, final SimpleCallback callback) {
         Log.d(Const.TAG, "Api: updateAllDebts");
+
+        if (!isConnected()) {
+            apiFailureHandler.HandleFailure(600, context.getString(R.string.no_internet), callback);
+            return;
+        }
+
         // Login
         client.addHeader("api-key", apiKey);
 
@@ -235,7 +273,12 @@ public class ApiRestClient {
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 super.onFailure(statusCode, headers, throwable, errorResponse);
-                apiFailureHandler.HandleFailure(statusCode, errorResponse.toString(), callback);
+
+                if (errorResponse != null) {
+                    apiFailureHandler.HandleFailure(statusCode, errorResponse.toString(), callback);
+                } else {
+                    apiFailureHandler.HandleFailure(statusCode, null, callback);
+                }
             }
         });
 
@@ -243,6 +286,12 @@ public class ApiRestClient {
 
     public void getActions(String apiKey, final SimpleCallback callback) {
         Log.d(Const.TAG, "Api: getActions");
+
+        if (!isConnected()) {
+            apiFailureHandler.HandleFailure(600, context.getString(R.string.no_internet), callback);
+            return;
+        }
+
         // Login
         client.addHeader("api-key", apiKey);
 
@@ -270,14 +319,58 @@ public class ApiRestClient {
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 super.onFailure(statusCode, headers, throwable, errorResponse);
-                apiFailureHandler.HandleFailure(statusCode, errorResponse.toString(), callback);
+
+                if (errorResponse != null) {
+                    apiFailureHandler.HandleFailure(statusCode, errorResponse.toString(), callback);
+                } else {
+                    apiFailureHandler.HandleFailure(statusCode, null, callback);
+                }
             }
         });
 
     }
 
+    // ------------------- Functions below only run multiple of functions above ------------------- //
+
+    public void updateDebtsAndActions(final String apiKey, final SimpleCallback callback) {
+        Log.d(Const.TAG, "Api: updateDebtsAndActions");
+
+        if (!isConnected()) {
+            apiFailureHandler.HandleFailure(600, context.getString(R.string.no_internet), callback);
+            return;
+        }
+
+        updateAllDebts(apiKey, new SimpleCallback() {
+            @Override
+            public void onSuccess() {
+                getActions(apiKey, new SimpleCallback() {
+                    @Override
+                    public void onSuccess() {
+                        callback.onSuccess();
+                    }
+
+                    @Override
+                    public void onFailure(String message) {
+                        callback.onFailure(message);
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(String message) {
+                callback.onFailure(message);
+            }
+        });
+    }
+
     public void updateAll(final String apiKey, final SimpleCallback callback) {
         Log.d(Const.TAG, "Api: updateAll");
+
+        if (!isConnected()) {
+            apiFailureHandler.HandleFailure(600, context.getString(R.string.no_internet), callback);
+            return;
+        }
+
         getUser(apiKey, new SimpleCallback() {
             @Override
             public void onSuccess() {
@@ -285,41 +378,53 @@ public class ApiRestClient {
                     @Override
                     public void onSuccess() {
 
-                        getActions(apiKey, new SimpleCallback() {
+                        updateAllDebts(apiKey, new SimpleCallback() {
                             @Override
                             public void onSuccess() {
-                                updateAllDebts(apiKey, new SimpleCallback() {
+                                getActions(apiKey, new SimpleCallback() {
                                     @Override
                                     public void onSuccess() {
                                         callback.onSuccess();
                                     }
 
                                     @Override
-                                    public void onFailure() {
-                                        callback.onFailure();
+                                    public void onFailure(String message) {
+                                        callback.onFailure(message);
                                     }
                                 });
                             }
 
                             @Override
-                            public void onFailure() {
-                                callback.onFailure();
+                            public void onFailure(String message) {
+                                callback.onFailure(message);
                             }
                         });
                     }
 
                     @Override
-                    public void onFailure() {
-                        callback.onFailure();
+                    public void onFailure(String message) {
+                        callback.onFailure(message);
                     }
                 });
             }
 
             @Override
-            public void onFailure() {
-                callback.onFailure();
+            public void onFailure(String message) {
+                callback.onFailure(message);
             }
         });
+    }
+
+    // ----------------- Other functions --------------------- //
+
+    /**
+     * Checks if user is connected to wifi or has data connection enabled.
+     * Does not necessarily mean that the user has internet connection.
+     * @return bool
+     */
+    private boolean isConnected() {
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        return cm.getActiveNetworkInfo() != null;
     }
 
     private static String getAbsoluteUrl(String relativeUrl) {

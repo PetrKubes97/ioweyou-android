@@ -1,7 +1,6 @@
 package cz.petrkubes.payuback.Activities;
 
 import android.Manifest;
-import android.app.Dialog;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -34,7 +33,6 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialogFragment;
@@ -60,8 +58,6 @@ import cz.petrkubes.payuback.Pojos.Debt;
 import cz.petrkubes.payuback.Pojos.Friend;
 import cz.petrkubes.payuback.Pojos.User;
 import cz.petrkubes.payuback.Tools.Tools;
-
-import static android.app.Activity.RESULT_OK;
 
 public class DebtActivity extends AppCompatActivity implements CalendarDatePickerDialogFragment.OnDateSetListener, RadialTimePickerDialogFragment.OnTimeSetListener {
 
@@ -242,7 +238,7 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(DebtActivity.this);
                 builder.setMessage(R.string.do_you_want_to_delete_this_debt)
-                        .setPositiveButton(R.string.yes_delete, new DialogInterface.OnClickListener() {
+                        .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 debtToEdit.deletedAt = new Date();

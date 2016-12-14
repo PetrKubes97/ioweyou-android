@@ -7,6 +7,6 @@ package cz.petrkubes.payuback.Api;
 public interface SimpleCallback {
 
     void onSuccess();
-    void onFailure();
+    void onFailure(String message);
 }
 

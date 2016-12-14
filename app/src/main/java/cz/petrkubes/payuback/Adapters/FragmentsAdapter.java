@@ -60,7 +60,7 @@ public class FragmentsAdapter extends FragmentStatePagerAdapter {
     @Override
     public int getItemPosition(Object object) {
         if (object instanceof UpdateableFragment) {
-            Log.d(Const.TAG, "Calling update in adapter");
+            Log.d(Const.TAG, "Calling update in adapter: " + object.toString());
             ((UpdateableFragment) object).update();
         }
 

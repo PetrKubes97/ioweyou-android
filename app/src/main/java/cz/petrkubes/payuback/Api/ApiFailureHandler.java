@@ -21,6 +21,9 @@ class ApiFailureHandler {
 
     private static final int UNAUTHORIZED = 401;
 
+    // Error codes made up by me
+    private static final int NO_INTERNET = 600;
+
     private Context context;
     private DatabaseHandler db;
 
@@ -32,7 +35,6 @@ class ApiFailureHandler {
     void HandleFailure(int StatusCode, String message, final SimpleCallback callback) {
 
         Log.d(Const.TAG, "API FAILURE: " + message );
-        Toast.makeText(context, message, Toast.LENGTH_LONG).show();
 
         // Log user out when the api keys don't match
         if (StatusCode == UNAUTHORIZED) {
@@ -41,8 +43,11 @@ class ApiFailureHandler {
                 ((MainActivity) context).logOut();
             }
 
-        } else {
-            callback.onFailure();
+        } else if (StatusCode == NO_INTERNET) {
+            callback.onFailure("No internet connection available.");
+        }
+        else {
+            callback.onFailure("Something went wrong. :-(");
         }
 
     }

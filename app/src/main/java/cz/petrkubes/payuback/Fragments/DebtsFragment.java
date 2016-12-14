@@ -214,6 +214,6 @@ public class DebtsFragment extends Fragment implements UpdateableFragment {
     private void payDebt(Debt debt) {
         debt.version = System.currentTimeMillis();
         db.addOrUpdateDebt(debt.id, debt);
-        ((MainActivity) getActivity()).updateDebts();
+        ((MainActivity) getActivity()).updateDebtsAndActions();
     }
 }

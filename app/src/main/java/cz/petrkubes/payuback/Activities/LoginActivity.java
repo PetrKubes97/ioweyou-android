@@ -44,10 +44,7 @@ public class LoginActivity extends AppCompatActivity {
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
         if (accessToken != null) {
             if (db.getUser() != null) {
-                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                intent.putExtra("facebookId", AccessToken.getCurrentAccessToken().getUserId());
-                intent.putExtra("facebookToken", AccessToken.getCurrentAccessToken().getToken());
-                startActivity(intent);
+                startMainActivity();
             }
         }
     }
@@ -119,26 +116,27 @@ public class LoginActivity extends AppCompatActivity {
                 apiClient.updateAll(db.getUser().apiKey, new SimpleCallback() {
                     @Override
                     public void onSuccess() {
-                        txtLoadingDescription.setText("");
-                        prgLoader.setVisibility(View.GONE);
-                        loginButton.setVisibility(View.VISIBLE);
-
-                        // Starts application
-                        Intent intent = new Intent(getBaseContext(), MainActivity.class);
-                        startActivity(intent);
+                        startMainActivity();
                     }
 
                     @Override
-                    public void onFailure() {
-
+                    public void onFailure(String message) {
+                        // TODO handle failures
                     }
                 });
             }
 
             @Override
-            public void onFailure() {
+            public void onFailure(String message) {
 
             }
         });
+    }
+
+    private void startMainActivity() {
+        Intent intent = new Intent(getBaseContext(), MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+        finish();
     }
 }
