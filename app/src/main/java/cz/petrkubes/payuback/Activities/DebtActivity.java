@@ -318,7 +318,7 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
             }
 
             if (debtToEdit.creditorId != null && debtToEdit.creditorId.equals(user.id)) {
-                rdioMyDebt.setChecked(false);
+                rdioTheirDebt.setChecked(true);
             } else {
                 rdioMyDebt.setChecked(true);
             }
