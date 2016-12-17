@@ -270,6 +270,8 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
         if (friend != null) {
             txtName.setText(friend.name);
             tempFacebookFriendId = friend.id;
+            // color text
+            txtName.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.facebook_lighter));
         }
 
         // Edit debt
