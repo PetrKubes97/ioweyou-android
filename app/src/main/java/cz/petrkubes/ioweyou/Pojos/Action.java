@@ -19,7 +19,8 @@ public class Action {
     public Date date;
 
     // Variables used for displaying other data in views
-    public String userName;
+    public String user1Name;
+    public String user2Name;
 
     public Action(Integer id, String type, Integer debtId, Integer userId, String note, Date date) {
         this.id = id;

@@ -55,7 +55,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/txt_name"
         android:textSize="18sp"
-        android:textColor="@color/black"
+        android:textColor="?android:attr/textColorPrimary"
         android:ellipsize="marquee"
         android:maxLines="1"
         android:gravity="start|bottom"

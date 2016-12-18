@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import cz.petrkubes.ioweyou.R;
 import cz.petrkubes.ioweyou.Pojos.Debt;
@@ -49,6 +50,7 @@ public class DebtsAdapter extends ArrayAdapter<Debt> {
             viewHolder.txtNote = (TextView) convertView.findViewById(R.id.txt_note);
             viewHolder.txtDate = (TextView) convertView.findViewById(R.id.txt_date);
             viewHolder.txtStatus = (TextView) convertView.findViewById(R.id.txt_status);
+            viewHolder.txtId = (TextView) convertView.findViewById(R.id.txt_id);
 
             convertView.setTag(viewHolder);
         } else {
@@ -62,6 +64,7 @@ public class DebtsAdapter extends ArrayAdapter<Debt> {
         viewHolder.txtNote.setText(debt.note);
         viewHolder.txtDate.setText(Tools.formatDate(debt.createdAt));
         viewHolder.txtStatus.setText(debt.status);
+        viewHolder.txtId.setText(String.format(Locale.getDefault(), "#%d", debt.id));
 
         // Set color of owned items
         if (myDebts) {
@@ -87,6 +90,7 @@ public class DebtsAdapter extends ArrayAdapter<Debt> {
 
     // View lookup cache
     private static class ViewHolder {
+        TextView txtId;
         TextView txtName;
         TextView txtWhat;
         TextView txtNote;

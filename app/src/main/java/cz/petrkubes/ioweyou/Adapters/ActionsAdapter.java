@@ -13,6 +13,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 import cz.petrkubes.ioweyou.Pojos.Action;
 import cz.petrkubes.ioweyou.R;
@@ -36,6 +37,10 @@ public class ActionsAdapter extends ArrayAdapter<Action> {
 
         final Action action = getItem(position);
 
+        if (action == null) {
+            return convertView;
+        }
+
         final ActionsAdapter.ViewHolder viewHolder;
 
         if (convertView == null) {
@@ -47,6 +52,8 @@ public class ActionsAdapter extends ArrayAdapter<Action> {
 
             viewHolder.txtMessage = (TextView) convertView.findViewById(R.id.txt_message);
             viewHolder.txtDate = (TextView) convertView.findViewById(R.id.txt_date);
+            viewHolder.txtUser1 = (TextView) convertView.findViewById(R.id.txt_user1);
+            viewHolder.txtUser2 = (TextView) convertView.findViewById(R.id.txt_user2);
 
             convertView.setTag(viewHolder);
         } else {
@@ -55,7 +62,9 @@ public class ActionsAdapter extends ArrayAdapter<Action> {
 
         // Populate the data from the data object via the viewHolder object
         // into the template view.
-        viewHolder.txtMessage.setText(action.userName + " " + action.type + " " + action.note);
+        viewHolder.txtUser1.setText(action.user1Name);
+        viewHolder.txtUser2.setText(action.user2Name);
+        viewHolder.txtMessage.setText(String.format(Locale.getDefault(), "#%d: %s", action.debtId, action.note));
         viewHolder.txtDate.setText(Tools.formatDate(action.date));
 
         // Return the completed view to render on screen
@@ -77,6 +86,8 @@ public class ActionsAdapter extends ArrayAdapter<Action> {
     private static class ViewHolder {
         TextView txtMessage;
         TextView txtDate;
+        TextView txtUser1;
+        TextView txtUser2;
     }
 
 }

@@ -2,6 +2,7 @@ package cz.petrkubes.ioweyou.Database;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -401,7 +402,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
      * Get friend by id
      * @return Friend
      */
-    public Friend getFriend(int id) {
+    public Friend getFriend(Integer id) {
 
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(TABLE_FRIENDS, friendProjection, FRIENDS_KEY_ID + "=?",
@@ -499,6 +500,28 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.close();
 
         return currency;
+    }
+
+    /**
+     * Returns a debt by id
+     * @return Debt
+     */
+    public Debt getDebt(Integer id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_DEBTS, debtProjection, DEBTS_KEY_ID + "=?",
+                new String[] {String.valueOf(id)}, null, null, null);
+
+        Debt debt = null;
+
+        if (cursor.moveToFirst())
+        {
+            debt = Debt.fromCursor(cursor);
+        }
+
+        cursor.close();
+        db.close();
+
+        return debt;
     }
 
     /**
@@ -732,7 +755,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         ArrayList<Action> list = new ArrayList<>();
 
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.query(TABLE_ACTIONS, actionProjection, null, null, null, null, ACTIONS_KEY_DATE + " DESC", "10");
+        Cursor cursor = db.query(TABLE_ACTIONS, actionProjection, null, null, null, null, ACTIONS_KEY_DATE + " DESC", "5");
 
         if (cursor.moveToFirst())
         {
@@ -747,12 +770,39 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                         Tools.parseDate(cursor.getString(5))
                 );
 
-                Friend friend = getFriend(action.userId);
-                if (friend != null) {
-                    action.userName = friend.name;
+                // Add name of person who created the action
+                Friend user1 = getFriend(action.userId);
+                if (user1 != null) {
+                    action.user1Name = user1.name;
                 } else {
-                    action.userName = "You";
+                    action.user1Name = "You";
                 }
+
+                // Add name of the other person
+                Debt debt = getDebt(action.debtId);
+                String user2Name = null;
+                // 1. get the id
+                Integer user2Id = null;
+                if (debt.creditorId == action.userId) {
+                    if (debt.debtorId != null) {
+                        user2Id = debt.debtorId;
+                    } else {
+                        user2Name = debt.customFriendName;
+                    }
+                } else {
+                    if (debt.creditorId != null) {
+                        user2Id = debt.creditorId;
+                    } else {
+                        user2Name = debt.customFriendName;
+                    }
+                }
+
+                if (user2Name == null) {
+                    // 2. get the nam
+                    user2Name = getFriend(user2Id).name;
+                }
+
+                action.user2Name = user2Name;
 
                 list.add(action);
 

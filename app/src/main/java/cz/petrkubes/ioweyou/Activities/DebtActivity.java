@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Color;
@@ -88,6 +89,9 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
 
     private ArrayAdapter<Friend> friendsAdapter = null;
 
+    private SharedPreferences sharedPreferences;
+    private static final String defaultCurrencyPos = "DEFAULT_CURRENCY_POS";
+
     private User user;
     private Date createdAt;
     private Debt debtToEdit;
@@ -163,6 +167,11 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
         ArrayAdapter<Currency> currenciesAdapter = new ArrayAdapter<Currency>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, currencies);
         spnCurrency.setPrompt("Currency:");
         spnCurrency.setAdapter(currenciesAdapter);
+
+        // Set default currency
+        sharedPreferences = getPreferences(Context.MODE_PRIVATE);
+        spnCurrency.setSelection(sharedPreferences.getInt(defaultCurrencyPos, 0));
+
 
         // Delete facebook friend info, when user types anything into the box
         // Also hide error messages
@@ -480,6 +489,10 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
             }
 
             currencyId = currencies.get(spnCurrency.getSelectedItemPosition()).id;
+            // Add currency to shared pref, so that this currency is used by default
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putInt(defaultCurrencyPos, spnCurrency.getSelectedItemPosition());
+            editor.apply();
 
             if (amount < 1) {
                 txtILWhat.setError("Sorry, you can't owe someone 0 money. :-)");
