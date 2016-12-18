@@ -15,6 +15,7 @@ import cz.petrkubes.ioweyou.Pojos.Currency;
 import cz.petrkubes.ioweyou.Pojos.Debt;
 import cz.petrkubes.ioweyou.Pojos.Friend;
 import cz.petrkubes.ioweyou.Pojos.User;
+import cz.petrkubes.ioweyou.R;
 import cz.petrkubes.ioweyou.Tools.Tools;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
@@ -775,7 +776,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 if (user1 != null) {
                     action.user1Name = user1.name;
                 } else {
-                    action.user1Name = "You";
+                    action.user1Name = context.getString(R.string.you);
                 }
 
                 // Add name of the other person
@@ -797,9 +798,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     }
                 }
 
-                if (user2Name == null) {
+                if (user2Name == null && user2Id != null) {
                     // 2. get the nam
-                    user2Name = getFriend(user2Id).name;
+                    Friend user2 = getFriend(user2Id);
+                    if (user2 != null) {
+                        user2Name = user2.name;
+                    } else {
+                        user2Name = context.getString(R.string.you);
+                    }
                 }
 
                 action.user2Name = user2Name;
