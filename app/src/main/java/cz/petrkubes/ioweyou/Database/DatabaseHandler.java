@@ -23,7 +23,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private Context context;
 
     // Database Version
-    private static final int DATABASE_VERSION = 20;
+    private static final int DATABASE_VERSION = 23;
 
     // Database Name
     private static final String DATABASE_NAME = "payUBack.db";
@@ -61,6 +61,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String DEBTS_KEY_DELETED_AT = "deleted_at";
     private static final String DEBTS_KEY_MODIFIED_AT = "modified_at";
     private static final String DEBTS_KEY_CREATED_AT = "created_at";
+    private static final String DEBTS_KEY_MANAGER_ID = "manager_id";
     private static final String DEBTS_KEY_VERSION = "version";
 
     private static final String ACTIONS_KEY_ID = "id";
@@ -101,6 +102,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             DEBTS_KEY_DELETED_AT,
             DEBTS_KEY_MODIFIED_AT,
             DEBTS_KEY_CREATED_AT,
+            DEBTS_KEY_MANAGER_ID,
             DEBTS_KEY_VERSION
     };
 
@@ -149,6 +151,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 DEBTS_KEY_DELETED_AT + " NUMERIC, " +
                 DEBTS_KEY_CREATED_AT + " NUMERIC, " +
                 DEBTS_KEY_MODIFIED_AT + " NUMERIC, " +
+                DEBTS_KEY_MANAGER_ID + " INTEGER, " +
                 DEBTS_KEY_VERSION +" INTEGER);";
 
         String CREATE_ACTIONS_TABLE = "CREATE TABLE " + TABLE_ACTIONS + " (" +
@@ -619,6 +622,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(DEBTS_KEY_DELETED_AT, deletedAt);
         values.put(DEBTS_KEY_MODIFIED_AT, Tools.formatDate(debt.modifiedAt));
         values.put(DEBTS_KEY_CREATED_AT, Tools.formatDate(debt.createdAt));
+        values.put(DEBTS_KEY_MANAGER_ID, debt.managerId);
         values.put(DEBTS_KEY_VERSION, debt.version);
 
         if (currentId == null || cursor.getCount() < 1) {

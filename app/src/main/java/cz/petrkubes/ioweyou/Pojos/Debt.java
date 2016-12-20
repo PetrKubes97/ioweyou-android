@@ -33,6 +33,7 @@ public class Debt {
     public Date deletedAt;
     public Date modifiedAt;
     public Date createdAt;
+    public Integer managerId;
     public Long version;
 
     // Variables used for easier displaying of debts
@@ -47,7 +48,7 @@ public class Debt {
     public Debt(Integer id, Integer creditorId, Integer debtorId,
                 String customFriendName, Integer amount, Integer currencyId,
                 String thingName, String note, Date paidAt,
-                Date deletedAt, Date modifiedAt, Date createdAt, Long version) {
+                Date deletedAt, Date modifiedAt, Date createdAt, Integer managerId, Long version) {
         this.id = id;
         this.creditorId = creditorId;
         this.debtorId = debtorId;
@@ -61,6 +62,7 @@ public class Debt {
         this.modifiedAt = modifiedAt;
         this.createdAt = createdAt;
         this.version = version;
+        this.managerId = managerId;
     }
 
     public String createdAtString() {
@@ -76,27 +78,30 @@ public class Debt {
     }
 
     public JSONObject toJson() throws JSONException {
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
         String paidAt = "";
         String deletedAt = "";
         String modifiedAt = "";
         String createdAt = "";
+        boolean lock = false;
 
         if (this.paidAt != null) {
-            paidAt = df.format(this.paidAt);
+            paidAt = Tools.formatDate(this.paidAt);
         }
 
         if (this.deletedAt != null) {
-            deletedAt = df.format(this.deletedAt);
+            deletedAt = Tools.formatDate(this.deletedAt);
         }
 
         if (this.modifiedAt != null) {
-            modifiedAt = df.format(this.modifiedAt);
+            modifiedAt = Tools.formatDate(this.modifiedAt);
         }
 
         if (this.createdAt != null) {
-            createdAt = df.format(this.createdAt);
+            createdAt = Tools.formatDate(this.createdAt);
+        }
+
+        if (this.managerId != null) { // Send only a boolean to prevent hackers from creating uneditable debts
+            lock = true;
         }
 
         JSONObject debtJson = new JSONObject();
@@ -112,13 +117,13 @@ public class Debt {
         debtJson.put("deletedAt", deletedAt);
         debtJson.put("modifiedAt", modifiedAt);
         debtJson.put("createdAt", createdAt);
+        debtJson.put("lock", lock);
         debtJson.put("version", this.version);
 
         return debtJson;
     }
 
     public static Debt fromJson(JSONObject response) throws Exception {
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
         // It is necessary to convert dates strings to Date classes
         Date paidAt = null;
@@ -132,21 +137,22 @@ public class Debt {
         String customFriendName = null;
         String thingName = null;
         String note = null;
+        Integer managerId = null;
 
         if (!response.getString("paidAt").isEmpty()) {
-            paidAt = df.parse(response.getString("paidAt"));
+            paidAt = Tools.parseDate(response.getString("paidAt"));
         }
 
         if (!response.getString("deletedAt").isEmpty()) {
-            deletedAt = df.parse(response.getString("deletedAt"));
+            deletedAt = Tools.parseDate(response.getString("deletedAt"));
         }
 
         if (!response.getString("createdAt").isEmpty()) {
-            createdAt = df.parse(response.getString("createdAt"));
+            createdAt = Tools.parseDate(response.getString("createdAt"));
         }
 
         if (!response.getString("modifiedAt").isEmpty()) {
-            modifiedAt = df.parse(response.getString("modifiedAt"));
+            modifiedAt = Tools.parseDate(response.getString("modifiedAt"));
         }
 
         if (!response.getString("creditorId").isEmpty()) {
@@ -177,6 +183,10 @@ public class Debt {
             note = response.getString("note");
         }
 
+        if (!response.getString("managerId").isEmpty()) {
+            managerId = response.getInt("managerId");
+        }
+
         return new Debt(
                 response.getInt("id"),
                 creditorId,
@@ -190,6 +200,7 @@ public class Debt {
                 deletedAt,
                 modifiedAt,
                 createdAt,
+                managerId,
                 response.getLong("version")
         );
     }
@@ -208,6 +219,8 @@ public class Debt {
         String customFriendName = null;
         String note = null;
         String thing = null;
+
+        Integer managerId = null;
 
 
         if (!cursor.isNull(8)) {
@@ -254,6 +267,10 @@ public class Debt {
             note = cursor.getString(7);
         }
 
+        if (!cursor.isNull(12)) {
+            managerId = cursor.getInt(12);
+        }
+
         return new Debt(
                 cursor.getInt(0),
                 creditorId,
@@ -267,6 +284,7 @@ public class Debt {
                 deletedAt,
                 modifiedAt,
                 createdAt,
-                cursor.getLong(12));
+                managerId,
+                cursor.getLong(13));
     }
 }

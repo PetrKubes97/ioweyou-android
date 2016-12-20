@@ -30,6 +30,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.RadioButton;
@@ -81,6 +82,7 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
     private TextInputLayout txtILWho;
     private Button btnCreatedAt;
     private Button btnDelete;
+    private CheckBox chckLocked;
 
 
     private Integer tempFacebookFriendId = null;
@@ -122,6 +124,7 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
         txtILWho = (TextInputLayout) findViewById(R.id.txtIL_who);
         btnCreatedAt = (Button) findViewById(R.id.btn_created_at);
         btnDelete = (Button) findViewById(R.id.btn_delete);
+        chckLocked = (CheckBox) findViewById(R.id.chck_locked);
 
         // Set the hint after the animation completes, workaround for Android bug
         txtNote.setHint(getResources().getString(R.string.note));
@@ -334,6 +337,13 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
                 rdioMyDebt.setChecked(true);
             }
 
+            // check locked
+            if (debtToEdit.managerId != null) {
+                chckLocked.setChecked(true);
+            } else {
+                chckLocked.setChecked(false);
+            }
+
         } else {
             // hide buttons which have no use for a new debt
             btnDelete.setVisibility(View.GONE);
@@ -439,7 +449,9 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
         Integer currencyId = null;
         Date paidAt = null;
         Date deletedAt = null;
+        Integer managerId = null;
         Long version = System.currentTimeMillis();
+
 
         // set 'invisible' variables if editing a debt
         if (debtToEdit != null) {
@@ -505,6 +517,10 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
             createdAt = new Date();
         }
 
+        if (chckLocked.isChecked()) {
+            managerId = user.id;
+        }
+
         Log.d(Const.TAG, "Adding debt to database: " + String.valueOf(tempFacebookFriendId));
 
         Debt debt = new Debt(
@@ -520,6 +536,7 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
                 deletedAt,
                 new Date(),
                 createdAt,
+                managerId,
                 version
         );
 

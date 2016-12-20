@@ -168,6 +168,62 @@ public class DebtsFragment extends Fragment implements UpdateableFragment {
 
         amount = debt.amount;
 
+        // Disable buttons for locked debts
+        if (debt.managerId != null && debt.managerId != user.id) {
+            btnDialogPay.setVisibility(GONE);
+            btnDialogEdit.setVisibility(GONE);
+            swtchPayment.setVisibility(GONE);
+        } else {
+            // Pay button
+            btnDialogPay.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    if (!swtchPayment.isChecked()) { // a) Pay back the whole debt
+                        debt.paidAt = new Date();
+                        payDebt(debt);
+                        dialog.cancel();
+                    } else {
+                        // Show payment dialog
+                        NumberPickerBuilder npb = new NumberPickerBuilder()
+                                .setFragmentManager(getFragmentManager())
+                                .setStyleResId(R.style.BetterPickersDialogFragment)
+                                .setMaxNumber(BigDecimal.valueOf(debt.amount))
+                                .setPlusMinusVisibility(View.GONE)
+                                .setMinNumber(BigDecimal.ONE)
+                                .setDecimalVisibility(View.GONE)
+                                .addNumberPickerDialogHandler(new NumberPickerDialogFragment.NumberPickerDialogHandlerV2() {
+                                    @Override
+                                    public void onDialogNumberSet(int reference, BigInteger number, double decimal, boolean isNegative, BigDecimal fullNumber) {
+                                        Integer payment = Integer.parseInt(number.toString());
+
+                                        if (debt.amount - payment <= 0) {
+                                            debt.paidAt = new Date();
+                                        } else {
+                                            debt.amount -= payment;
+                                        }
+
+                                        payDebt(debt);
+                                        dialog.cancel();
+                                    }
+                                });
+                        npb.show();
+                    }
+                }
+            });
+
+            // Edit button
+            btnDialogEdit.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(getContext(), DebtActivity.class);
+                    intent.putExtra(DEBT_TO_EDIT, Parcels.wrap(debt));
+                    getActivity().startActivityForResult(intent, MainActivity.ADD_DEBT_REQUEST);
+                    dialog.cancel();
+                }
+            });
+        }
+
         // Cancel button
         btnDialogCancel.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -176,54 +232,6 @@ public class DebtsFragment extends Fragment implements UpdateableFragment {
             }
         });
 
-        // Pay button
-        btnDialogPay.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                if (!swtchPayment.isChecked()) { // a) Pay back the whole debt
-                    debt.paidAt = new Date();
-                    payDebt(debt);
-                    dialog.cancel();
-                } else {
-                    // Show payment dialog
-                    NumberPickerBuilder npb = new NumberPickerBuilder()
-                            .setFragmentManager(getFragmentManager())
-                            .setStyleResId(R.style.BetterPickersDialogFragment)
-                            .setMaxNumber(BigDecimal.valueOf(debt.amount))
-                            .setPlusMinusVisibility(View.GONE)
-                            .setMinNumber(BigDecimal.ONE)
-                            .setDecimalVisibility(View.GONE)
-                            .addNumberPickerDialogHandler(new NumberPickerDialogFragment.NumberPickerDialogHandlerV2() {
-                                @Override
-                                public void onDialogNumberSet(int reference, BigInteger number, double decimal, boolean isNegative, BigDecimal fullNumber) {
-                                    Integer payment = Integer.parseInt(number.toString());
-
-                                    if (debt.amount - payment <= 0) {
-                                        debt.paidAt = new Date();
-                                    } else {
-                                        debt.amount -= payment;
-                                    }
-
-                                    payDebt(debt);
-                                    dialog.cancel();
-                                }
-                            });
-                    npb.show();
-                }
-            }
-        });
-
-        // Edit button
-        btnDialogEdit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getContext(), DebtActivity.class);
-                intent.putExtra(DEBT_TO_EDIT, Parcels.wrap(debt));
-                getActivity().startActivityForResult(intent, MainActivity.ADD_DEBT_REQUEST);
-                dialog.cancel();
-            }
-        });
 
         // display dialog
         dialog.show();

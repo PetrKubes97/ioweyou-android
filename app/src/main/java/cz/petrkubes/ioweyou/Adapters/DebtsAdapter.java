@@ -24,6 +24,7 @@ public class DebtsAdapter extends ArrayAdapter<Debt> {
 
     ArrayList<Debt> debts;
     boolean myDebts = true;
+    Integer userId = null;
 
     public DebtsAdapter(Context context, List<Debt> debts, boolean myDebts) {
         super(context, R.layout.item_debt, debts);

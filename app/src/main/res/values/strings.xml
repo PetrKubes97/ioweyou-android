@@ -36,4 +36,6 @@
     <string name="no_actions">You will find any changes that affect your debts here. </string>
     <string name="no_friend">Hey, here you can see your friends and settle up all of their debts at once. Neat, isn\'t it?</string>
     <string name="you">You</string>
+    <string name="locked">Locked</string>
+    <string name="created_at">Created at:</string>
 </resources>
