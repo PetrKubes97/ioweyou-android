@@ -445,7 +445,7 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
         Integer debtorId = null;
         String customFriendName = null;
         String thingName = null;
-        Integer amount = null;
+        Double amount = null;
         Integer currencyId = null;
         Date paidAt = null;
         Date deletedAt = null;
@@ -494,9 +494,15 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
         } else {
 
             try {
-                amount = Integer.parseInt(txtWhat.getText().toString());
+                amount = Double.parseDouble(txtWhat.getText().toString());
             } catch (NumberFormatException e) {
                 txtILWhat.setError("This field has to be a number.");
+                return;
+            }
+
+            // Check if amount is not too big
+            if (amount > 999999999) {
+                txtILWhat.setError("This number is too big");
                 return;
             }
 

@@ -60,7 +60,7 @@ public class DebtsFragment extends Fragment implements UpdateableFragment {
     private TextView txtNote;
 
     // Dialog variables
-    private Integer amount;
+    private Double amount;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {

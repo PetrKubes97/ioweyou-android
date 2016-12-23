@@ -25,7 +25,7 @@ public class Debt {
     public Integer creditorId;
     public Integer debtorId;
     public String customFriendName;
-    public Integer amount;
+    public Double amount;
     public Integer currencyId;
     public String thingName;
     public String note;
@@ -46,7 +46,7 @@ public class Debt {
     public Debt() {};
 
     public Debt(Integer id, Integer creditorId, Integer debtorId,
-                String customFriendName, Integer amount, Integer currencyId,
+                String customFriendName, Double amount, Integer currencyId,
                 String thingName, String note, Date paidAt,
                 Date deletedAt, Date modifiedAt, Date createdAt, Integer managerId, Long version) {
         this.id = id;
@@ -132,7 +132,7 @@ public class Debt {
         Date modifiedAt = null;
         Integer creditorId = null;
         Integer debtorId = null;
-        Integer amount = null;
+        Double amount = null;
         Integer currencyId = null;
         String customFriendName = null;
         String thingName = null;
@@ -164,7 +164,7 @@ public class Debt {
         }
 
         if (!response.getString("amount").isEmpty()) {
-            amount = response.getInt("amount");
+            amount = response.getDouble("amount");
         }
 
         if (!response.getString("currencyId").isEmpty()) {
@@ -211,7 +211,7 @@ public class Debt {
         Date modifiedAt = null;
         Date createdAt = null;
 
-        Integer amount = null;
+        Double amount = null;
         Integer creditorId = null;
         Integer debtorId = null;
         Integer currencyId = null;
@@ -240,7 +240,7 @@ public class Debt {
         }
 
         if (cursor.getInt(4) != 0) {
-            amount = cursor.getInt(4);
+            amount = cursor.getDouble(4);
         }
 
         if (!cursor.isNull(1)) {

@@ -156,6 +156,8 @@ public class FriendsFragment extends Fragment implements UpdateableFragment {
                 adapter.addAll(db.getExtendedFriendsWhoAreCreditorsOrDebtors(user.id));
                 adapter.notifyDataSetChanged();
 
+                ((MainActivity) getActivity()).updateDebtsAndActions();
+
                 dialog.cancel();
             }
         });
