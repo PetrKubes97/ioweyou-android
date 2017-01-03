@@ -297,6 +297,8 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
             txtName.setKeyListener(null);
             txtName.setBackgroundColor(Color.TRANSPARENT);
 
+            chckLocked.setVisibility(View.GONE);
+
             txtName.setText(debtToEdit.who);
             txtNote.setText(debtToEdit.note);
             btnCreatedAt.setText(debtToEdit.createdAtString());
@@ -335,13 +337,6 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
                 rdioTheirDebt.setChecked(true);
             } else {
                 rdioMyDebt.setChecked(true);
-            }
-
-            // check locked
-            if (debtToEdit.managerId != null) {
-                chckLocked.setChecked(true);
-            } else {
-                chckLocked.setChecked(false);
             }
 
         } else {
@@ -457,6 +452,7 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
         if (debtToEdit != null) {
             id = debtToEdit.id;
             deletedAt = debtToEdit.deletedAt;
+            managerId = debtToEdit.managerId;
         }
 
         // Set user
@@ -521,10 +517,6 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
         // Set createdAt
         if (createdAt == null) {
             createdAt = new Date();
-        }
-
-        if (chckLocked.isChecked()) {
-            managerId = user.id;
         }
 
         Log.d(Const.TAG, "Adding debt to database: " + String.valueOf(tempFacebookFriendId));
