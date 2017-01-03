@@ -12,6 +12,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,8 +24,10 @@ import com.facebook.login.LoginManager;
 import com.facebook.stetho.Stetho;
 
 import cz.petrkubes.ioweyou.Adapters.FragmentsAdapter;
+import cz.petrkubes.ioweyou.Api.Api;
 import cz.petrkubes.ioweyou.Api.ApiRestClient;
 import cz.petrkubes.ioweyou.Api.SimpleCallback;
+import cz.petrkubes.ioweyou.Const;
 import cz.petrkubes.ioweyou.Database.DatabaseHandler;
 import cz.petrkubes.ioweyou.R;
 import cz.petrkubes.ioweyou.Pojos.User;
@@ -50,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ApiRestClient apiClient;
     private User user;
+    private Api api;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +85,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Setup api client for synchronization
         apiClient = new ApiRestClient(this);
+        api = new Api();
         user = db.getUser();
 
         // Start a new activity in which user adds debts
@@ -198,6 +203,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void updateAll() {
+
+        api.download(new SimpleCallback() {
+            @Override
+            public void onSuccess() {
+                Log.d(Const.TAG, "HURAAAAA");
+            }
+
+            @Override
+            public void onFailure(String message) {
+
+            }
+        });
+
         toggleLoading();
 
         apiClient.updateAll(user.apiKey, new SimpleCallback() {
