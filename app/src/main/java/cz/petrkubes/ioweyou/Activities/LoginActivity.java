@@ -13,12 +13,18 @@ import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
+import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import cz.petrkubes.ioweyou.Api.Api;
 import cz.petrkubes.ioweyou.Api.ApiRestClient;
 import cz.petrkubes.ioweyou.Api.SimpleCallback;
 import cz.petrkubes.ioweyou.Database.DatabaseHandler;
+import cz.petrkubes.ioweyou.Pojos.ApiParams;
 import cz.petrkubes.ioweyou.R;
 
 public class LoginActivity extends AppCompatActivity {
@@ -29,6 +35,7 @@ public class LoginActivity extends AppCompatActivity {
     private TextView txtLoadingDescription;
 
     private ApiRestClient apiClient;
+    private Api api;
     private DatabaseHandler db;
     private CallbackManager callbackManager;
 
@@ -65,6 +72,7 @@ public class LoginActivity extends AppCompatActivity {
         prgLoader.setVisibility(View.GONE);
 
         apiClient = new ApiRestClient(getApplicationContext());
+        api = new Api(getApplicationContext());
         db = new DatabaseHandler(getApplicationContext());
 
         // Callback registration
@@ -103,9 +111,10 @@ public class LoginActivity extends AppCompatActivity {
 
         loginButton.setVisibility(View.GONE);
         prgLoader.setVisibility(View.VISIBLE);
+        txtLoadingDescription.setVisibility(View.VISIBLE);
         txtLoadingDescription.setText(getResources().getString(R.string.loading_login));
 
-        apiClient.login(facebookId, facebookToken, new SimpleCallback() {
+        /*apiClient.login(facebookId, facebookToken, new SimpleCallback() {
             @Override
             public void onSuccess() {
                 apiClient.updateAll(db.getUser().apiKey, new SimpleCallback() {
@@ -125,7 +134,37 @@ public class LoginActivity extends AppCompatActivity {
             public void onFailure(String message) {
 
             }
-        });
+        });*/
+
+        JSONObject jsonWithFbCredentials = new JSONObject();
+        try {
+            jsonWithFbCredentials.put("facebookId", facebookId);
+            jsonWithFbCredentials.put("facebookToken", facebookToken);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        ApiParams params = new ApiParams();
+        params.jsonToSend = jsonWithFbCredentials;
+        params.callback = new SimpleCallback() {
+            @Override
+            public void onSuccess() {
+                prgLoader.setVisibility(View.GONE);
+                txtLoadingDescription.setVisibility(View.GONE);
+                startMainActivity();
+            }
+
+            @Override
+            public void onFailure(String message) {
+                LoginManager.getInstance().logOut();
+                loginButton.setVisibility(View.VISIBLE);
+                txtLoadingDescription.setVisibility(View.GONE);
+                prgLoader.setVisibility(View.GONE);
+
+            }
+        };
+        api.download(Api.API_LOGIN, params);
+
     }
 
     private void startMainActivity() {

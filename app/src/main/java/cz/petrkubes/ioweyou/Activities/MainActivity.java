@@ -29,6 +29,7 @@ import cz.petrkubes.ioweyou.Api.ApiRestClient;
 import cz.petrkubes.ioweyou.Api.SimpleCallback;
 import cz.petrkubes.ioweyou.Const;
 import cz.petrkubes.ioweyou.Database.DatabaseHandler;
+import cz.petrkubes.ioweyou.Pojos.ApiParams;
 import cz.petrkubes.ioweyou.R;
 import cz.petrkubes.ioweyou.Pojos.User;
 
@@ -85,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Setup api client for synchronization
         apiClient = new ApiRestClient(this);
-        api = new Api();
+        api = new Api(this);
         user = db.getUser();
 
         // Start a new activity in which user adds debts
@@ -204,17 +205,20 @@ public class MainActivity extends AppCompatActivity {
 
     public void updateAll() {
 
-        api.download(new SimpleCallback() {
+        ApiParams params = new ApiParams();
+        params.callback = new SimpleCallback() {
             @Override
             public void onSuccess() {
-                Log.d(Const.TAG, "HURAAAAA");
+
             }
 
             @Override
             public void onFailure(String message) {
 
             }
-        });
+        };
+        api.download(Api.API_GET_USER, params);
+
 
         toggleLoading();
 

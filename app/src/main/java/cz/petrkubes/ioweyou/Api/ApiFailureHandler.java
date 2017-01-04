@@ -37,11 +37,8 @@ class ApiFailureHandler {
                 ((MainActivity) context).logOut();
             }
 
-        } else if (StatusCode == NO_INTERNET) {
-            callback.onFailure("No internet connection available.");
-        }
-        else {
-            callback.onFailure("Something went wrong. :-(");
+        } else {
+            callback.onFailure(message);
         }
 
     }
