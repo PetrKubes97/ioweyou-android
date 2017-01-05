@@ -6,7 +6,7 @@ package cz.petrkubes.ioweyou.Api;
 
 public interface SimpleCallback {
 
-    void onSuccess();
+    void onSuccess(int apiMethodCode);
     void onFailure(String message);
 }
 

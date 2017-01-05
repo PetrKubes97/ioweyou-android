@@ -187,9 +187,10 @@ public class MainActivity extends AppCompatActivity {
         pageAdapter.notifyDataSetChanged();
         toggleLoading();
 
-        apiClient.updateDebtsAndActions(user.apiKey, new SimpleCallback() {
+        ApiParams params = new ApiParams();
+        params.callback = new SimpleCallback() {
             @Override
-            public void onSuccess() {
+            public void onSuccess(int apiMethodCode) {
                 toggleLoading();
                 pageAdapter.notifyDataSetChanged();
                 Snackbar.make(coordinatorLayout, getString(R.string.changes_synced), Snackbar.LENGTH_SHORT).show();
@@ -200,31 +201,18 @@ public class MainActivity extends AppCompatActivity {
                 toggleLoading();
                 Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_SHORT).show();
             }
-        });
+        };
+
+        api.download(Api.API_UPDATE_DEBTS_AND_ACTIONS, params);
     }
 
     public void updateAll() {
+        toggleLoading();
 
         ApiParams params = new ApiParams();
         params.callback = new SimpleCallback() {
             @Override
-            public void onSuccess() {
-
-            }
-
-            @Override
-            public void onFailure(String message) {
-
-            }
-        };
-        api.download(Api.API_GET_USER, params);
-
-
-        toggleLoading();
-
-        apiClient.updateAll(user.apiKey, new SimpleCallback() {
-            @Override
-            public void onSuccess() {
+            public void onSuccess(int apiMethodCode) {
                 toggleLoading();
                 pageAdapter.notifyDataSetChanged();
                 Snackbar.make(coordinatorLayout, getString(R.string.changes_synced), Snackbar.LENGTH_SHORT).show();
@@ -235,7 +223,9 @@ public class MainActivity extends AppCompatActivity {
                 toggleLoading();
                 Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_SHORT).show();
             }
-        });
+        };
+
+        api.download(Api.API_UPDATE_ALL, params);
     }
 
     /**

@@ -28,6 +28,7 @@ import cz.petrkubes.ioweyou.Pojos.Friend;
 import cz.petrkubes.ioweyou.Pojos.User;
 import cz.petrkubes.ioweyou.R;
 
+@Deprecated
 public class ApiRestClient {
 
     private static final String BASE_URL = "http://34.194.114.99/payuback-api/www/api/";
@@ -93,7 +94,7 @@ public class ApiRestClient {
                 } catch (Exception e) {
                     apiFailureHandler.HandleFailure(statusCode, e.getMessage(), callback);
                 }
-                callback.onSuccess();
+                callback.onSuccess(0);
             }
 
             @Override
@@ -138,7 +139,7 @@ public class ApiRestClient {
                             null
                     ));
 
-                    callback.onSuccess();
+                    callback.onSuccess(0);
 
                 } catch (JSONException e) {
                     apiFailureHandler.HandleFailure(statusCode, e.getMessage(), callback);
@@ -187,7 +188,7 @@ public class ApiRestClient {
                         db.addCurrency(currency);
                     }
 
-                    callback.onSuccess();
+                    callback.onSuccess(0);
 
                 } catch (Exception e) {
                     apiFailureHandler.HandleFailure(statusCode, e.getMessage(), callback);
@@ -263,7 +264,7 @@ public class ApiRestClient {
                         db.addOrUpdateDebt(onlineDebt.id, onlineDebt);
                     }
 
-                    callback.onSuccess();
+                    callback.onSuccess(0);
 
                 } catch (Exception e) {
                     apiFailureHandler.HandleFailure(statusCode, e.getMessage(), callback);
@@ -313,7 +314,7 @@ public class ApiRestClient {
                 } catch (Exception e) {
                     apiFailureHandler.HandleFailure(statusCode, e.getMessage(), callback);
                 }
-                callback.onSuccess();
+                callback.onSuccess(0);
             }
 
             @Override
@@ -342,11 +343,11 @@ public class ApiRestClient {
 
         updateAllDebts(apiKey, new SimpleCallback() {
             @Override
-            public void onSuccess() {
+            public void onSuccess(int apiMethodCode) {
                 getActions(apiKey, new SimpleCallback() {
                     @Override
-                    public void onSuccess() {
-                        callback.onSuccess();
+                    public void onSuccess(int apiMethodCode) {
+                        callback.onSuccess(0);
                     }
 
                     @Override
@@ -373,18 +374,18 @@ public class ApiRestClient {
 
         getUser(apiKey, new SimpleCallback() {
             @Override
-            public void onSuccess() {
+            public void onSuccess(int apiMethodCode) {
                 getCurrencies(apiKey, new SimpleCallback() {
                     @Override
-                    public void onSuccess() {
+                    public void onSuccess(int apiMethodCode) {
 
                         updateAllDebts(apiKey, new SimpleCallback() {
                             @Override
-                            public void onSuccess() {
+                            public void onSuccess(int apiMethodCode) {
                                 getActions(apiKey, new SimpleCallback() {
                                     @Override
-                                    public void onSuccess() {
-                                        callback.onSuccess();
+                                    public void onSuccess(int apiMethodCode) {
+                                        callback.onSuccess(0);
                                     }
 
                                     @Override

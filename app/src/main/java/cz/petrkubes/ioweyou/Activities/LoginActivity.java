@@ -148,7 +148,7 @@ public class LoginActivity extends AppCompatActivity {
         params.jsonToSend = jsonWithFbCredentials;
         params.callback = new SimpleCallback() {
             @Override
-            public void onSuccess() {
+            public void onSuccess(int apiMethodCode) {
                 prgLoader.setVisibility(View.GONE);
                 txtLoadingDescription.setVisibility(View.GONE);
                 startMainActivity();
@@ -163,7 +163,7 @@ public class LoginActivity extends AppCompatActivity {
 
             }
         };
-        api.download(Api.API_LOGIN, params);
+        api.download(Api.API_LOGIN_AND_UPDATE_ALL, params);
 
     }
 
