@@ -69,6 +69,7 @@ public class LoginActivity extends AppCompatActivity {
         loginButton.setReadPermissions("user_friends", "email");
 
         loginButton.setVisibility(View.VISIBLE);
+        txtLoadingDescription.setVisibility(View.GONE);
         prgLoader.setVisibility(View.GONE);
 
         apiClient = new ApiRestClient(getApplicationContext());

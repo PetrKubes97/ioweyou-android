@@ -1,31 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_login"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="cz.petrkubes.ioweyou.Activities.LoginActivity"
-    android:background="@color/primary">
+    android:background="?attr/colorPrimary">
+
+    <ImageView
+        android:layout_width="215dp"
+        app:srcCompat="@drawable/logo1024"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/imageView"
+        android:layout_above="@+id/textView"
+        android:layout_alignParentTop="true"
+        android:elevation="1dp"
+        android:layout_height="200dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginStart="16dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintRight_toRightOf="parent"
+        android:contentDescription="logo" />
+
+    <TextView
+        android:text="Login with Facebook so it's easier to share debts with your friends. ;-)"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        android:textAlignment="center"
+        android:layout_alignTop="@+id/prg_loader"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="24dp"
+        app:layout_constraintTop_toBottomOf="@+id/imageView"
+        android:layout_marginEnd="24dp"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginStart="24dp"
+        app:layout_constraintLeft_toLeftOf="parent" />
+
+    <ProgressBar
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/prg_loader"
+        tools:visibility="visible"
+        android:minHeight="110dip"
+        android:minWidth="110dip"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@+id/textView"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginStart="16dp"
+        app:layout_constraintLeft_toLeftOf="parent" />
 
     <com.facebook.login.widget.LoginButton
         android:id="@+id/login_button"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true"
+        android:layout_width="wrap_content"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginStart="16dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginTop="32dp"
+        app:layout_constraintTop_toBottomOf="@+id/textView"
         android:paddingBottom="15dp"
         android:paddingLeft="25dp"
         android:paddingRight="25dp"
         android:paddingTop="15dp"
         android:textSize="18sp"
         android:textAllCaps="false"
-        android:fontFamily="sans-serif"
-        android:visibility="gone" />
+        android:fontFamily="sans-serif" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -33,19 +83,15 @@
         android:id="@+id/txt_loading_description"
         android:textColor="@color/white"
         android:textSize="14sp"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
-
-    <ProgressBar
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/prg_loader"
-        tools:visibility="gone"
-        android:minHeight="110dip"
-        android:minWidth="110dip"
-        android:layout_above="@+id/txt_loading_description"
+        android:text="@string/loading_login"
+        android:layout_below="@+id/prg_loader"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="30dp" />
+        android:layout_marginEnd="16dp"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginStart="16dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@+id/prg_loader" />
 
-</RelativeLayout>
+
+</android.support.constraint.ConstraintLayout>
