@@ -93,5 +93,18 @@
         android:layout_marginTop="8dp"
         app:layout_constraintTop_toBottomOf="@+id/prg_loader" />
 
+    <TextView
+        android:text="TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/txt_version"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginStart="16dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:textColor="@color/white" />
+
 
 </android.support.constraint.ConstraintLayout>

@@ -5,6 +5,8 @@ import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -38,6 +40,7 @@ public class LoginActivity extends AppCompatActivity {
     private LoginButton loginButton;
     private ProgressBar prgLoader;
     private TextView txtLoadingDescription;
+    private TextView txtVersion;
 
     private ApiRestClient apiClient;
     private Api api;
@@ -70,6 +73,7 @@ public class LoginActivity extends AppCompatActivity {
         loginButton = (LoginButton) this.findViewById(R.id.login_button);
         prgLoader = (ProgressBar) this.findViewById(R.id.prg_loader);
         txtLoadingDescription = (TextView) this.findViewById(R.id.txt_loading_description);
+        txtVersion = (TextView) this.findViewById(R.id.txt_version);
 
         loginButton.setReadPermissions("user_friends", "email");
 
@@ -99,6 +103,16 @@ public class LoginActivity extends AppCompatActivity {
                 // App code
             }
         });
+
+        String version = "Unknown";
+        try {
+            PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            version = pInfo.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        txtVersion.setText(version);
+
     }
 
     @Override
