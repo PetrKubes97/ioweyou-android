@@ -1,5 +1,9 @@
 package cz.petrkubes.ioweyou.Activities;
 
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -26,6 +30,7 @@ import cz.petrkubes.ioweyou.Api.SimpleCallback;
 import cz.petrkubes.ioweyou.Database.DatabaseHandler;
 import cz.petrkubes.ioweyou.Pojos.ApiParams;
 import cz.petrkubes.ioweyou.R;
+import cz.petrkubes.ioweyou.Services.UpdateAllService;
 
 public class LoginActivity extends AppCompatActivity {
 

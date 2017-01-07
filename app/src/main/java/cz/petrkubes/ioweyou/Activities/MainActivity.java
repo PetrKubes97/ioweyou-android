@@ -1,6 +1,10 @@
 package cz.petrkubes.ioweyou.Activities;
 
 import android.app.ActivityOptions;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -32,6 +36,7 @@ import cz.petrkubes.ioweyou.Database.DatabaseHandler;
 import cz.petrkubes.ioweyou.Pojos.ApiParams;
 import cz.petrkubes.ioweyou.R;
 import cz.petrkubes.ioweyou.Pojos.User;
+import cz.petrkubes.ioweyou.Services.UpdateAllService;
 
 /**
  * Created by petr on 16.10.16.
@@ -111,6 +116,8 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+        startBackgroundJob();
     }
 
     /**
@@ -240,6 +247,10 @@ public class MainActivity extends AppCompatActivity {
 
         // TODO empty api key on server
 
+        // Cancel all background jobs
+        JobScheduler jobScheduler =  (JobScheduler) getApplication().getSystemService(Context.JOB_SCHEDULER_SERVICE);
+        jobScheduler.cancelAll();
+
         // Truncate db
         db.truncate();
         Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
@@ -256,6 +267,23 @@ public class MainActivity extends AppCompatActivity {
         } else {
             item.setVisible(true);
             toolbarPragressBar.setVisibility(View.GONE);
+        }
+    }
+
+    /**
+     * Starts a JobScheduler, which launches UpdateAllService to update the database every few hours
+     */
+    public void startBackgroundJob() {
+        JobScheduler jobScheduler = (JobScheduler) getApplication().getSystemService(Context.JOB_SCHEDULER_SERVICE);
+        if (jobScheduler.getAllPendingJobs().size() < 1) {
+            ComponentName mServiceComponent = new ComponentName(this, UpdateAllService.class);
+            JobInfo jobInfo = new JobInfo.Builder(0, mServiceComponent  )
+                    .setPeriodic(6 * 60 * 60 * 1000) // 5 hours
+                    .setRequiresCharging(false)
+                    .setPersisted(true)
+                    .build();
+            jobScheduler.cancelAll();
+            jobScheduler.schedule(jobInfo);
         }
     }
 }
