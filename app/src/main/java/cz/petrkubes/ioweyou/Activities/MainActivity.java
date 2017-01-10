@@ -206,7 +206,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onFailure(String message) {
                 toggleLoading();
-                Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_LONG).show();
             }
         };
 
@@ -228,7 +228,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onFailure(String message) {
                 toggleLoading();
-                Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_LONG).show();
             }
         };
 
