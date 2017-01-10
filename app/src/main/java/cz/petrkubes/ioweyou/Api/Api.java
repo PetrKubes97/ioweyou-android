@@ -466,7 +466,7 @@ public class Api {
             if (params.jsonToSend != null) {
                 Log.d(Const.TAG, "jsonToSend is set:" + params.jsonToSend.toString());
                 DataOutputStream printout = new DataOutputStream(urlConnection.getOutputStream());
-                printout.writeBytes(params.jsonToSend.toString());
+                printout.write(params.jsonToSend.toString().getBytes("UTF-8"));
                 printout.flush ();
                 printout.close ();
             }
