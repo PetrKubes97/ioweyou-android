@@ -107,7 +107,6 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
         // Setup actionbar
         Toolbar myToolbar = (Toolbar) findViewById(R.id.debt_toolbar);
         setSupportActionBar(myToolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         // Setup all widgets

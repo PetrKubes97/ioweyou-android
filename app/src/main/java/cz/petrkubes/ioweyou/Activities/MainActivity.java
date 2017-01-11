@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Stetho.initializeWithDefaults(this);
+        //Stetho.initializeWithDefaults(this);
         setContentView(R.layout.activity_main);
         // Setup actionbar
         toolbar = (Toolbar) findViewById(R.id.my_toolbar);
@@ -118,6 +118,12 @@ public class MainActivity extends AppCompatActivity {
         });
 
         startBackgroundJob();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        pageAdapter.notifyDataSetChanged();
     }
 
     /**
