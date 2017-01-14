@@ -30,7 +30,7 @@ public class UpdateAllService extends JobService {
 
             @Override
             public void onFailure(String message) {
-                Toast.makeText(getApplicationContext(), "IOweYou background service stopped working. :'(", Toast.LENGTH_SHORT).show();
+                jobFinished(params, false);
             }
         };
 
