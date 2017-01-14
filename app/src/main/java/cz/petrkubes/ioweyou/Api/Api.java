@@ -325,8 +325,14 @@ public class Api {
                 try {
                     JSONArray onlineDebtsArr = result.json.getJSONArray("debts");
 
-                    // Remove all old debts
-                    db.removeOfflineDebts();
+                    // Update only if we receive correct number of debts
+                    if (onlineDebtsArr.length() >= onlineDebtsArr.length()) {
+                        // Remove all old debts
+                        db.removeOfflineDebts();
+                    } else {
+                        result.message = "Ok, this error message has no logical explanation AT ALL.";
+                        result.successfull = false;
+                    }
 
                     for (int i=0;i<onlineDebtsArr.length();i++) {
 
