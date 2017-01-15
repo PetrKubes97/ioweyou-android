@@ -8,9 +8,10 @@ import cz.petrkubes.ioweyou.Const;
 import cz.petrkubes.ioweyou.Database.DatabaseHandler;
 
 /**
- * Created by petr on 11.12.16.
+ * Class used for handling api error
+ *
+ * @author Petr Kubes
  */
-
 class ApiFailureHandler {
 
     private static final int UNAUTHORIZED = 401;
@@ -26,14 +27,19 @@ class ApiFailureHandler {
         this.context = context;
     }
 
+    /**
+     * @param StatusCode ex. 400, 500
+     * @param message    Error message
+     * @param callback   callback
+     */
     void HandleFailure(int StatusCode, String message, final SimpleCallback callback) {
 
-        Log.d(Const.TAG, "API FAILURE: " + message );
+        Log.d(Const.TAG, "API FAILURE: " + message);
 
         // Log user out when the api keys don't match
         if (StatusCode == UNAUTHORIZED) {
 
-            if(context instanceof MainActivity){ // this should be true every time, because ApiRestClient is created only in that Activity
+            if (context instanceof MainActivity) { // this should be true every time, because ApiRestClient is created only in that Activity
                 ((MainActivity) context).logOut();
             }
 

@@ -1,11 +1,9 @@
 package cz.petrkubes.ioweyou.Api;
 
 /**
- * Created by petr on 2.11.16.
+ * @author Petr Kubes
  */
-
 public interface SimpleCallback {
-
     void onSuccess(int apiMethodCode);
     void onFailure(String message);
 }

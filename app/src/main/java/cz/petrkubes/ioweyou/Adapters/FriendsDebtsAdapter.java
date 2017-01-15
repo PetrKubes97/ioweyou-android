@@ -16,7 +16,9 @@ import cz.petrkubes.ioweyou.R;
 import cz.petrkubes.ioweyou.Tools.Tools;
 
 /**
- * Created by petr on 23.11.16.
+ * Adapter for displaying debts connected to a specific friend in Friends tab after clicking on a friend
+ *
+ * @author Petr Kubes
  */
 
 public class FriendsDebtsAdapter extends ArrayAdapter<Debt> {
@@ -26,7 +28,7 @@ public class FriendsDebtsAdapter extends ArrayAdapter<Debt> {
     private ArrayList<Debt> selectedDebts;
 
     public FriendsDebtsAdapter(Context context, ArrayList<Debt> objects, Integer userId) {
-        super(context, R.layout.item_friends_debts,  objects);
+        super(context, R.layout.item_friends_debts, objects);
         this.debts = objects;
         this.userId = userId;
         selectedDebts = new ArrayList<Debt>();
@@ -99,7 +101,10 @@ public class FriendsDebtsAdapter extends ArrayAdapter<Debt> {
         return debts.size();
     }
 
-    // View lookup cache
+
+    /**
+     * View lookup cache
+     */
     private static class ViewHolder {
         TextView txtCreatedAt;
         TextView txtWhat;

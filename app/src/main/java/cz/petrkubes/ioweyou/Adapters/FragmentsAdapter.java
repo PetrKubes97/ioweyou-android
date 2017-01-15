@@ -13,7 +13,9 @@ import cz.petrkubes.ioweyou.Fragments.FriendsFragment;
 import cz.petrkubes.ioweyou.Fragments.UpdateableFragment;
 
 /**
- * Created by petr on 22.10.16.
+ * Adapter for displaying displaying fragments
+ *
+ * @author Petr Kubes
  */
 
 public class FragmentsAdapter extends FragmentStatePagerAdapter {

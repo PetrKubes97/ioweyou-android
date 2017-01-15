@@ -17,14 +17,15 @@ import cz.petrkubes.ioweyou.Pojos.Debt;
 import cz.petrkubes.ioweyou.Tools.Tools;
 
 /**
- * Created by petr on 5.11.16.
+ * Adapter for displaying info about debts in myDebts and theirDebts tabs
+ *
+ * @author Petr Kubes
  */
 
 public class DebtsAdapter extends ArrayAdapter<Debt> {
 
-    ArrayList<Debt> debts;
-    boolean myDebts = true;
-    Integer userId = null;
+    private ArrayList<Debt> debts;
+    private boolean myDebts = true;
 
     public DebtsAdapter(Context context, List<Debt> debts, boolean myDebts) {
         super(context, R.layout.item_debt, debts);
@@ -58,8 +59,7 @@ public class DebtsAdapter extends ArrayAdapter<Debt> {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        // Populate the data from the data object via the viewHolder object
-        // into the template view.
+        // Populate the data from the data object via the viewHolder object into the template view.
         viewHolder.txtName.setText(debt.who);
         viewHolder.txtWhat.setText(debt.what);
         viewHolder.txtNote.setText(debt.note);
@@ -89,7 +89,9 @@ public class DebtsAdapter extends ArrayAdapter<Debt> {
         return debts.size();
     }
 
-    // View lookup cache
+    /**
+     * View lookup cache
+     */
     private static class ViewHolder {
         TextView txtId;
         TextView txtName;

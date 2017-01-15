@@ -34,6 +34,11 @@ import cz.petrkubes.ioweyou.Pojos.ApiParams;
 import cz.petrkubes.ioweyou.R;
 import cz.petrkubes.ioweyou.Services.UpdateAllService;
 
+/**
+ * Login screen with facebook login button
+ *
+ * @author Petr Kubes
+ */
 public class LoginActivity extends AppCompatActivity {
 
     // Widgets
@@ -42,7 +47,6 @@ public class LoginActivity extends AppCompatActivity {
     private TextView txtLoadingDescription;
     private TextView txtVersion;
 
-    private ApiRestClient apiClient;
     private Api api;
     private DatabaseHandler db;
     private CallbackManager callbackManager;
@@ -63,13 +67,14 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Initialize the SDK before executing any other operations,
+        // Initialize the facebook SDK
         FacebookSdk.sdkInitialize(getApplicationContext());
         AppEventsLogger.activateApp(this);
         callbackManager = CallbackManager.Factory.create();
 
         setContentView(R.layout.activity_login);
 
+        // widgets
         loginButton = (LoginButton) this.findViewById(R.id.login_button);
         prgLoader = (ProgressBar) this.findViewById(R.id.prg_loader);
         txtLoadingDescription = (TextView) this.findViewById(R.id.txt_loading_description);
@@ -81,11 +86,10 @@ public class LoginActivity extends AppCompatActivity {
         txtLoadingDescription.setVisibility(View.GONE);
         prgLoader.setVisibility(View.GONE);
 
-        apiClient = new ApiRestClient(getApplicationContext());
         api = new Api(getApplicationContext());
         db = new DatabaseHandler(getApplicationContext());
 
-        // Callback registration
+        // Facebook login callback
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
@@ -95,15 +99,17 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onCancel() {
-                // App code
+                // do nothing
             }
 
             @Override
             public void onError(FacebookException exception) {
-                // App code
+                // do nothing
             }
         });
 
+
+        // Get version code and display it on the login screen
         String version = "Unknown";
         try {
             PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
@@ -118,44 +124,26 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        // Facebook callback
         callbackManager.onActivityResult(requestCode, resultCode, data);
     }
 
 
     /**
      * Displays progress bar, logs user in, and starts main activity
-     * @param facebookId user's facebook id
+     *
+     * @param facebookId    user's facebook id
      * @param facebookToken user's facebook token
      */
     private void loginUser(String facebookId, final String facebookToken) {
 
+        // Show loading widgets and hide others
         loginButton.setVisibility(View.GONE);
         prgLoader.setVisibility(View.VISIBLE);
         txtLoadingDescription.setVisibility(View.VISIBLE);
         txtLoadingDescription.setText(getResources().getString(R.string.loading_login));
 
-        /*apiClient.login(facebookId, facebookToken, new SimpleCallback() {
-            @Override
-            public void onSuccess() {
-                apiClient.updateAll(db.getUser().apiKey, new SimpleCallback() {
-                    @Override
-                    public void onSuccess() {
-                        startMainActivity();
-                    }
-
-                    @Override
-                    public void onFailure(String message) {
-                        // TODO handle failures
-                    }
-                });
-            }
-
-            @Override
-            public void onFailure(String message) {
-
-            }
-        });*/
-
+        // Create a JSON with facebook credentials and send it to the server
         JSONObject jsonWithFbCredentials = new JSONObject();
         try {
             jsonWithFbCredentials.put("facebookId", facebookId);
@@ -164,11 +152,13 @@ public class LoginActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+        // Send http request
         ApiParams params = new ApiParams();
         params.jsonToSend = jsonWithFbCredentials;
         params.callback = new SimpleCallback() {
             @Override
             public void onSuccess(int apiMethodCode) {
+                // Starts main activity and hides loading widgets
                 prgLoader.setVisibility(View.GONE);
                 txtLoadingDescription.setVisibility(View.GONE);
                 startMainActivity();
@@ -176,6 +166,7 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(String message) {
+                // Logs out from facebook when the server login does not succeed
                 LoginManager.getInstance().logOut();
                 loginButton.setVisibility(View.VISIBLE);
                 txtLoadingDescription.setVisibility(View.GONE);
@@ -187,6 +178,9 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Starts main activity
+     */
     private void startMainActivity() {
         Intent intent = new Intent(getBaseContext(), MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

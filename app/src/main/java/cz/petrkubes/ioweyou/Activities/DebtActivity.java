@@ -61,6 +61,12 @@ import cz.petrkubes.ioweyou.Pojos.Friend;
 import cz.petrkubes.ioweyou.Pojos.User;
 import cz.petrkubes.ioweyou.Tools.Tools;
 
+/**
+ * Activity for adding or editing a new debt
+ * This activity is launched after clicking the floating plus button
+ *
+ * @author Petr Kubes
+ */
 public class DebtActivity extends AppCompatActivity implements CalendarDatePickerDialogFragment.OnDateSetListener, RadialTimePickerDialogFragment.OnTimeSetListener {
 
     private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 100;
@@ -268,7 +274,7 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
         });
 
 
-        // --------------------- Pre-filling widgets ----------------------------
+        // --------------------- Pre-filling widgets while editing debt ----------------------------
         // Check my or their debt
         if (getIntent().getBooleanExtra(MainActivity.MY_DEBT, true)) {
             rdioMyDebt.setChecked(true);
@@ -369,7 +375,7 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
     }
 
     /**
-     * Returns list of users contacts
+     * Returns a list of users's contacts
      *
      * @return List<String> contacts
      */
@@ -401,9 +407,6 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
 
     /**
      * Handle user's answer to 'request permission' dialog
-     * @param requestCode
-     * @param permissions
-     * @param grantResults
      */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -429,7 +432,7 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
     }
 
     /**
-     * Adds a new debt to the local database or updates it
+     * Adds a new debt to the local database
      * Finishes activity and returns to main activity
      */
     private void addDebt() {
@@ -478,6 +481,7 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
             return;
         }
 
+        // Check if the owed thing is valid
         if (rdioThing.isChecked()) {
             thingName = txtWhat.getText().toString();
 
@@ -568,10 +572,6 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
     /**
      * Handles date picking dialog
      * Shows time picking dialog
-     * @param dialog
-     * @param year
-     * @param monthOfYear
-     * @param dayOfMonth
      */
     @Override
     public void onDateSet(CalendarDatePickerDialogFragment dialog, int year, int monthOfYear, int dayOfMonth) {
@@ -581,9 +581,6 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
 
     /**
      * Handles time picking dialog
-     * @param dialog
-     * @param hourOfDay
-     * @param minute
      */
     @Override
     public void onTimeSet(RadialTimePickerDialogFragment dialog, int hourOfDay, int minute) {

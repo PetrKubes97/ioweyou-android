@@ -1,9 +1,5 @@
 package cz.petrkubes.ioweyou.Adapters;
 
-/**
- * Created by petr on 1.12.16.
- */
-
 import android.content.Context;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -20,15 +16,16 @@ import cz.petrkubes.ioweyou.R;
 import cz.petrkubes.ioweyou.Tools.Tools;
 
 /**
- * Created by petr on 23.11.16.
+ * Adapter for displaying info about actions in listview
+ *
+ * @author Petr Kubes
  */
-
 public class ActionsAdapter extends ArrayAdapter<Action> {
 
     private ArrayList<Action> actions;
 
     public ActionsAdapter(Context context, ArrayList<Action> objects) {
-        super(context, R.layout.item_action,  objects);
+        super(context, R.layout.item_action, objects);
         this.actions = objects;
     }
 
@@ -43,6 +40,7 @@ public class ActionsAdapter extends ArrayAdapter<Action> {
 
         final ActionsAdapter.ViewHolder viewHolder;
 
+        // If cached view does not exist, create a new one
         if (convertView == null) {
 
             viewHolder = new ActionsAdapter.ViewHolder();
@@ -82,7 +80,9 @@ public class ActionsAdapter extends ArrayAdapter<Action> {
         return actions.size();
     }
 
-    // View lookup cache
+    /**
+     * View lookup cache
+     */
     private static class ViewHolder {
         TextView txtMessage;
         TextView txtDate;

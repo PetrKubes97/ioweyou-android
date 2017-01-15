@@ -18,13 +18,14 @@ import cz.petrkubes.ioweyou.R;
 import cz.petrkubes.ioweyou.Pojos.Friend;
 
 /**
- * Created by petr on 28.10.16.
+ * Adapter for displaying friends suggestions when adding a new debt
+ *
+ * @author Petr Kubes
  */
-
 public class FriendsSuggestionAdapter extends ArrayAdapter<Friend> implements Filterable {
 
     private Context context;
-    private ArrayList<Friend> originalList;
+    private ArrayList<Friend> originalList; // List containing all friends
     private ArrayList<Friend> suggestions = new ArrayList<>();
     private Filter filter = new CustomFilter();
 
@@ -109,7 +110,9 @@ public class FriendsSuggestionAdapter extends ArrayAdapter<Friend> implements Fi
             if (originalList != null && constraint != null) { // Check if the Original List and Constraint aren't null.
                 for (int i = 0; i < originalList.size(); i++) {
 
-                    if (originalList.get(i).name.toLowerCase().matches("(.*)"+constraint.toString().toLowerCase()+"(.*)")) { // Compare item in original list if it contains constraints.
+                    // TODO: Ignore diacritics
+
+                    if (originalList.get(i).name.toLowerCase().matches("(.*)" + constraint.toString().toLowerCase() + "(.*)")) { // Compare item in original list if it contains constraints.
                         suggestions.add(originalList.get(i));
                     }
                 }
@@ -131,7 +134,9 @@ public class FriendsSuggestionAdapter extends ArrayAdapter<Friend> implements Fi
         }
     }
 
-    // View lookup cache
+    /**
+     * View lookup cache
+     */
     private static class ViewHolder {
         TextView name;
         TextView email;

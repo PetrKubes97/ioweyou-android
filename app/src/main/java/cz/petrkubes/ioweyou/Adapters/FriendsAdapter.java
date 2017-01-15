@@ -18,10 +18,12 @@ import cz.petrkubes.ioweyou.R;
 import cz.petrkubes.ioweyou.Pojos.Friend;
 
 /**
- * Created by petr on 21.11.16.
+ * Adapter for displaying friends in the friends tab
+ *
+ * @author Petr Kubes
  */
 
-public class  FriendsAdapter extends ArrayAdapter<Friend> {
+public class FriendsAdapter extends ArrayAdapter<Friend> {
 
     ArrayList<Friend> friends;
 
@@ -74,13 +76,15 @@ public class  FriendsAdapter extends ArrayAdapter<Friend> {
         return friends.size();
     }
 
-    // View lookup cache
+    /**
+     * View lookup cache
+     */
     private static class ViewHolder {
         TextView txtName;
         TextView txtStuff;
     }
 
-    // I don't even have a comment for this...
+    // Fixes a weird bug
     @SuppressWarnings("deprecation")
     private Spanned fromHtml(String source) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {

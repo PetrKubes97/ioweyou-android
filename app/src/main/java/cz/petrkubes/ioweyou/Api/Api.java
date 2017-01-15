@@ -31,9 +31,10 @@ import cz.petrkubes.ioweyou.Pojos.User;
 import cz.petrkubes.ioweyou.R;
 
 /**
- * Created by petr on 3.1.17.
+ * Class handling all http requests
+ *
+ * @author Petr Kubes
  */
-
 public class Api {
 
     public static final int API_GET_USER = 1;
@@ -56,6 +57,12 @@ public class Api {
         this.apiFailureHandler = new ApiFailureHandler(context, this.db);
     }
 
+    /**
+     * Executes async task corresponding to selected type of request
+     *
+     * @param type   type of request ex. API_GET_USER, API_LOGIN etc.
+     * @param params parameters required by the task, usually contains a callback
+     */
     public void download(int type, ApiParams params) {
 
         // Don't try to getResult when the user is clearly not online
@@ -96,8 +103,8 @@ public class Api {
     // --------------------------------------- Api calls ------------------------------------------ //
 
     /**
-     * Makes an API call to the server
-     * Saves user's is and apiKey to the database
+     * Requires parameter jsonToSend to be set and it has to include facebook parameters
+     * Saves user's id and apiKey to the database
      */
     private class Login extends AsyncTask<ApiParams, Void, ApiResult> {
         @Override
@@ -215,7 +222,7 @@ public class Api {
                     // Go through every currency and add it to the database
                     JSONArray currenciesJson = result.json.getJSONArray("currencies");
 
-                    for (int i=0;i<currenciesJson.length();i++) {
+                    for (int i = 0; i < currenciesJson.length(); i++) {
 
                         JSONObject currencyJson = currenciesJson.getJSONObject(i);
 
@@ -261,7 +268,7 @@ public class Api {
                     // Go through every friend and add him to database
                     JSONArray actionsJson = result.json.getJSONArray("actions");
 
-                    for (int i=0;i<actionsJson.length();i++) {
+                    for (int i = 0; i < actionsJson.length(); i++) {
                         JSONObject actionJson = actionsJson.getJSONObject(i);
                         Action action = Action.fromJson(actionJson);
                         db.addAction(action);
@@ -334,7 +341,7 @@ public class Api {
                         result.successfull = false;
                     }
 
-                    for (int i=0;i<onlineDebtsArr.length();i++) {
+                    for (int i = 0; i < onlineDebtsArr.length(); i++) {
 
                         JSONObject onlineDebtJson = onlineDebtsArr.getJSONObject(i);
 
@@ -364,6 +371,11 @@ public class Api {
 
     // --------------------------------------- Functions below only run multiple of functions in a row ------------------------------------------ //
 
+    /**
+     * Updated debts and actions
+     *
+     * @param params requires a callback
+     */
     private void updateDebtsAndActions(final ApiParams params) {
 
         ApiParams customParams = new ApiParams();
@@ -382,6 +394,11 @@ public class Api {
         new UpdateDebts().execute(customParams);
     }
 
+    /**
+     * Updates everything
+     *
+     * @param params requires a callback
+     */
     private void updateAll(final ApiParams params) {
         final ApiParams customParams = new ApiParams();
 
@@ -410,6 +427,11 @@ public class Api {
         new GetUser().execute(customParams);
     }
 
+    /**
+     * Logs user in and than executes function to update everything
+     *
+     * @param params requires a callback and facebook login json
+     */
     private void loginAndUpdateAll(final ApiParams params) {
 
         ApiParams customParams = new ApiParams();
@@ -433,6 +455,16 @@ public class Api {
 
     // --------------------------------------- Other private methods ------------------------------------------ //
 
+    /**
+     * method doing the actual web request
+     * the method does not run in a seperate thread, therefore must be executed only in a async task
+     *
+     * @param address url
+     * @param method  request type, ex. POST, GET
+     * @param params  parameters including JSON to be send to the server and a callback
+     * @param apiKey  key used for user authentication
+     * @return apiResult containing information about the request
+     */
     private ApiResult getResult(String address, String method, ApiParams params, String apiKey) {
 
         Log.d(Const.TAG, "Connecting...");
@@ -453,7 +485,7 @@ public class Api {
             urlConnection.setConnectTimeout(10000);
             urlConnection.setReadTimeout(10000);
             urlConnection.setRequestMethod(method);
-            urlConnection.setRequestProperty("Content-Type","application/json");
+            urlConnection.setRequestProperty("Content-Type", "application/json");
             urlConnection.setDoOutput(true);
             urlConnection.setDoInput(true);
 
@@ -467,8 +499,8 @@ public class Api {
                 Log.d(Const.TAG, "jsonToSend is set:" + params.jsonToSend.toString());
                 DataOutputStream printout = new DataOutputStream(urlConnection.getOutputStream());
                 printout.write(params.jsonToSend.toString().getBytes("UTF-8"));
-                printout.flush ();
-                printout.close ();
+                printout.flush();
+                printout.close();
             }
             // Get response
             code = urlConnection.getResponseCode();
@@ -488,7 +520,7 @@ public class Api {
                 result += current;
             }
 
-            Log.d(Const.TAG, "Result: "+result);
+            Log.d(Const.TAG, "Result: " + result);
             // Convert response to JSON
             json = new JSONObject(result);
 
@@ -520,6 +552,7 @@ public class Api {
     /**
      * Checks if user is connected to wifi or has data connection enabled.
      * Does not necessarily mean that the user has internet connection.
+     *
      * @return bool
      */
     private boolean isConnected() {

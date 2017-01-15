@@ -39,7 +39,9 @@ import cz.petrkubes.ioweyou.Pojos.User;
 import cz.petrkubes.ioweyou.Services.UpdateAllService;
 
 /**
- * Created by petr on 16.10.16.
+ * Main activity includes all fragments and a viewPager, which displays the fragments
+ *
+ * @author Petr Kubes
  */
 
 public class MainActivity extends AppCompatActivity {
@@ -64,8 +66,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //Stetho.initializeWithDefaults(this);
+
+        // Library only for testing purposes
+        // Stetho.initializeWithDefaults(this);
+
         setContentView(R.layout.activity_main);
+
         // Setup actionbar
         toolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(toolbar);
@@ -90,11 +96,10 @@ public class MainActivity extends AppCompatActivity {
         db = new DatabaseHandler(getApplicationContext());
 
         // Setup api client for synchronization
-        apiClient = new ApiRestClient(this);
         api = new Api(this);
         user = db.getUser();
 
-        // Start a new activity in which user adds debts
+        // Start a new activity in which user adds debts when user click the plus button
         btnAddDebt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -108,15 +113,17 @@ public class MainActivity extends AppCompatActivity {
 
                 intent.putExtra(MY_DEBT, myDebt);
 
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP){
+                // Make transition only on newer android version
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
                     ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(MainActivity.this, btnAddDebt, getString(R.string.transition_button));
                     startActivityForResult(intent, ADD_DEBT_REQUEST, options.toBundle());
-                } else{
+                } else {
                     startActivityForResult(intent, ADD_DEBT_REQUEST);
                 }
             }
         });
 
+        // Start a background job
         startBackgroundJob();
     }
 
@@ -127,10 +134,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Synces debts after user adds/updates a debt
-     * @param requestCode
-     * @param resultCode
-     * @param data
+     * Syncs debts after user adds/updates a debt
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -143,8 +147,6 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Handles toolbar actions
-     * @param item
-     * @return
      */
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
@@ -152,7 +154,6 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_logout:
 
                 logOut();
-
                 return true;
 
             case R.id.action_refresh:
@@ -161,7 +162,8 @@ public class MainActivity extends AppCompatActivity {
                 if (user != null) {
                     updateAll();
                 } else {
-                    Toast.makeText(getApplicationContext(), "Neni", Toast.LENGTH_SHORT).show();
+                    // This should not happen during normal app usage. Used for testing.
+                    Toast.makeText(getApplicationContext(), "User is not logged in", Toast.LENGTH_SHORT).show();
                 }
                 return true;
 
@@ -170,7 +172,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // Inflate action bar
+
+    /**
+     * Inflates actionbar
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu, menu);
@@ -193,9 +198,11 @@ public class MainActivity extends AppCompatActivity {
         });
         dialogBuilder.setNegativeButton(getString(R.string.no), null);
         dialogBuilder.show();
-
     }
 
+    /**
+     * Calls Api download method to update debts and actions and processes callback
+     */
     public void updateDebtsAndActions() {
         pageAdapter.notifyDataSetChanged();
         toggleLoading();
@@ -219,6 +226,9 @@ public class MainActivity extends AppCompatActivity {
         api.download(Api.API_UPDATE_DEBTS_AND_ACTIONS, params);
     }
 
+    /**
+     * Calls Api download method to update everything and processes callback
+     */
     public void updateAll() {
         toggleLoading();
 
@@ -254,7 +264,7 @@ public class MainActivity extends AppCompatActivity {
         // TODO empty api key on server
 
         // Cancel all background jobs
-        JobScheduler jobScheduler =  (JobScheduler) getApplication().getSystemService(Context.JOB_SCHEDULER_SERVICE);
+        JobScheduler jobScheduler = (JobScheduler) getApplication().getSystemService(Context.JOB_SCHEDULER_SERVICE);
         jobScheduler.cancelAll();
 
         // Truncate db
@@ -264,6 +274,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    /**
+     * Toggles loading in the toolbar
+     */
     private void toggleLoading() {
         final MenuItem item = toolbar.getMenu().getItem(0);
 
@@ -278,12 +291,13 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Starts a JobScheduler, which launches UpdateAllService to update the database every few hours
+     * First checks if job doesn't already exist, if yes, does not create any new jobs
      */
     public void startBackgroundJob() {
         JobScheduler jobScheduler = (JobScheduler) getApplication().getSystemService(Context.JOB_SCHEDULER_SERVICE);
         if (jobScheduler.getAllPendingJobs().size() < 1) {
             ComponentName mServiceComponent = new ComponentName(this, UpdateAllService.class);
-            JobInfo jobInfo = new JobInfo.Builder(0, mServiceComponent  )
+            JobInfo jobInfo = new JobInfo.Builder(0, mServiceComponent)
                     .setPeriodic(6 * 60 * 60 * 1000) // 5 hours
                     .setRequiresCharging(false)
                     .setPersisted(true)
