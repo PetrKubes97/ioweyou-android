@@ -760,7 +760,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         ArrayList<Action> list = new ArrayList<>();
 
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.query(TABLE_ACTIONS, actionProjection, null, null, null, null, ACTIONS_KEY_DATE + " DESC", "5");
+        Cursor cursor = db.query(TABLE_ACTIONS, actionProjection, null, null, null, null, ACTIONS_KEY_DATE + " DESC", "50");
 
         if (cursor.moveToFirst())
         {
