@@ -1,6 +1,7 @@
 package cz.petrkubes.ioweyou.Tools;
 
 import java.text.DateFormat;
+import java.text.Normalizer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -32,6 +33,19 @@ public class Tools {
             e.printStackTrace();
             return null;
         }
+    }
+
+    /**
+     * Removes diacritics from a string
+     *
+     * @param text input text
+     * @return text without diacritics
+     */
+    public static String removeDiacritics(String text) {
+        text = Normalizer.normalize(text, Normalizer.Form.NFD)
+                .replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+
+        return text;
     }
 
 }

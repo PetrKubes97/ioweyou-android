@@ -3,6 +3,7 @@ package cz.petrkubes.ioweyou.Adapters;
 import android.content.Context;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,10 +13,16 @@ import android.widget.Filterable;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.util.ArrayList;
+import com.facebook.stetho.common.StringUtil;
 
+import java.text.Normalizer;
+import java.util.ArrayList;
+import java.util.Collection;
+
+import cz.petrkubes.ioweyou.Const;
 import cz.petrkubes.ioweyou.R;
 import cz.petrkubes.ioweyou.Pojos.Friend;
+import cz.petrkubes.ioweyou.Tools.Tools;
 
 /**
  * Adapter for displaying friends suggestions when adding a new debt
@@ -26,6 +33,7 @@ public class FriendsSuggestionAdapter extends ArrayAdapter<Friend> implements Fi
 
     private Context context;
     private ArrayList<Friend> originalList; // List containing all friends
+    private ArrayList<Friend> tempSuggestions = new ArrayList<>(); // temporary suggestions, suggestions can't be update right away
     private ArrayList<Friend> suggestions = new ArrayList<>();
     private Filter filter = new CustomFilter();
 
@@ -105,27 +113,26 @@ public class FriendsSuggestionAdapter extends ArrayAdapter<Friend> implements Fi
     private class CustomFilter extends Filter {
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
-            suggestions.clear();
+            tempSuggestions.clear();
 
             if (originalList != null && constraint != null) { // Check if the Original List and Constraint aren't null.
                 for (int i = 0; i < originalList.size(); i++) {
 
-                    // TODO: Ignore diacritics
-
-                    if (originalList.get(i).name.toLowerCase().matches("(.*)" + constraint.toString().toLowerCase() + "(.*)")) { // Compare item in original list if it contains constraints.
-                        suggestions.add(originalList.get(i));
+                    if (Tools.removeDiacritics(originalList.get(i).name).toLowerCase().matches("(.*)" + constraint.toString().toLowerCase() + "(.*)")) { // Compare item in original list if it contains constraints.
+                        tempSuggestions.add(originalList.get(i));
                     }
                 }
             }
             FilterResults results = new FilterResults(); // Create new Filter Results and return this to publishResults;
-            results.values = suggestions;
-            results.count = suggestions.size();
-
+            results.values = tempSuggestions;
+            results.count = tempSuggestions.size();
             return results;
         }
 
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
+            suggestions.clear();
+            suggestions.addAll((ArrayList<Friend>) results.values);
             if (results.count > 0) {
                 notifyDataSetChanged();
             } else {

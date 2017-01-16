@@ -95,7 +95,7 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
     private ArrayList<Currency> currencies = null;
     private ArrayList<Friend> friends = null;
 
-    private ArrayAdapter<Friend> friendsAdapter = null;
+    private ArrayAdapter<Friend> friendsSuggestionAdapter = null;
 
     private SharedPreferences sharedPreferences;
     private static final String defaultCurrencyPos = "DEFAULT_CURRENCY_POS";
@@ -148,10 +148,10 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
         }
 
         // Create the adapter to convert the array to views
-        friendsAdapter = new FriendsSuggestionAdapter(this, friends);
+        friendsSuggestionAdapter = new FriendsSuggestionAdapter(this, friends);
 
         // Setup autocomplete
-        txtName.setAdapter(friendsAdapter);
+        txtName.setAdapter(friendsSuggestionAdapter);
         txtName.setThreshold(1);
         // Save the information, that selected user is facebook friend (his id) or a contact
         txtName.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -423,7 +423,7 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
                     friends.add(new Friend(null, contact, ""));
                 }
 
-                friendsAdapter.notifyDataSetChanged();
+                friendsSuggestionAdapter.notifyDataSetChanged();
 
             } else {
                 Toast.makeText(this, "We won't be able to suggest you people from your contacts. :(", Toast.LENGTH_LONG).show();
