@@ -44,21 +44,21 @@ import org.parceler.Parcels;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.ArrayList;
 import java.util.List;
 
 import cz.petrkubes.ioweyou.Adapters.FriendsSuggestionAdapter;
-import cz.petrkubes.ioweyou.Const;
 import cz.petrkubes.ioweyou.Database.DatabaseHandler;
 import cz.petrkubes.ioweyou.Fragments.DebtsFragment;
 import cz.petrkubes.ioweyou.Fragments.FriendsFragment;
-import cz.petrkubes.ioweyou.R;
 import cz.petrkubes.ioweyou.Pojos.Currency;
 import cz.petrkubes.ioweyou.Pojos.Debt;
 import cz.petrkubes.ioweyou.Pojos.Friend;
 import cz.petrkubes.ioweyou.Pojos.User;
+import cz.petrkubes.ioweyou.R;
+import cz.petrkubes.ioweyou.Tools.Const;
 import cz.petrkubes.ioweyou.Tools.Tools;
 
 /**
@@ -72,7 +72,7 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
     private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 100;
     private static final String FRAG_TAG_DATE_PICKER = "fragment_date_picker_created_at";
     private static final String FRAG_TAG_TIME_PICKER = "fragment_time_picker_created_at";
-
+    private static final String defaultCurrencyPos = "DEFAULT_CURRENCY_POS";
     // Widgets
     private AutoCompleteTextView txtName;
     private EditText txtWhat;
@@ -89,17 +89,11 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
     private Button btnCreatedAt;
     private Button btnDelete;
     private CheckBox chckLocked;
-
-
     private Integer tempFacebookFriendId = null;
     private ArrayList<Currency> currencies = null;
     private ArrayList<Friend> friends = null;
-
     private ArrayAdapter<Friend> friendsSuggestionAdapter = null;
-
     private SharedPreferences sharedPreferences;
-    private static final String defaultCurrencyPos = "DEFAULT_CURRENCY_POS";
-
     private User user;
     private Date createdAt;
     private Debt debtToEdit;

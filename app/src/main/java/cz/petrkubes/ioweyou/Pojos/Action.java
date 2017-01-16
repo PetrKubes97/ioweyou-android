@@ -7,10 +7,10 @@ import java.util.Date;
 import cz.petrkubes.ioweyou.Tools.Tools;
 
 /**
- * Created by petr on 30.11.16.
+ * @author Petr Kubes
  */
-
 public class Action {
+
     public Integer id;
     public String type;
     public Integer debtId;
@@ -31,6 +31,13 @@ public class Action {
         this.date = date;
     }
 
+    /**
+     * Generates action object from a JSONObject
+     *
+     * @param response JSONObject
+     * @return Action
+     * @throws Exception
+     */
     public static Action fromJson(JSONObject response) throws Exception {
 
         Date date = null;

@@ -3,9 +3,8 @@ package cz.petrkubes.ioweyou.Pojos;
 import java.util.Date;
 
 /**
- * Created by petr on 21.10.16.
+ * @author Petr Kubes
  */
-
 public class User {
 
     public Integer id;

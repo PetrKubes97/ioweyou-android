@@ -3,7 +3,6 @@ package cz.petrkubes.ioweyou.Adapters;
 import android.content.Context;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,15 +12,10 @@ import android.widget.Filterable;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.facebook.stetho.common.StringUtil;
-
-import java.text.Normalizer;
 import java.util.ArrayList;
-import java.util.Collection;
 
-import cz.petrkubes.ioweyou.Const;
-import cz.petrkubes.ioweyou.R;
 import cz.petrkubes.ioweyou.Pojos.Friend;
+import cz.petrkubes.ioweyou.R;
 import cz.petrkubes.ioweyou.Tools.Tools;
 
 /**
@@ -108,6 +102,15 @@ public class FriendsSuggestionAdapter extends ArrayAdapter<Friend> implements Fi
     }
 
     /**
+     * View lookup cache
+     */
+    private static class ViewHolder {
+        TextView name;
+        TextView email;
+        LinearLayout layout;
+    }
+
+    /**
      * Custom filter class
      */
     private class CustomFilter extends Filter {
@@ -139,14 +142,5 @@ public class FriendsSuggestionAdapter extends ArrayAdapter<Friend> implements Fi
                 notifyDataSetInvalidated();
             }
         }
-    }
-
-    /**
-     * View lookup cache
-     */
-    private static class ViewHolder {
-        TextView name;
-        TextView email;
-        LinearLayout layout;
     }
 }

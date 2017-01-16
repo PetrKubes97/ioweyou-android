@@ -16,7 +16,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,17 +24,15 @@ import android.widget.Toast;
 
 import com.facebook.FacebookSdk;
 import com.facebook.login.LoginManager;
-import com.facebook.stetho.Stetho;
 
 import cz.petrkubes.ioweyou.Adapters.FragmentsAdapter;
 import cz.petrkubes.ioweyou.Api.Api;
 import cz.petrkubes.ioweyou.Api.ApiRestClient;
 import cz.petrkubes.ioweyou.Api.SimpleCallback;
-import cz.petrkubes.ioweyou.Const;
 import cz.petrkubes.ioweyou.Database.DatabaseHandler;
 import cz.petrkubes.ioweyou.Pojos.ApiParams;
-import cz.petrkubes.ioweyou.R;
 import cz.petrkubes.ioweyou.Pojos.User;
+import cz.petrkubes.ioweyou.R;
 import cz.petrkubes.ioweyou.Services.UpdateAllService;
 
 /**

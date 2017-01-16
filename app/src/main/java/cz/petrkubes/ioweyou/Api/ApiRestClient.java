@@ -19,7 +19,6 @@ import java.util.Date;
 
 import cz.msebera.android.httpclient.Header;
 import cz.msebera.android.httpclient.entity.StringEntity;
-import cz.petrkubes.ioweyou.Const;
 import cz.petrkubes.ioweyou.Database.DatabaseHandler;
 import cz.petrkubes.ioweyou.Pojos.Action;
 import cz.petrkubes.ioweyou.Pojos.Currency;
@@ -27,6 +26,7 @@ import cz.petrkubes.ioweyou.Pojos.Debt;
 import cz.petrkubes.ioweyou.Pojos.Friend;
 import cz.petrkubes.ioweyou.Pojos.User;
 import cz.petrkubes.ioweyou.R;
+import cz.petrkubes.ioweyou.Tools.Const;
 
 @Deprecated
 public class ApiRestClient {
@@ -44,6 +44,10 @@ public class ApiRestClient {
         this.apiFailureHandler = new ApiFailureHandler(context, this.db);
     }
 
+    private static String getAbsoluteUrl(String relativeUrl) {
+        return BASE_URL + relativeUrl;
+    }
+
     public void getUser(String apiKey, final SimpleCallback callback) {
 
         Log.d(Const.TAG, "Api: getUser");
@@ -53,7 +57,7 @@ public class ApiRestClient {
             return;
         }
 
-        client.addHeader("api-key",apiKey);
+        client.addHeader("api-key", apiKey);
 
         client.get(getAbsoluteUrl("user/"), null, new JsonHttpResponseHandler() {
             @Override
@@ -64,7 +68,7 @@ public class ApiRestClient {
                     // Go through every friend and add him to database
                     JSONArray friendsJson = response.getJSONArray("friends");
 
-                    for (int i=0;i<friendsJson.length();i++) {
+                    for (int i = 0; i < friendsJson.length(); i++) {
                         JSONObject friendJson = friendsJson.getJSONObject(i);
                         Friend friend = new Friend(
                                 friendJson.getInt("id"),
@@ -177,7 +181,7 @@ public class ApiRestClient {
                     // Go through every currency and add it to the database
                     JSONArray currenciesJson = response.getJSONArray("currencies");
 
-                    for (int i=0;i<currenciesJson.length();i++) {
+                    for (int i = 0; i < currenciesJson.length(); i++) {
 
                         JSONObject currencyJson = currenciesJson.getJSONObject(i);
 
@@ -208,7 +212,7 @@ public class ApiRestClient {
         });
     }
 
-    public void updateAllDebts (String apiKey, final SimpleCallback callback) {
+    public void updateAllDebts(String apiKey, final SimpleCallback callback) {
         Log.d(Const.TAG, "Api: updateAllDebts");
 
         if (!isConnected()) {
@@ -255,7 +259,7 @@ public class ApiRestClient {
                         db.removeOfflineDebts();
                     }
 
-                    for (int i=0;i<onlineDebtsArr.length();i++) {
+                    for (int i = 0; i < onlineDebtsArr.length(); i++) {
 
                         JSONObject onlineDebtJson = onlineDebtsArr.getJSONObject(i);
 
@@ -285,6 +289,8 @@ public class ApiRestClient {
 
     }
 
+    // ------------------- Functions below only run multiple of functions above ------------------- //
+
     public void getActions(String apiKey, final SimpleCallback callback) {
         Log.d(Const.TAG, "Api: getActions");
 
@@ -305,7 +311,7 @@ public class ApiRestClient {
                     // Go through every friend and add him to database
                     JSONArray actionsJson = response.getJSONArray("actions");
 
-                    for (int i=0;i<actionsJson.length();i++) {
+                    for (int i = 0; i < actionsJson.length(); i++) {
                         JSONObject actionJson = actionsJson.getJSONObject(i);
                         Action action = Action.fromJson(actionJson);
                         db.addAction(action);
@@ -330,8 +336,6 @@ public class ApiRestClient {
         });
 
     }
-
-    // ------------------- Functions below only run multiple of functions above ------------------- //
 
     public void updateDebtsAndActions(final String apiKey, final SimpleCallback callback) {
         Log.d(Const.TAG, "Api: updateDebtsAndActions");
@@ -363,6 +367,8 @@ public class ApiRestClient {
             }
         });
     }
+
+    // ----------------- Other functions --------------------- //
 
     public void updateAll(final String apiKey, final SimpleCallback callback) {
         Log.d(Const.TAG, "Api: updateAll");
@@ -416,19 +422,14 @@ public class ApiRestClient {
         });
     }
 
-    // ----------------- Other functions --------------------- //
-
     /**
      * Checks if user is connected to wifi or has data connection enabled.
      * Does not necessarily mean that the user has internet connection.
+     *
      * @return bool
      */
     private boolean isConnected() {
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         return cm.getActiveNetworkInfo() != null;
-    }
-
-    private static String getAbsoluteUrl(String relativeUrl) {
-        return BASE_URL + relativeUrl;
     }
 }

@@ -1,9 +1,8 @@
 package cz.petrkubes.ioweyou.Fragments;
 
 /**
- * Created by petr on 6.11.16.
+ * Interface allowing updating the fragments
  */
-
 public interface UpdateableFragment {
     public void update();
 }

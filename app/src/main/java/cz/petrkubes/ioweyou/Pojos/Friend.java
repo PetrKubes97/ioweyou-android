@@ -5,9 +5,8 @@ import org.parceler.Parcel;
 import java.util.ArrayList;
 
 /**
- * Created by petr on 21.10.16.
+ * @author Petr Kubes
  */
-
 @Parcel
 public class Friend {
 
@@ -20,7 +19,8 @@ public class Friend {
     public ArrayList<Debt> debts;
 
     // Empty constructor for Parceler
-    public Friend() {};
+    public Friend() {
+    }
 
     public Friend(Integer id, String name, String email) {
         this.id = id;

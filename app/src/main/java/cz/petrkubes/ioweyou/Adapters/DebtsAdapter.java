@@ -12,8 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import cz.petrkubes.ioweyou.R;
 import cz.petrkubes.ioweyou.Pojos.Debt;
+import cz.petrkubes.ioweyou.R;
 import cz.petrkubes.ioweyou.Tools.Tools;
 
 /**

@@ -14,8 +14,8 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import cz.petrkubes.ioweyou.R;
 import cz.petrkubes.ioweyou.Pojos.Friend;
+import cz.petrkubes.ioweyou.R;
 
 /**
  * Adapter for displaying friends in the friends tab
@@ -76,14 +76,6 @@ public class FriendsAdapter extends ArrayAdapter<Friend> {
         return friends.size();
     }
 
-    /**
-     * View lookup cache
-     */
-    private static class ViewHolder {
-        TextView txtName;
-        TextView txtStuff;
-    }
-
     // Fixes a weird bug
     @SuppressWarnings("deprecation")
     private Spanned fromHtml(String source) {
@@ -92,5 +84,13 @@ public class FriendsAdapter extends ArrayAdapter<Friend> {
         } else {
             return Html.fromHtml(source);
         }
+    }
+
+    /**
+     * View lookup cache
+     */
+    private static class ViewHolder {
+        TextView txtName;
+        TextView txtStuff;
     }
 }

@@ -5,9 +5,8 @@ import org.json.JSONObject;
 import cz.petrkubes.ioweyou.Api.SimpleCallback;
 
 /**
- * Created by petr on 4.1.17.
+ * @author Petr Kubes
  */
-
 public class ApiResult {
 
     public int code;

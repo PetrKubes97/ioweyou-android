@@ -28,13 +28,18 @@ import cz.petrkubes.ioweyou.Activities.DebtActivity;
 import cz.petrkubes.ioweyou.Activities.MainActivity;
 import cz.petrkubes.ioweyou.Adapters.DebtsAdapter;
 import cz.petrkubes.ioweyou.Database.DatabaseHandler;
-import cz.petrkubes.ioweyou.R;
 import cz.petrkubes.ioweyou.Pojos.Debt;
 import cz.petrkubes.ioweyou.Pojos.User;
+import cz.petrkubes.ioweyou.R;
 
 import static android.view.View.GONE;
 
 
+/**
+ * Fragment representing the MyDebts and TheirDebts tabs
+ *
+ * @author Petr Kubes
+ */
 public class DebtsFragment extends Fragment implements UpdateableFragment {
 
     public static final String ARG_MY = "argMy";
@@ -85,7 +90,7 @@ public class DebtsFragment extends Fragment implements UpdateableFragment {
         myDebts = args.getBoolean(ARG_MY);
 
         if (user != null) {
-             debts = db.getExtendedDebts(myDebts, user.id);
+            debts = db.getExtendedDebts(myDebts, user.id);
         }
         toggleNote();
 
@@ -118,6 +123,9 @@ public class DebtsFragment extends Fragment implements UpdateableFragment {
         adapter.notifyDataSetChanged();
     }
 
+    /**
+     * Toggles the note that is supposed to show only when the list is empty
+     */
     public void toggleNote() {
         // Show note
         if (debts.size() == 0) {
@@ -132,6 +140,11 @@ public class DebtsFragment extends Fragment implements UpdateableFragment {
         }
     }
 
+    /**
+     * Creates and show the dialog with debts actions
+     *
+     * @param debt Selected debt
+     */
     private void showDialog(final Debt debt) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -148,9 +161,9 @@ public class DebtsFragment extends Fragment implements UpdateableFragment {
         btnDialogEdit = (Button) debtDialogView.findViewById(R.id.btn_edit);
         swtchPayment = (Switch) debtDialogView.findViewById(R.id.swtch_payment);
 
-        txtDialogWhat = (TextView)  debtDialogView.findViewById(R.id.txt_what);
-        txtDialogWho = (TextView)  debtDialogView.findViewById(R.id.txt_who);
-        txtDialogNote = (TextView)  debtDialogView.findViewById(R.id.txt_note);
+        txtDialogWhat = (TextView) debtDialogView.findViewById(R.id.txt_what);
+        txtDialogWho = (TextView) debtDialogView.findViewById(R.id.txt_who);
+        txtDialogNote = (TextView) debtDialogView.findViewById(R.id.txt_note);
         txtDialogDate = (TextView) debtDialogView.findViewById(R.id.txt_date);
 
         txtDialogWhat.setText(debt.what);

@@ -1,9 +1,8 @@
 package cz.petrkubes.ioweyou.Pojos;
 
 /**
- * Created by petr on 31.10.16.
+ * @author Petr Kubes
  */
-
 public class Currency {
 
     public int id;

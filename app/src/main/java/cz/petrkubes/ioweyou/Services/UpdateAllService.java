@@ -7,13 +7,14 @@ import android.widget.Toast;
 
 import cz.petrkubes.ioweyou.Api.Api;
 import cz.petrkubes.ioweyou.Api.SimpleCallback;
-import cz.petrkubes.ioweyou.Const;
 import cz.petrkubes.ioweyou.Pojos.ApiParams;
+import cz.petrkubes.ioweyou.Tools.Const;
 
 /**
- * Created by petr on 7.1.17.
+ * Service that is started by the jobsScheduler and every few hours updates the local database
+ *
+ * @author Petr Kubes
  */
-
 public class UpdateAllService extends JobService {
     @Override
     public boolean onStartJob(final JobParameters params) {

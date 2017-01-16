@@ -1,9 +1,8 @@
 package cz.petrkubes.ioweyou.Pojos;
 
 /**
- * Created by petr on 30.10.16.
+ * @author Petr Kubes
  */
-
 public class Header {
     public String name;
     public String key;

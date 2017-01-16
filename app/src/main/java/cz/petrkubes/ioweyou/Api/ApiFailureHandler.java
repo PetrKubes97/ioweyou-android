@@ -4,8 +4,8 @@ import android.content.Context;
 import android.util.Log;
 
 import cz.petrkubes.ioweyou.Activities.MainActivity;
-import cz.petrkubes.ioweyou.Const;
 import cz.petrkubes.ioweyou.Database.DatabaseHandler;
+import cz.petrkubes.ioweyou.Tools.Const;
 
 /**
  * Class used for handling api error

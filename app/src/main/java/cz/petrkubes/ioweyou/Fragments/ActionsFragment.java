@@ -1,6 +1,5 @@
 package cz.petrkubes.ioweyou.Fragments;
 
-import android.media.tv.TvContract;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -21,10 +20,12 @@ import cz.petrkubes.ioweyou.R;
 
 import static android.view.View.GONE;
 
-/**
- * Created by petr on 27.10.16.
- */
 
+/**
+ * Fragment representing the Actions tab
+ *
+ * @author Petr Kubes
+ */
 public class ActionsFragment extends Fragment implements UpdateableFragment {
 
     private ListView lstActions;
@@ -66,6 +67,9 @@ public class ActionsFragment extends Fragment implements UpdateableFragment {
         new Task().execute();
     }
 
+    /**
+     * Toggles the note that is supposed to show only when the list is empty
+     */
     public void toggleNote() {
         // Show note
         if (actions.size() == 0) {
@@ -75,6 +79,9 @@ public class ActionsFragment extends Fragment implements UpdateableFragment {
         }
     }
 
+    /**
+     * Task for asynchronous populating of the list
+     */
     private class Task extends AsyncTask<Void, Void, ArrayList<Action>> {
         @Override
         protected void onPreExecute() {

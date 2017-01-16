@@ -7,16 +7,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.parceler.Parcel;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import cz.petrkubes.ioweyou.Tools.Tools;
 
 /**
- * Created by petr on 4.11.16.
+ * @author Petr Kubes
  */
-
 @Parcel
 public class Debt {
 
@@ -43,7 +40,8 @@ public class Debt {
     public String currencyString;
 
     // Empty constructor for Parceler
-    public Debt() {};
+    public Debt() {
+    }
 
     public Debt(Integer id, Integer creditorId, Integer debtorId,
                 String customFriendName, Double amount, Integer currencyId,
@@ -65,64 +63,11 @@ public class Debt {
         this.managerId = managerId;
     }
 
-    public String createdAtString() {
-        return Tools.formatDate(this.createdAt);
-    }
-
-    public String deletedAtString() {
-        return Tools.formatDate(this.deletedAt);
-    }
-
-    public String paidAtString() {
-        return Tools.formatDate(this.paidAt);
-    }
-
-    public JSONObject toJson() throws JSONException {
-        String paidAt = "";
-        String deletedAt = "";
-        String modifiedAt = "";
-        String createdAt = "";
-        boolean lock = false;
-
-        if (this.paidAt != null) {
-            paidAt = Tools.formatDate(this.paidAt);
-        }
-
-        if (this.deletedAt != null) {
-            deletedAt = Tools.formatDate(this.deletedAt);
-        }
-
-        if (this.modifiedAt != null) {
-            modifiedAt = Tools.formatDate(this.modifiedAt);
-        }
-
-        if (this.createdAt != null) {
-            createdAt = Tools.formatDate(this.createdAt);
-        }
-
-        if (this.managerId != null) { // Send only a boolean to prevent hackers from creating uneditable debts
-            lock = true;
-        }
-
-        JSONObject debtJson = new JSONObject();
-        debtJson.put("id", this.id);
-        debtJson.put("creditorId", this.creditorId);
-        debtJson.put("debtorId", this.debtorId);
-        debtJson.put("customFriendName", this.customFriendName);
-        debtJson.put("amount", this.amount);
-        debtJson.put("currencyId", this.currencyId);
-        debtJson.put("thingName", this.thingName);
-        debtJson.put("note", this.note);
-        debtJson.put("paidAt", paidAt);
-        debtJson.put("deletedAt", deletedAt);
-        debtJson.put("modifiedAt", modifiedAt);
-        debtJson.put("createdAt", createdAt);
-        debtJson.put("lock", lock);
-        debtJson.put("version", this.version);
-
-        return debtJson;
-    }
-
+    /**
+     * @param response JSONObject of the debt
+     * @return Debt object
+     * @throws Exception
+     */
     public static Debt fromJson(JSONObject response) throws Exception {
 
         // It is necessary to convert dates strings to Date classes
@@ -205,6 +150,10 @@ public class Debt {
         );
     }
 
+    /**
+     * @param cursor Cursor located at desired debt
+     * @return Debt object
+     */
     public static Debt fromCursor(Cursor cursor) {
         Date paidAt = null;
         Date deletedAt = null;
@@ -286,5 +235,76 @@ public class Debt {
                 createdAt,
                 managerId,
                 cursor.getLong(13));
+    }
+
+    /**
+     * @return createdAt date converted to a string
+     */
+    public String createdAtString() {
+        return Tools.formatDate(this.createdAt);
+    }
+
+    /**
+     * @return deletedAtString date converted to a string
+     */
+    public String deletedAtString() {
+        return Tools.formatDate(this.deletedAt);
+    }
+
+    /**
+     * @return paidAt date converted to a string
+     */
+    public String paidAtString() {
+        return Tools.formatDate(this.paidAt);
+    }
+
+    /**
+     * @return Debt converted to a JSONObject
+     * @throws JSONException
+     */
+    public JSONObject toJson() throws JSONException {
+        String paidAt = "";
+        String deletedAt = "";
+        String modifiedAt = "";
+        String createdAt = "";
+        boolean lock = false;
+
+        if (this.paidAt != null) {
+            paidAt = Tools.formatDate(this.paidAt);
+        }
+
+        if (this.deletedAt != null) {
+            deletedAt = Tools.formatDate(this.deletedAt);
+        }
+
+        if (this.modifiedAt != null) {
+            modifiedAt = Tools.formatDate(this.modifiedAt);
+        }
+
+        if (this.createdAt != null) {
+            createdAt = Tools.formatDate(this.createdAt);
+        }
+
+        if (this.managerId != null) { // Send only a boolean to prevent hackers from creating uneditable debts
+            lock = true;
+        }
+
+        JSONObject debtJson = new JSONObject();
+        debtJson.put("id", this.id);
+        debtJson.put("creditorId", this.creditorId);
+        debtJson.put("debtorId", this.debtorId);
+        debtJson.put("customFriendName", this.customFriendName);
+        debtJson.put("amount", this.amount);
+        debtJson.put("currencyId", this.currencyId);
+        debtJson.put("thingName", this.thingName);
+        debtJson.put("note", this.note);
+        debtJson.put("paidAt", paidAt);
+        debtJson.put("deletedAt", deletedAt);
+        debtJson.put("modifiedAt", modifiedAt);
+        debtJson.put("createdAt", createdAt);
+        debtJson.put("lock", lock);
+        debtJson.put("version", this.version);
+
+        return debtJson;
     }
 }

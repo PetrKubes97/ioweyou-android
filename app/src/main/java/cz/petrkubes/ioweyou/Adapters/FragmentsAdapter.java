@@ -6,11 +6,11 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.util.Log;
 
-import cz.petrkubes.ioweyou.Const;
-import cz.petrkubes.ioweyou.Fragments.DebtsFragment;
 import cz.petrkubes.ioweyou.Fragments.ActionsFragment;
+import cz.petrkubes.ioweyou.Fragments.DebtsFragment;
 import cz.petrkubes.ioweyou.Fragments.FriendsFragment;
 import cz.petrkubes.ioweyou.Fragments.UpdateableFragment;
+import cz.petrkubes.ioweyou.Tools.Const;
 
 /**
  * Adapter for displaying displaying fragments

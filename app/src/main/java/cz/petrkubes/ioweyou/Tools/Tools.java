@@ -7,9 +7,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * Created by petr on 19.11.16.
+ * Class including useful functions used on many places throughout the project
+ *
+ * @author Petr Kubes
  */
-
 public class Tools {
 
     public static String formatDate(Date date) {

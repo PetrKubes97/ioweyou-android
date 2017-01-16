@@ -101,6 +101,9 @@ public class FriendsDebtsAdapter extends ArrayAdapter<Debt> {
         return debts.size();
     }
 
+    public ArrayList<Debt> getSelectedDebts() {
+        return selectedDebts;
+    }
 
     /**
      * View lookup cache
@@ -111,10 +114,6 @@ public class FriendsDebtsAdapter extends ArrayAdapter<Debt> {
         TextView txtNote;
         CheckBox chckbSelected;
         View layout;
-    }
-
-    public ArrayList<Debt> getSelectedDebts() {
-        return selectedDebts;
     }
 
 }

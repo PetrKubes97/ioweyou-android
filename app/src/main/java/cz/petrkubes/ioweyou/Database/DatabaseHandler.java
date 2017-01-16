@@ -2,7 +2,6 @@ package cz.petrkubes.ioweyou.Database;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -18,37 +17,32 @@ import cz.petrkubes.ioweyou.Pojos.User;
 import cz.petrkubes.ioweyou.R;
 import cz.petrkubes.ioweyou.Tools.Tools;
 
+/**
+ * Class for handling all reading and writing to the local database
+ */
 public class DatabaseHandler extends SQLiteOpenHelper {
-
-    private Context context;
 
     // Database Version
     private static final int DATABASE_VERSION = 23;
-
     // Database Name
     private static final String DATABASE_NAME = "payUBack.db";
-
-    // Table names
+    // Tables names
     private static final String TABLE_USERS = "users";
     private static final String TABLE_DEBTS = "debts";
     private static final String TABLE_FRIENDS = "friends";
     private static final String TABLE_CURRENCIES = "currencies";
     private static final String TABLE_ACTIONS = "actions";
-
-    // Table column names
+    // Column names
     private static final String USERS_KEY_ID = "id";
     private static final String USERS_KEY_NAME = "name";
     private static final String USERS_KEY_EMAIL = "email";
     private static final String USERS_KEY_API_KEY = "api_key";
     private static final String USERS_KEY_REGISTERED_AT = "registered_at";
-
     private static final String FRIENDS_KEY_ID = "id";
     private static final String FRIENDS_KEY_NAME = "name";
     private static final String FRIENDS_KEY_EMAIL = "email";
-
     private static final String CURRENCIES_KEY_ID = "id";
     private static final String CURRENCIES_KEY_SYMBOL = "symbol";
-
     private static final String DEBTS_KEY_ID = "id";
     private static final String DEBTS_KEY_CREDITOR_ID = "creditor_id";
     private static final String DEBTS_KEY_DEBTOR_ID = "debtor_id";
@@ -63,33 +57,31 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String DEBTS_KEY_CREATED_AT = "created_at";
     private static final String DEBTS_KEY_MANAGER_ID = "manager_id";
     private static final String DEBTS_KEY_VERSION = "version";
-
     private static final String ACTIONS_KEY_ID = "id";
     private static final String ACTIONS_KEY_TYPE = "type";
     private static final String ACTIONS_KEY_DEBT_ID = "debt_id";
     private static final String ACTIONS_KEY_USER_ID = "user_id";
     private static final String ACTIONS_KEY_NOTE = "note";
     private static final String ACTIONS_KEY_DATE = "date";
-
-
+    private Context context;
     // Strings including all columns
-    private String[] userProjection = new String[] {
+    private String[] userProjection = new String[]{
             USERS_KEY_ID,
             USERS_KEY_API_KEY,
             USERS_KEY_NAME,
             USERS_KEY_EMAIL,
             USERS_KEY_REGISTERED_AT};
 
-    private String[] friendProjection = new String[] {
+    private String[] friendProjection = new String[]{
             FRIENDS_KEY_ID,
             FRIENDS_KEY_NAME,
             FRIENDS_KEY_EMAIL};
 
-    private String[] currenciesProjection = new String[] {
+    private String[] currenciesProjection = new String[]{
             CURRENCIES_KEY_ID,
             CURRENCIES_KEY_SYMBOL};
 
-    private String[] debtProjection = new String[] {
+    private String[] debtProjection = new String[]{
             DEBTS_KEY_ID,
             DEBTS_KEY_CREDITOR_ID,
             DEBTS_KEY_DEBTOR_ID,
@@ -106,7 +98,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             DEBTS_KEY_VERSION
     };
 
-    private String[] actionProjection = new String[] {
+    private String[] actionProjection = new String[]{
             ACTIONS_KEY_ID,
             ACTIONS_KEY_TYPE,
             ACTIONS_KEY_DEBT_ID,
@@ -152,7 +144,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 DEBTS_KEY_CREATED_AT + " NUMERIC, " +
                 DEBTS_KEY_MODIFIED_AT + " NUMERIC, " +
                 DEBTS_KEY_MANAGER_ID + " INTEGER, " +
-                DEBTS_KEY_VERSION +" INTEGER);";
+                DEBTS_KEY_VERSION + " INTEGER);";
 
         String CREATE_ACTIONS_TABLE = "CREATE TABLE " + TABLE_ACTIONS + " (" +
                 ACTIONS_KEY_ID + " INTEGER PRIMARY KEY, " +
@@ -196,21 +188,35 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.close();
     }
 
+    /**
+     * Adds a new user or overrides the previous entry
+     * There is always only one row in the user table
+     *
+     * @param user User object
+     */
     public void addOrUpdateUser(User user) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         // Checks if user does already exist
-        Cursor cursor = db.query(TABLE_USERS, new String[] {USERS_KEY_ID}, USERS_KEY_ID + "=?",
-                new String[] {String.valueOf(user.id)}, null, null, null);
+        Cursor cursor = db.query(TABLE_USERS, new String[]{USERS_KEY_ID}, USERS_KEY_ID + "=?",
+                new String[]{String.valueOf(user.id)}, null, null, null);
 
         ContentValues values = new ContentValues();
 
         // Update only non-null values
         values.put(USERS_KEY_ID, user.id);
-        if (user.email != null) {values.put(USERS_KEY_EMAIL, user.email);}
-        if (user.name != null) {values.put(USERS_KEY_NAME, user.name);}
-        if (user.apiKey != null) {values.put(USERS_KEY_API_KEY, user.apiKey);}
-        if (user.registredAt != null) {values.put(USERS_KEY_REGISTERED_AT, String.valueOf(user.registredAt));}
+        if (user.email != null) {
+            values.put(USERS_KEY_EMAIL, user.email);
+        }
+        if (user.name != null) {
+            values.put(USERS_KEY_NAME, user.name);
+        }
+        if (user.apiKey != null) {
+            values.put(USERS_KEY_API_KEY, user.apiKey);
+        }
+        if (user.registredAt != null) {
+            values.put(USERS_KEY_REGISTERED_AT, String.valueOf(user.registredAt));
+        }
 
         if (cursor.getCount() > 0) {
             // User does exist, let's update his data
@@ -226,7 +232,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     /**
      * Returns currently logged in user
-     * @return User
+     *
+     * @return User currently logged in user
      */
     public User getUser() {
         User user = null;
@@ -235,9 +242,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         Cursor cursor = db.query(TABLE_USERS, userProjection, null, null, null, null, null);
 
         // It is not necessary to loop through the result because there should always be at most 1 user row
-        if (cursor.moveToFirst())
-        {
-             user = new User(
+        if (cursor.moveToFirst()) {
+            user = new User(
                     cursor.getInt(0),
                     cursor.getString(1),
                     cursor.getString(2),
@@ -253,16 +259,16 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     /**
-     * Save friend object to the database
-     * @param friend
-     * @throws Exception
+     * Saves friend to the database
+     *
+     * @param friend Friend object
      */
     public void addFriend(Friend friend) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         // Checks if user doesn't already exist
-        Cursor cursor = db.query(TABLE_FRIENDS, new String[] {FRIENDS_KEY_ID}, FRIENDS_KEY_ID + "=?",
-                new String[] {String.valueOf(friend.id)}, null, null, null);
+        Cursor cursor = db.query(TABLE_FRIENDS, new String[]{FRIENDS_KEY_ID}, FRIENDS_KEY_ID + "=?",
+                new String[]{String.valueOf(friend.id)}, null, null, null);
 
         if (cursor.getCount() > 0) {
             return;
@@ -282,6 +288,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     /**
      * Get a list of friends from the database
+     *
      * @return ArrayList<Friend>
      */
     public ArrayList<Friend> getFriends() {
@@ -290,13 +297,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(TABLE_FRIENDS, friendProjection, null, null, null, null, null);
 
-        if (cursor.moveToFirst())
-        {
+        if (cursor.moveToFirst()) {
             do {
                 list.add(new Friend(
-                    cursor.getInt(0),
-                    cursor.getString(1),
-                    cursor.getString(2)));
+                        cursor.getInt(0),
+                        cursor.getString(1),
+                        cursor.getString(2)));
             } while (cursor.moveToNext());
 
         }
@@ -308,7 +314,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     /**
-     * Returns a list of friends who are currenctly debtors or creditors with set variable 'debtsString'
+     * Returns a list of friends who have a common debt with the user
+     * Returned friend objects contain additional values - debtsString
+     *
      * @return ArrayList<Friend>
      */
     public ArrayList<Friend> getExtendedFriendsWhoAreCreditorsOrDebtors(Integer userId) {
@@ -320,10 +328,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         Cursor cursor = null;
 
         // Get all current debts
-        cursor = db.query(TABLE_DEBTS, debtProjection, DEBTS_KEY_PAID_AT + " IS NULL AND "+DEBTS_KEY_DELETED_AT + " IS NULL", null, null, null, DEBTS_KEY_CREATED_AT + " DESC");
+        cursor = db.query(TABLE_DEBTS, debtProjection, DEBTS_KEY_PAID_AT + " IS NULL AND " + DEBTS_KEY_DELETED_AT + " IS NULL", null, null, null, DEBTS_KEY_CREATED_AT + " DESC");
 
-        if (cursor.moveToFirst())
-        {
+        if (cursor.moveToFirst()) {
             do {
 
                 Debt debt = Debt.fromCursor(cursor);
@@ -351,7 +358,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                 // Debt String
                 // Add commas
-                if (friend.debtsString.length()>0) {
+                if (friend.debtsString.length() > 0) {
                     friend.debtsString += ", ";
                 }
 
@@ -387,6 +394,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return list;
     }
 
+    /**
+     * Gets a friendId or the customFriend name
+     *
+     * @param debt   Debt
+     * @param userId userID
+     * @return String with the id or name
+     */
     private String getFriendHashFromDebt(Debt debt, int userId) {
 
         if (debt.customFriendName != null) {
@@ -401,21 +415,20 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
 
-
     /**
      * Get friend by id
+     *
      * @return Friend
      */
     public Friend getFriend(Integer id) {
 
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(TABLE_FRIENDS, friendProjection, FRIENDS_KEY_ID + "=?",
-                new String[] {String.valueOf(id)}, null, null, null);
+                new String[]{String.valueOf(id)}, null, null, null);
 
         Friend friend = null;
 
-        if (cursor.moveToFirst())
-        {
+        if (cursor.moveToFirst()) {
             friend = new Friend(
                     cursor.getInt(0),
                     cursor.getString(1),
@@ -430,15 +443,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     /**
      * Inserts currency into local database
+     *
      * @param currency currency received from the web
-     * @throws Exception
      */
     public void addCurrency(Currency currency) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         // Checks if user doesn't already exist
-        Cursor cursor = db.query(TABLE_CURRENCIES, new String[] {CURRENCIES_KEY_ID}, CURRENCIES_KEY_ID + "=?",
-                new String[] {String.valueOf(currency.id)}, null, null, null);
+        Cursor cursor = db.query(TABLE_CURRENCIES, new String[]{CURRENCIES_KEY_ID}, CURRENCIES_KEY_ID + "=?",
+                new String[]{String.valueOf(currency.id)}, null, null, null);
 
         if (cursor.getCount() > 0) {
             return;
@@ -457,6 +470,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     /**
      * Returns list of currencies in local database
+     *
      * @return ArrayList<Currency>
      */
     public ArrayList<Currency> getCurrencies() {
@@ -465,8 +479,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(TABLE_CURRENCIES, currenciesProjection, null, null, null, null, null);
 
-        if (cursor.moveToFirst())
-        {
+        if (cursor.moveToFirst()) {
             do {
                 list.add(new Currency(
                         cursor.getInt(0),
@@ -483,18 +496,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     /**
      * Get currency by id
+     *
      * @return Currency
      */
     public Currency getCurrency(int id) {
 
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(TABLE_CURRENCIES, currenciesProjection, CURRENCIES_KEY_ID + "=?",
-                new String[] {String.valueOf(id)}, null, null, null);
+                new String[]{String.valueOf(id)}, null, null, null);
 
         Currency currency = null;
 
-        if (cursor.moveToFirst())
-        {
+        if (cursor.moveToFirst()) {
             currency = new Currency(
                     cursor.getInt(0),
                     cursor.getString(1));
@@ -508,17 +521,17 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     /**
      * Returns a debt by id
+     *
      * @return Debt
      */
     public Debt getDebt(Integer id) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(TABLE_DEBTS, debtProjection, DEBTS_KEY_ID + "=?",
-                new String[] {String.valueOf(id)}, null, null, null);
+                new String[]{String.valueOf(id)}, null, null, null);
 
         Debt debt = null;
 
-        if (cursor.moveToFirst())
-        {
+        if (cursor.moveToFirst()) {
             debt = Debt.fromCursor(cursor);
         }
 
@@ -530,6 +543,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     /**
      * Returns list of debts
+     *
      * @return ArrayList<Debt>
      */
     public ArrayList<Debt> getDebts() {
@@ -538,8 +552,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(TABLE_DEBTS, debtProjection, null, null, null, null, null);
 
-        if (cursor.moveToFirst())
-        {
+        if (cursor.moveToFirst()) {
             do {
                 list.add(Debt.fromCursor(cursor));
             } while (cursor.moveToNext());
@@ -553,13 +566,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     /**
      * Update debt.
+     *
      * @param currentId Current id in local database
-     * @param debt Current version of the debt
-     * @throws Exception
+     * @param debt      Current version of the debt
      */
     public void addOrUpdateDebt(Integer currentId, Debt debt) {
 
-        // TODO Exception?
         if (debt == null) {
             return;
         }
@@ -567,16 +579,16 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         // Get current debt
-        Cursor cursor = db.query(TABLE_DEBTS, new String[] {DEBTS_KEY_ID}, DEBTS_KEY_ID + "=?",
-                new String[] {String.valueOf(currentId)}, null, null, null);
+        Cursor cursor = db.query(TABLE_DEBTS, new String[]{DEBTS_KEY_ID}, DEBTS_KEY_ID + "=?",
+                new String[]{String.valueOf(currentId)}, null, null, null);
 
         // Checks if we are updating a debt or adding a new one.
         if (currentId == null || cursor.getCount() < 1) {
 
             if (debt.id != null) { // It's a debt from the web
                 // Checks if debt doesn't already exist
-                cursor = db.query(TABLE_DEBTS, new String[] {DEBTS_KEY_ID}, DEBTS_KEY_ID + "= ?",
-                        new String[] {String.valueOf(debt.id)}, null, null, null);
+                cursor = db.query(TABLE_DEBTS, new String[]{DEBTS_KEY_ID}, DEBTS_KEY_ID + "= ?",
+                        new String[]{String.valueOf(debt.id)}, null, null, null);
                 if (cursor.getCount() > 0) {
                     return;
                 }
@@ -585,7 +597,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 // Find the currently lowest id in the database
                 int lowestId = 0;
 
-                cursor = db.query(TABLE_DEBTS, new String[] {DEBTS_KEY_ID}, null,
+                cursor = db.query(TABLE_DEBTS, new String[]{DEBTS_KEY_ID}, null,
                         null, null, null, DEBTS_KEY_ID + " ASC");
 
                 if (cursor.moveToFirst()) {
@@ -593,7 +605,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                         lowestId = cursor.getInt(0);
                 }
 
-                debt.id = lowestId-1;
+                debt.id = lowestId - 1;
             }
         }
 
@@ -630,7 +642,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             db.insert(TABLE_DEBTS, null, values);
         } else {
             // Update debt id
-            db.update(TABLE_DEBTS, values, DEBTS_KEY_ID + "=?", new String[] {String.valueOf(currentId)});
+            db.update(TABLE_DEBTS, values, DEBTS_KEY_ID + "=?", new String[]{String.valueOf(currentId)});
         }
 
         db.close();
@@ -639,8 +651,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     /**
      * Returns list of debts with added variables for displaying
-     * @param my If true, returns only debts which user owes, otherwise debts he will collect
-     * @return ArrayList<Debt>
+     *
+     * @param my     if true returns only debts owed by the user, otherwise returns debts owed to the user
+     * @param userId userId
+     * @return list of extended debts
      */
     public ArrayList<Debt> getExtendedDebts(boolean my, Integer userId) {
         ArrayList<Debt> list = new ArrayList<>();
@@ -649,13 +663,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         Cursor cursor = null;
 
         if (my) {
-            cursor = db.query(TABLE_DEBTS, debtProjection, DEBTS_KEY_DEBTOR_ID + "=? AND " + DEBTS_KEY_PAID_AT + " IS NULL AND "+DEBTS_KEY_DELETED_AT + " IS NULL", new String[] {String.valueOf(userId)}, null, null, DEBTS_KEY_CREATED_AT + " DESC");
+            cursor = db.query(TABLE_DEBTS, debtProjection, DEBTS_KEY_DEBTOR_ID + "=? AND " + DEBTS_KEY_PAID_AT + " IS NULL AND " + DEBTS_KEY_DELETED_AT + " IS NULL", new String[]{String.valueOf(userId)}, null, null, DEBTS_KEY_CREATED_AT + " DESC");
         } else {
-            cursor = db.query(TABLE_DEBTS, debtProjection, DEBTS_KEY_CREDITOR_ID + "=? AND " + DEBTS_KEY_PAID_AT + " IS NULL AND "+DEBTS_KEY_DELETED_AT + " IS NULL", new String[] {String.valueOf(userId)}, null, null, DEBTS_KEY_CREATED_AT + " DESC");
+            cursor = db.query(TABLE_DEBTS, debtProjection, DEBTS_KEY_CREDITOR_ID + "=? AND " + DEBTS_KEY_PAID_AT + " IS NULL AND " + DEBTS_KEY_DELETED_AT + " IS NULL", new String[]{String.valueOf(userId)}, null, null, DEBTS_KEY_CREATED_AT + " DESC");
         }
 
-        if (cursor.moveToFirst())
-        {
+        if (cursor.moveToFirst()) {
             do {
                 Debt debt = Debt.fromCursor(cursor);
 
@@ -675,6 +688,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return list;
     }
 
+    /**
+     * @param debt   Original debt
+     * @param userId userId
+     * @return Debt with additional variable like debt.what, debt.who etc.
+     */
     private Debt getDebtWithAdditionalVariables(Debt debt, Integer userId) {
         if (debt.creditorId != null && debt.creditorId.equals(userId)) {
             if (debt.debtorId == null) {
@@ -722,16 +740,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     /**
      * Inserts an action into the local database
-     * @param action received from the web
-     * @throws Exception
+     *
+     * @param action Action received from the web
      */
-
-    public void addAction (Action action) {
+    public void addAction(Action action) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         // Checks if action doesn't already exist
-        Cursor cursor = db.query(TABLE_ACTIONS, new String[] {ACTIONS_KEY_ID}, ACTIONS_KEY_ID + "=?",
-                new String[] {String.valueOf(action.id)}, null, null, null);
+        Cursor cursor = db.query(TABLE_ACTIONS, new String[]{ACTIONS_KEY_ID}, ACTIONS_KEY_ID + "=?",
+                new String[]{String.valueOf(action.id)}, null, null, null);
 
         if (cursor.getCount() > 0) {
             return;
@@ -753,7 +770,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     /**
-     * Returns list of actions in local database
+     * Returns list of actions in the local database
+     * Limit 50
+     *
      * @return ArrayList<Action>
      */
     public ArrayList<Action> getExtendedActions() {
@@ -762,8 +781,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(TABLE_ACTIONS, actionProjection, null, null, null, null, ACTIONS_KEY_DATE + " DESC", "50");
 
-        if (cursor.moveToFirst())
-        {
+        if (cursor.moveToFirst()) {
             do {
 
                 Action action = new Action(
@@ -831,7 +849,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
      */
     public void removeOfflineDebts() {
         SQLiteDatabase db = this.getWritableDatabase();
-        db.execSQL("delete from "+ TABLE_DEBTS);
+        db.execSQL("delete from " + TABLE_DEBTS);
         db.close();
     }
 }

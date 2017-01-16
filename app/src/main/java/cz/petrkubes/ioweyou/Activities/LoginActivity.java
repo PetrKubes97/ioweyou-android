@@ -1,14 +1,10 @@
 package cz.petrkubes.ioweyou.Activities;
 
-import android.app.job.JobInfo;
-import android.app.job.JobScheduler;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -27,12 +23,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import cz.petrkubes.ioweyou.Api.Api;
-import cz.petrkubes.ioweyou.Api.ApiRestClient;
 import cz.petrkubes.ioweyou.Api.SimpleCallback;
 import cz.petrkubes.ioweyou.Database.DatabaseHandler;
 import cz.petrkubes.ioweyou.Pojos.ApiParams;
 import cz.petrkubes.ioweyou.R;
-import cz.petrkubes.ioweyou.Services.UpdateAllService;
 
 /**
  * Login screen with facebook login button

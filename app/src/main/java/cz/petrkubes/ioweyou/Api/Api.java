@@ -19,7 +19,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-import cz.petrkubes.ioweyou.Const;
 import cz.petrkubes.ioweyou.Database.DatabaseHandler;
 import cz.petrkubes.ioweyou.Pojos.Action;
 import cz.petrkubes.ioweyou.Pojos.ApiParams;
@@ -29,6 +28,7 @@ import cz.petrkubes.ioweyou.Pojos.Debt;
 import cz.petrkubes.ioweyou.Pojos.Friend;
 import cz.petrkubes.ioweyou.Pojos.User;
 import cz.petrkubes.ioweyou.R;
+import cz.petrkubes.ioweyou.Tools.Const;
 
 /**
  * Class handling all http requests
@@ -46,7 +46,6 @@ public class Api {
     public static final int API_UPDATE_ALL = 7;
     public static final int API_LOGIN_AND_UPDATE_ALL = 8;
 
-    private static final String BASE_URL = "http://34.194.114.99/payuback-api/www/api/";
     private DatabaseHandler db;
     private Context context;
     private ApiFailureHandler apiFailureHandler;
@@ -101,275 +100,6 @@ public class Api {
     }
 
     // --------------------------------------- Api calls ------------------------------------------ //
-
-    /**
-     * Requires parameter jsonToSend to be set and it has to include facebook parameters
-     * Saves user's id and apiKey to the database
-     */
-    private class Login extends AsyncTask<ApiParams, Void, ApiResult> {
-        @Override
-        protected ApiResult doInBackground(ApiParams... params) {
-            Log.d(Const.TAG, "Api: login");
-            ApiResult result = getResult(BASE_URL + "user/login", "POST", params[0], null);
-
-            if (result.successfull) {
-                try {
-                    // 1. case: user logged in for the first time so a new row is created with his id
-                    // 2. case: user logged in and already has a row in the database so we just update the api key
-                    db.addOrUpdateUser(new User(
-                            result.json.getInt("id"),
-                            result.json.getString("apiKey"),
-                            null,
-                            null,
-                            null
-                    ));
-
-                } catch (JSONException e) {
-                    result.successfull = false;
-                    result.message = e.getMessage();
-                    return result;
-                }
-            }
-
-            return result;
-        }
-
-        @Override
-        protected void onPostExecute(ApiResult apiResult) {
-            if (apiResult.successfull) {
-                apiResult.callback.onSuccess(API_LOGIN);
-            } else {
-                apiFailureHandler.HandleFailure(apiResult.code, apiResult.message, apiResult.callback);
-            }
-        }
-    }
-
-    /**
-     * Downloads and saves info about the user
-     */
-    private class GetUser extends AsyncTask<ApiParams, Void, ApiResult> {
-        @Override
-        protected ApiResult doInBackground(ApiParams... params) {
-            Log.d(Const.TAG, "API: getUser");
-
-            User currentUser = db.getUser();
-            ApiResult result = getResult(BASE_URL + "user/", "GET", params[0], currentUser.apiKey);
-
-            if (result.successfull) {
-                try {
-                    // Go through every friend and add him to database
-                    JSONArray friendsJson = result.json.getJSONArray("friends");
-
-                    for (int i = 0; i < friendsJson.length(); i++) {
-                        JSONObject friendJson = friendsJson.getJSONObject(i);
-                        Friend friend = new Friend(
-                                friendJson.getInt("id"),
-                                friendJson.getString("name"),
-                                friendJson.getString("email")
-                        );
-
-                        db.addFriend(friend);
-
-                    }
-
-                    // It is necessary to convert date string to Date class
-                    DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                    Date registeredAt = null;
-
-                    registeredAt = df.parse(result.json.getString("registeredAt"));
-
-                    User user = new User(
-                            result.json.getInt("id"),
-                            null,
-                            result.json.getString("email"),
-                            result.json.getString("name"),
-                            registeredAt);
-
-                    db.addOrUpdateUser(user);
-
-                } catch (Exception e) {
-                    result.successfull = false;
-                    result.message = e.getMessage();
-                }
-            }
-
-            return result;
-        }
-
-        @Override
-        protected void onPostExecute(ApiResult apiResult) {
-            if (apiResult.successfull) {
-                apiResult.callback.onSuccess(API_GET_USER);
-            } else {
-                apiFailureHandler.HandleFailure(apiResult.code, apiResult.message, apiResult.callback);
-            }
-        }
-    }
-
-    /**
-     * Downloads and saves currencies
-     */
-    private class GetCurrencies extends AsyncTask<ApiParams, Void, ApiResult> {
-        @Override
-        protected ApiResult doInBackground(ApiParams... params) {
-            Log.d(Const.TAG, "API: getCurrencies");
-
-            User currentUser = db.getUser();
-            ApiResult result = getResult(BASE_URL + "currencies/", "GET", params[0], currentUser.apiKey);
-
-            if (result.successfull) {
-                try {
-                    // Go through every currency and add it to the database
-                    JSONArray currenciesJson = result.json.getJSONArray("currencies");
-
-                    for (int i = 0; i < currenciesJson.length(); i++) {
-
-                        JSONObject currencyJson = currenciesJson.getJSONObject(i);
-
-                        Currency currency = new Currency(
-                                currencyJson.getInt("id"),
-                                currencyJson.getString("symbol"));
-
-                        db.addCurrency(currency);
-                    }
-
-                } catch (Exception e) {
-                    result.successfull = false;
-                    result.message = e.getMessage();
-                }
-            }
-
-            return result;
-        }
-
-        @Override
-        protected void onPostExecute(ApiResult apiResult) {
-            if (apiResult.successfull) {
-                apiResult.callback.onSuccess(API_GET_CURENCIES);
-            } else {
-                apiFailureHandler.HandleFailure(apiResult.code, apiResult.message, apiResult.callback);
-            }
-        }
-    }
-
-    /**
-     * Downloads and saves actions
-     */
-    private class GetActions extends AsyncTask<ApiParams, Void, ApiResult> {
-        @Override
-        protected ApiResult doInBackground(ApiParams... params) {
-            Log.d(Const.TAG, "API: getActions");
-
-            User currentUser = db.getUser();
-            ApiResult result = getResult(BASE_URL + "actions/", "GET", params[0], currentUser.apiKey);
-
-            if (result.successfull) {
-                try {
-                    // Go through every friend and add him to database
-                    JSONArray actionsJson = result.json.getJSONArray("actions");
-
-                    for (int i = 0; i < actionsJson.length(); i++) {
-                        JSONObject actionJson = actionsJson.getJSONObject(i);
-                        Action action = Action.fromJson(actionJson);
-                        db.addAction(action);
-                    }
-
-                } catch (Exception e) {
-                    result.message = e.getMessage();
-                    result.successfull = false;
-                }
-            }
-
-            return result;
-        }
-
-        @Override
-        protected void onPostExecute(ApiResult apiResult) {
-            if (apiResult.successfull) {
-                apiResult.callback.onSuccess(API_GET_ACTIONS);
-            } else {
-                apiFailureHandler.HandleFailure(apiResult.code, apiResult.message, apiResult.callback);
-            }
-        }
-    }
-
-    /**
-     * Sends debts to the server
-     * Downloads all most current debts
-     * Deletes all old debts and saves the new ones into the local database
-     */
-    private class UpdateDebts extends AsyncTask<ApiParams, Void, ApiResult> {
-        @Override
-        protected ApiResult doInBackground(ApiParams... params) {
-            Log.d(Const.TAG, "API: updateDebts");
-
-            User currentUser = db.getUser();
-
-            // Create a json with all offline debts
-            JSONObject debtsJson = new JSONObject();
-
-            try {
-                ArrayList<Debt> offlineDebts = db.getDebts();
-                JSONArray offlineDebtsJson = new JSONArray();
-
-                for (Debt debt : offlineDebts) {
-                    offlineDebtsJson.put(debt.toJson());
-                }
-
-                debtsJson.put("debts", offlineDebtsJson);
-            } catch (Exception e) {
-                ApiResult result = new ApiResult();
-                result.successfull = false;
-                result.message = e.getMessage();
-                return result;
-            }
-
-            params[0].jsonToSend = debtsJson;
-
-            ApiResult result = getResult(BASE_URL + "debts/update", "POST", params[0], currentUser.apiKey);
-
-            if (result.successfull) {
-                try {
-                    JSONArray onlineDebtsArr = result.json.getJSONArray("debts");
-
-                    // Update only if we receive correct number of debts
-                    if (onlineDebtsArr.length() >= onlineDebtsArr.length()) {
-                        // Remove all old debts
-                        db.removeOfflineDebts();
-                    } else {
-                        result.message = "Ok, this error message has no logical explanation AT ALL.";
-                        result.successfull = false;
-                    }
-
-                    for (int i = 0; i < onlineDebtsArr.length(); i++) {
-
-                        JSONObject onlineDebtJson = onlineDebtsArr.getJSONObject(i);
-
-                        Debt onlineDebt = Debt.fromJson(onlineDebtJson);
-                        // Add every updated debt
-                        db.addOrUpdateDebt(onlineDebt.id, onlineDebt);
-                    }
-
-                } catch (Exception e) {
-                    result.successfull = false;
-                    result.message = e.getMessage();
-                }
-            }
-
-            return result;
-        }
-
-        @Override
-        protected void onPostExecute(ApiResult apiResult) {
-            if (apiResult.successfull) {
-                apiResult.callback.onSuccess(API_UPDATE_DEBTS);
-            } else {
-                apiFailureHandler.HandleFailure(apiResult.code, apiResult.message, apiResult.callback);
-            }
-        }
-    }
-
-    // --------------------------------------- Functions below only run multiple of functions in a row ------------------------------------------ //
 
     /**
      * Updated debts and actions
@@ -452,8 +182,6 @@ public class Api {
 
         new Login().execute(customParams);
     }
-
-    // --------------------------------------- Other private methods ------------------------------------------ //
 
     /**
      * method doing the actual web request
@@ -558,5 +286,276 @@ public class Api {
     private boolean isConnected() {
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         return cm.getActiveNetworkInfo() != null;
+    }
+
+    // --------------------------------------- Functions below only run multiple of functions in a row ------------------------------------------ //
+
+    /**
+     * Requires parameter jsonToSend to be set and it has to include facebook parameters
+     * Saves user's id and apiKey to the database
+     */
+    private class Login extends AsyncTask<ApiParams, Void, ApiResult> {
+        @Override
+        protected ApiResult doInBackground(ApiParams... params) {
+            Log.d(Const.TAG, "Api: login");
+            ApiResult result = getResult(Const.BASE_URL + "user/login", "POST", params[0], null);
+
+            if (result.successfull) {
+                try {
+                    // 1. case: user logged in for the first time so a new row is created with his id
+                    // 2. case: user logged in and already has a row in the database so we just update the api key
+                    db.addOrUpdateUser(new User(
+                            result.json.getInt("id"),
+                            result.json.getString("apiKey"),
+                            null,
+                            null,
+                            null
+                    ));
+
+                } catch (JSONException e) {
+                    result.successfull = false;
+                    result.message = e.getMessage();
+                    return result;
+                }
+            }
+
+            return result;
+        }
+
+        @Override
+        protected void onPostExecute(ApiResult apiResult) {
+            if (apiResult.successfull) {
+                apiResult.callback.onSuccess(API_LOGIN);
+            } else {
+                apiFailureHandler.HandleFailure(apiResult.code, apiResult.message, apiResult.callback);
+            }
+        }
+    }
+
+    /**
+     * Downloads and saves info about the user
+     */
+    private class GetUser extends AsyncTask<ApiParams, Void, ApiResult> {
+        @Override
+        protected ApiResult doInBackground(ApiParams... params) {
+            Log.d(Const.TAG, "API: getUser");
+
+            User currentUser = db.getUser();
+            ApiResult result = getResult(Const.BASE_URL + "user/", "GET", params[0], currentUser.apiKey);
+
+            if (result.successfull) {
+                try {
+                    // Go through every friend and add him to database
+                    JSONArray friendsJson = result.json.getJSONArray("friends");
+
+                    for (int i = 0; i < friendsJson.length(); i++) {
+                        JSONObject friendJson = friendsJson.getJSONObject(i);
+                        Friend friend = new Friend(
+                                friendJson.getInt("id"),
+                                friendJson.getString("name"),
+                                friendJson.getString("email")
+                        );
+
+                        db.addFriend(friend);
+
+                    }
+
+                    // It is necessary to convert date string to Date class
+                    DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    Date registeredAt = null;
+
+                    registeredAt = df.parse(result.json.getString("registeredAt"));
+
+                    User user = new User(
+                            result.json.getInt("id"),
+                            null,
+                            result.json.getString("email"),
+                            result.json.getString("name"),
+                            registeredAt);
+
+                    db.addOrUpdateUser(user);
+
+                } catch (Exception e) {
+                    result.successfull = false;
+                    result.message = e.getMessage();
+                }
+            }
+
+            return result;
+        }
+
+        @Override
+        protected void onPostExecute(ApiResult apiResult) {
+            if (apiResult.successfull) {
+                apiResult.callback.onSuccess(API_GET_USER);
+            } else {
+                apiFailureHandler.HandleFailure(apiResult.code, apiResult.message, apiResult.callback);
+            }
+        }
+    }
+
+    /**
+     * Downloads and saves currencies
+     */
+    private class GetCurrencies extends AsyncTask<ApiParams, Void, ApiResult> {
+        @Override
+        protected ApiResult doInBackground(ApiParams... params) {
+            Log.d(Const.TAG, "API: getCurrencies");
+
+            User currentUser = db.getUser();
+            ApiResult result = getResult(Const.BASE_URL + "currencies/", "GET", params[0], currentUser.apiKey);
+
+            if (result.successfull) {
+                try {
+                    // Go through every currency and add it to the database
+                    JSONArray currenciesJson = result.json.getJSONArray("currencies");
+
+                    for (int i = 0; i < currenciesJson.length(); i++) {
+
+                        JSONObject currencyJson = currenciesJson.getJSONObject(i);
+
+                        Currency currency = new Currency(
+                                currencyJson.getInt("id"),
+                                currencyJson.getString("symbol"));
+
+                        db.addCurrency(currency);
+                    }
+
+                } catch (Exception e) {
+                    result.successfull = false;
+                    result.message = e.getMessage();
+                }
+            }
+
+            return result;
+        }
+
+        @Override
+        protected void onPostExecute(ApiResult apiResult) {
+            if (apiResult.successfull) {
+                apiResult.callback.onSuccess(API_GET_CURENCIES);
+            } else {
+                apiFailureHandler.HandleFailure(apiResult.code, apiResult.message, apiResult.callback);
+            }
+        }
+    }
+
+    // --------------------------------------- Other private methods ------------------------------------------ //
+
+    /**
+     * Downloads and saves actions
+     */
+    private class GetActions extends AsyncTask<ApiParams, Void, ApiResult> {
+        @Override
+        protected ApiResult doInBackground(ApiParams... params) {
+            Log.d(Const.TAG, "API: getActions");
+
+            User currentUser = db.getUser();
+            ApiResult result = getResult(Const.BASE_URL + "actions/", "GET", params[0], currentUser.apiKey);
+
+            if (result.successfull) {
+                try {
+                    // Go through every friend and add him to database
+                    JSONArray actionsJson = result.json.getJSONArray("actions");
+
+                    for (int i = 0; i < actionsJson.length(); i++) {
+                        JSONObject actionJson = actionsJson.getJSONObject(i);
+                        Action action = Action.fromJson(actionJson);
+                        db.addAction(action);
+                    }
+
+                } catch (Exception e) {
+                    result.message = e.getMessage();
+                    result.successfull = false;
+                }
+            }
+
+            return result;
+        }
+
+        @Override
+        protected void onPostExecute(ApiResult apiResult) {
+            if (apiResult.successfull) {
+                apiResult.callback.onSuccess(API_GET_ACTIONS);
+            } else {
+                apiFailureHandler.HandleFailure(apiResult.code, apiResult.message, apiResult.callback);
+            }
+        }
+    }
+
+    /**
+     * Sends debts to the server
+     * Downloads all most current debts
+     * Deletes all old debts and saves the new ones into the local database
+     */
+    private class UpdateDebts extends AsyncTask<ApiParams, Void, ApiResult> {
+        @Override
+        protected ApiResult doInBackground(ApiParams... params) {
+            Log.d(Const.TAG, "API: updateDebts");
+
+            User currentUser = db.getUser();
+
+            // Create a json with all offline debts
+            JSONObject debtsJson = new JSONObject();
+
+            try {
+                ArrayList<Debt> offlineDebts = db.getDebts();
+                JSONArray offlineDebtsJson = new JSONArray();
+
+                for (Debt debt : offlineDebts) {
+                    offlineDebtsJson.put(debt.toJson());
+                }
+
+                debtsJson.put("debts", offlineDebtsJson);
+            } catch (Exception e) {
+                ApiResult result = new ApiResult();
+                result.successfull = false;
+                result.message = e.getMessage();
+                return result;
+            }
+
+            params[0].jsonToSend = debtsJson;
+
+            ApiResult result = getResult(Const.BASE_URL + "debts/update", "POST", params[0], currentUser.apiKey);
+
+            if (result.successfull) {
+                try {
+                    JSONArray onlineDebtsArr = result.json.getJSONArray("debts");
+
+                    // Update only if we receive correct number of debts
+                    if (onlineDebtsArr.length() >= onlineDebtsArr.length()) {
+                        // Remove all old debts
+                        db.removeOfflineDebts();
+                    } else {
+                        result.message = "Ok, this error message has no logical explanation AT ALL.";
+                        result.successfull = false;
+                    }
+
+                    for (int i = 0; i < onlineDebtsArr.length(); i++) {
+
+                        JSONObject onlineDebtJson = onlineDebtsArr.getJSONObject(i);
+
+                        Debt onlineDebt = Debt.fromJson(onlineDebtJson);
+                        // Add every updated debt
+                        db.addOrUpdateDebt(onlineDebt.id, onlineDebt);
+                    }
+
+                } catch (Exception e) {
+                    result.successfull = false;
+                    result.message = e.getMessage();
+                }
+            }
+
+            return result;
+        }
+
+        @Override
+        protected void onPostExecute(ApiResult apiResult) {
+            if (apiResult.successfull) {
+                apiResult.callback.onSuccess(API_UPDATE_DEBTS);
+            } else {
+                apiFailureHandler.HandleFailure(apiResult.code, apiResult.message, apiResult.callback);
+            }
+        }
     }
 }

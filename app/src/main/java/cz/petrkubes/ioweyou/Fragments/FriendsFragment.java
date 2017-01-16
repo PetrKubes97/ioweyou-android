@@ -23,19 +23,21 @@ import cz.petrkubes.ioweyou.Activities.DebtActivity;
 import cz.petrkubes.ioweyou.Activities.MainActivity;
 import cz.petrkubes.ioweyou.Adapters.FriendsAdapter;
 import cz.petrkubes.ioweyou.Adapters.FriendsDebtsAdapter;
-import cz.petrkubes.ioweyou.Const;
 import cz.petrkubes.ioweyou.Database.DatabaseHandler;
-import cz.petrkubes.ioweyou.R;
 import cz.petrkubes.ioweyou.Pojos.Debt;
 import cz.petrkubes.ioweyou.Pojos.Friend;
 import cz.petrkubes.ioweyou.Pojos.User;
+import cz.petrkubes.ioweyou.R;
+import cz.petrkubes.ioweyou.Tools.Const;
 
 import static android.view.View.GONE;
 
-/**
- * Created by petr on 27.10.16.
- */
 
+/**
+ * Fragment representing the friends tab
+ *
+ * @author Petr Kubes
+ */
 public class FriendsFragment extends Fragment implements UpdateableFragment {
 
     public static final String ADD_TO_FRIEND = "addToFriend";
@@ -106,6 +108,9 @@ public class FriendsFragment extends Fragment implements UpdateableFragment {
         adapter.notifyDataSetChanged();
     }
 
+    /**
+     * Toggles the note that is supposed to show only when the list is empty
+     */
     public void toggleNote() {
         // Show note
         if (friends.size() == 0) {
@@ -143,7 +148,7 @@ public class FriendsFragment extends Fragment implements UpdateableFragment {
             public void onClick(View view) {
                 Log.d(Const.TAG, "-------------------");
                 // Mark every selected debt as paid and notify adapter
-                for (Debt debt : friendsDebtsAdapter.getSelectedDebts() ) {
+                for (Debt debt : friendsDebtsAdapter.getSelectedDebts()) {
                     Log.d(Const.TAG, "Marking debt: " + debt.what);
                     friendsDebtsAdapter.remove(debt);
                     debt.paidAt = new Date();
