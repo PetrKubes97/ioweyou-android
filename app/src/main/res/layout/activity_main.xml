@@ -65,5 +65,6 @@
         android:layout_marginBottom="24dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
-        app:elevation="4dp" />
+        app:elevation="8dp"
+        app:backgroundTint="@color/accent" />
 </android.support.design.widget.CoordinatorLayout>

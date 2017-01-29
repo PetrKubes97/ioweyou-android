@@ -19,6 +19,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -272,9 +274,24 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Toggles loading in the toolbar
+     * disables add debt button, adding debt while loading can cause problems
      */
     private void toggleLoading() {
         final MenuItem item = toolbar.getMenu().getItem(0);
+
+        if (btnAddDebt.isEnabled()) {
+            btnAddDebt.setEnabled(false);
+
+            Animation animation = AnimationUtils.loadAnimation(getApplicationContext(),
+                    R.anim.move_down);
+            btnAddDebt.startAnimation(animation);
+        } else {
+            btnAddDebt.setEnabled(true);
+            Animation animation = AnimationUtils.loadAnimation(getApplicationContext(),
+                    R.anim.move_up);
+            btnAddDebt.startAnimation(animation);
+
+        }
 
         if (item.isVisible()) {
             item.setVisible(false);
