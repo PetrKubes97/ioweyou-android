@@ -91,7 +91,7 @@ public class ActionsFragment extends Fragment implements UpdateableFragment {
 
         @Override
         protected ArrayList<Action> doInBackground(Void[] params) {
-            actions = db.getExtendedActions();
+            actions = db.getActions();
             return actions;
         }
 

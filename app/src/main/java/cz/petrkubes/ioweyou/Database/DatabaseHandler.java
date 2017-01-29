@@ -27,7 +27,7 @@ import cz.petrkubes.ioweyou.Tools.Tools;
 public class DatabaseHandler extends SQLiteOpenHelper {
 
     // Database Version
-    private static final int DATABASE_VERSION = 23;
+    private static final int DATABASE_VERSION = 24;
     // Database Name
     private static final String DATABASE_NAME = "payUBack.db";
     // Tables names
@@ -64,7 +64,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String ACTIONS_KEY_ID = "id";
     private static final String ACTIONS_KEY_TYPE = "type";
     private static final String ACTIONS_KEY_DEBT_ID = "debt_id";
-    private static final String ACTIONS_KEY_USER_ID = "user_id";
+    private static final String ACTIONS_KEY_USER1_ID = "user1_id";
+    private static final String ACTIONS_KEY_USER1_NAME = "user1_name";
+    private static final String ACTIONS_KEY_USER2_ID = "user2_id";
+    private static final String ACTIONS_KEY_USER2_NAME = "user2_name";
     private static final String ACTIONS_KEY_NOTE = "note";
     private static final String ACTIONS_KEY_DATE = "date";
     private Context context;
@@ -106,7 +109,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             ACTIONS_KEY_ID,
             ACTIONS_KEY_TYPE,
             ACTIONS_KEY_DEBT_ID,
-            ACTIONS_KEY_USER_ID,
+            ACTIONS_KEY_USER1_ID,
+            ACTIONS_KEY_USER1_NAME,
+            ACTIONS_KEY_USER2_ID,
+            ACTIONS_KEY_USER2_NAME,
             ACTIONS_KEY_NOTE,
             ACTIONS_KEY_DATE
     };
@@ -154,7 +160,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 ACTIONS_KEY_ID + " INTEGER PRIMARY KEY, " +
                 ACTIONS_KEY_TYPE + " TEXT, " +
                 ACTIONS_KEY_DEBT_ID + " INTEGER, " +
-                ACTIONS_KEY_USER_ID + " INTEGER, " +
+                ACTIONS_KEY_USER1_ID + " INTEGER, " +
+                ACTIONS_KEY_USER1_NAME + " TEXT, " +
+                ACTIONS_KEY_USER2_ID + " INTEGER, " +
+                ACTIONS_KEY_USER2_NAME + " TEXT, " +
                 ACTIONS_KEY_NOTE + " TEXT, " +
                 ACTIONS_KEY_DATE + " NUMERIC);";
 
@@ -797,7 +806,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(ACTIONS_KEY_ID, action.id);
         values.put(ACTIONS_KEY_TYPE, action.type);
         values.put(ACTIONS_KEY_DEBT_ID, action.debtId);
-        values.put(ACTIONS_KEY_USER_ID, action.userId);
+        values.put(ACTIONS_KEY_USER1_ID, action.user1Id);
+        values.put(ACTIONS_KEY_USER1_NAME, action.user1Name);
+        values.put(ACTIONS_KEY_USER2_ID, action.user2Id);
+        values.put(ACTIONS_KEY_USER2_NAME, action.user2Name);
         values.put(ACTIONS_KEY_NOTE, action.note);
         values.put(ACTIONS_KEY_DATE, Tools.formatDate(action.date));
 
@@ -813,7 +825,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
      *
      * @return ArrayList<Action>
      */
-    public ArrayList<Action> getExtendedActions() {
+    public ArrayList<Action> getActions() {
         ArrayList<Action> list = new ArrayList<>();
 
         SQLiteDatabase db = this.getReadableDatabase();
@@ -828,47 +840,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                         cursor.getInt(2),
                         cursor.getInt(3),
                         cursor.getString(4),
-                        Tools.parseDate(cursor.getString(5))
+                        cursor.getInt(5),
+                        cursor.getString(6),
+                        cursor.getString(7),
+                        Tools.parseDate(cursor.getString(8))
                 );
-
-                // Add name of person who created the action
-                Friend user1 = getFriend(action.userId);
-                if (user1 != null) {
-                    action.user1Name = user1.name;
-                } else {
-                    action.user1Name = context.getString(R.string.you);
-                }
-
-                // Add name of the other person
-                Debt debt = getDebt(action.debtId);
-                String user2Name = null;
-                // 1. get the id
-                Integer user2Id = null;
-                if (debt.creditorId == action.userId) {
-                    if (debt.debtorId != null) {
-                        user2Id = debt.debtorId;
-                    } else {
-                        user2Name = debt.customFriendName;
-                    }
-                } else {
-                    if (debt.creditorId != null) {
-                        user2Id = debt.creditorId;
-                    } else {
-                        user2Name = debt.customFriendName;
-                    }
-                }
-
-                if (user2Name == null && user2Id != null) {
-                    // 2. get the nam
-                    Friend user2 = getFriend(user2Id);
-                    if (user2 != null) {
-                        user2Name = user2.name;
-                    } else {
-                        user2Name = context.getString(R.string.you);
-                    }
-                }
-
-                action.user2Name = user2Name;
 
                 list.add(action);
 
