@@ -5,9 +5,12 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
+import android.util.SparseArray;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import cz.petrkubes.ioweyou.Pojos.Action;
 import cz.petrkubes.ioweyou.Pojos.Currency;
@@ -15,6 +18,7 @@ import cz.petrkubes.ioweyou.Pojos.Debt;
 import cz.petrkubes.ioweyou.Pojos.Friend;
 import cz.petrkubes.ioweyou.Pojos.User;
 import cz.petrkubes.ioweyou.R;
+import cz.petrkubes.ioweyou.Tools.Const;
 import cz.petrkubes.ioweyou.Tools.Tools;
 
 /**
@@ -315,7 +319,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     /**
      * Returns a list of friends who have a common debt with the user
-     * Returned friend objects contain additional values - debtsString
+     * Returned friend objects contain additional values - ex. debtsString
      *
      * @return ArrayList<Friend>
      */
@@ -325,10 +329,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         HashMap<String, Friend> hashMap = new HashMap<>();
 
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = null;
 
         // Get all current debts
-        cursor = db.query(TABLE_DEBTS, debtProjection, DEBTS_KEY_PAID_AT + " IS NULL AND " + DEBTS_KEY_DELETED_AT + " IS NULL", null, null, null, DEBTS_KEY_CREATED_AT + " DESC");
+        Cursor cursor = db.query(TABLE_DEBTS, debtProjection, DEBTS_KEY_PAID_AT + " IS NULL AND " + DEBTS_KEY_DELETED_AT + " IS NULL", null, null, null, DEBTS_KEY_CREATED_AT + " DESC");
 
         if (cursor.moveToFirst()) {
             do {
@@ -344,42 +347,77 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     // Add friend
                     if (debt.customFriendName != null) {
                         friend = new Friend(null, debt.customFriendName, "");
-                    } else if (userId == debt.creditorId && debt.debtorId > 0) {
+                    } else if (userId.equals(debt.creditorId) && debt.debtorId > 0) {
                         friend = getFriend(debt.debtorId);
-                    } else if (userId == debt.debtorId && debt.creditorId > 0) {
+                    } else {
                         friend = getFriend(debt.creditorId);
                     }
 
                     friend.debtsString = "";
-                    friend.debts = new ArrayList<Debt>();
+                    friend.debts = new ArrayList<>();
+                    friend.totals = new HashMap<>();
                 }
 
                 friend.debts.add(debt);
 
-                // Debt String
-                // Add commas
-                if (friend.debtsString.length() > 0) {
-                    friend.debtsString += ", ";
-                }
 
-                // color
-                if (debt.creditorId != null && debt.creditorId == userId) {
-                    //noinspection ResourceType
-                    friend.debtsString += "<font color='#009747'>";
+                // Calculate the total debt
+                boolean friendOwes = (debt.creditorId != null && debt.creditorId.equals(userId));
+
+                if (debt.thingName != null) {
+
+                    if (friendOwes) {
+                        friend.totals.put("<font color='#009747'>" + debt.thingName + "</font>", 0.0);
+                    } else {
+                        friend.totals.put("<font color='#ff3737'>" + debt.thingName + "</font>", 0.0);
+                    }
+
                 } else {
-                    //noinspection ResourceType
-                    friend.debtsString += "<font color='#ff3737'>";
+                    Double totalAmount = friend.totals.get(debt.currencyString);
+
+                    if (totalAmount == null) {
+                        totalAmount = 0.0;
+                    }
+
+                    if (friendOwes) {
+                        totalAmount -= debt.amount;
+                    } else {
+                        totalAmount += debt.amount;
+                    }
+
+                    friend.totals.put(debt.currencyString, totalAmount);
+
+                    // remove even debts, sum 0 is reserved for things
+                    if (totalAmount == 0.0) {
+                        friend.totals.remove(debt.currencyString);
+                    }
                 }
 
-                // add a thing or money to the string
-                if (debt.amount != null) {
-                    friend.debtsString += String.valueOf(debt.amount) + " " + String.valueOf(getCurrency(debt.currencyId));
-                } else {
-                    friend.debtsString += debt.thingName;
-                }
+                // Generate the string from the hashmap
 
-                // color end tag
-                friend.debtsString += "</font>";
+                friend.debtsString = "";
+
+                for(Map.Entry<String, Double> entry : friend.totals.entrySet()) {
+                    String key = entry.getKey();
+                    Double amount = entry.getValue();
+
+                    // Add commas
+                    if (friend.debtsString.length() > 0) {
+                        friend.debtsString += ", ";
+                    }
+
+                    if (amount == 0) { // thing
+                        friend.debtsString += key;
+                    } else { // money
+
+                        if (amount > 0) {
+                            friend.debtsString += "<font color='#ff3737'>" + String.valueOf(amount) + " " + key + "</font>";
+                        } else {
+                            friend.debtsString += "<font color='#009747'>" + String.valueOf(-1 * amount) + " " + key + "</font>";
+                        }
+
+                    }
+                }
 
                 // Update hash map
                 hashMap.put(getFriendHashFromDebt(debt, userId), friend);

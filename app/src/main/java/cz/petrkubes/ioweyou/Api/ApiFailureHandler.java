@@ -39,7 +39,7 @@ class ApiFailureHandler {
         // Log user out when the api keys don't match
         if (StatusCode == UNAUTHORIZED) {
 
-            if (context instanceof MainActivity) { // this should be true every time, because ApiRestClient is created only in that Activity
+            if (context instanceof MainActivity) { // this should be true every time, because Api is created only in that Activity
                 ((MainActivity) context).logOut();
             }
 

@@ -24,10 +24,10 @@ import android.widget.Toast;
 
 import com.facebook.FacebookSdk;
 import com.facebook.login.LoginManager;
+import com.facebook.stetho.Stetho;
 
 import cz.petrkubes.ioweyou.Adapters.FragmentsAdapter;
 import cz.petrkubes.ioweyou.Api.Api;
-import cz.petrkubes.ioweyou.Api.ApiRestClient;
 import cz.petrkubes.ioweyou.Api.SimpleCallback;
 import cz.petrkubes.ioweyou.Database.DatabaseHandler;
 import cz.petrkubes.ioweyou.Pojos.ApiParams;
@@ -56,7 +56,6 @@ public class MainActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private CoordinatorLayout coordinatorLayout;
 
-    private ApiRestClient apiClient;
     private User user;
     private Api api;
 
@@ -65,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         // Library only for testing purposes
-        // Stetho.initializeWithDefaults(this);
+        Stetho.initializeWithDefaults(this);
 
         setContentView(R.layout.activity_main);
 

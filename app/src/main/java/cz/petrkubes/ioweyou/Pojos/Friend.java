@@ -3,6 +3,7 @@ package cz.petrkubes.ioweyou.Pojos;
 import org.parceler.Parcel;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * @author Petr Kubes
@@ -17,6 +18,7 @@ public class Friend {
     // Variables used for displaying friends
     public String debtsString;
     public ArrayList<Debt> debts;
+    public HashMap<String, Double> totals;
 
     // Empty constructor for Parceler
     public Friend() {
