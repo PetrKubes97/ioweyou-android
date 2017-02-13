@@ -7,6 +7,8 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.PorterDuff;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -18,6 +20,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -87,6 +90,7 @@ public class MainActivity extends AppCompatActivity {
         pageAdapter = new FragmentsAdapter(getSupportFragmentManager());
         viewPager = (ViewPager) findViewById(R.id.pager);
         viewPager.setAdapter(pageAdapter);
+        viewPager.setOffscreenPageLimit(4);
         tabLayout.setupWithViewPager(viewPager);
         pageAdapter.notifyDataSetChanged();
 
@@ -278,7 +282,7 @@ public class MainActivity extends AppCompatActivity {
      */
     private void toggleLoading() {
         final MenuItem item = toolbar.getMenu().getItem(0);
-
+        /*
         if (btnAddDebt.isEnabled()) {
             btnAddDebt.setEnabled(false);
 
@@ -290,8 +294,7 @@ public class MainActivity extends AppCompatActivity {
             Animation animation = AnimationUtils.loadAnimation(getApplicationContext(),
                     R.anim.move_up);
             btnAddDebt.startAnimation(animation);
-
-        }
+        }*/
 
         if (item.isVisible()) {
             item.setVisible(false);

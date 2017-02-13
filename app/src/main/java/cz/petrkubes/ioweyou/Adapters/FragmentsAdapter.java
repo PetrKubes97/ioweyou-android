@@ -3,6 +3,7 @@ package cz.petrkubes.ioweyou.Adapters;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.util.Log;
 
@@ -18,7 +19,7 @@ import cz.petrkubes.ioweyou.Tools.Const;
  * @author Petr Kubes
  */
 
-public class FragmentsAdapter extends FragmentStatePagerAdapter {
+public class FragmentsAdapter extends FragmentPagerAdapter {
 
     private Fragment fragment;
     private Bundle args;

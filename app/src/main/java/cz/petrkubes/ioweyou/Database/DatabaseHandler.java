@@ -394,6 +394,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                         totalAmount += debt.amount;
                     }
 
+
+
                     friend.totals.put(debt.currencyString, totalAmount);
 
                     // remove even debts, sum 0 is reserved for things
@@ -420,9 +422,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     } else { // money
 
                         if (amount > 0) {
-                            friend.debtsString += "<font color='#ff3737'>" + String.valueOf(amount) + " " + key + "</font>";
+                            friend.debtsString += "<font color='#ff3737'>" + String.format("%.1f", amount) + " " + key + "</font>";
                         } else {
-                            friend.debtsString += "<font color='#009747'>" + String.valueOf(-1 * amount) + " " + key + "</font>";
+                            friend.debtsString += "<font color='#009747'>" + String.format("%.1f", -1 * amount) + " " + key + "</font>";
                         }
 
                     }
@@ -614,10 +616,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     /**
      * Update debt.
      *
-     * @param currentId Current id in local database
      * @param debt      Current version of the debt
      */
-    public void addOrUpdateDebt(Integer currentId, Debt debt) {
+    public void addOrUpdateDebt(Debt debt) {
 
         if (debt == null) {
             return;
@@ -625,34 +626,33 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         SQLiteDatabase db = this.getWritableDatabase();
 
-        // Get current debt
-        Cursor cursor = db.query(TABLE_DEBTS, new String[]{DEBTS_KEY_ID}, DEBTS_KEY_ID + "=?",
-                new String[]{String.valueOf(currentId)}, null, null, null);
+        if (debt.id == null) {
+            // It's a new debt, we assign it a negative id, so there are not any conflicts with server database
+            // Find the currently lowest id in the database
+            int lowestId = 0;
 
-        // Checks if we are updating a debt or adding a new one.
-        if (currentId == null || cursor.getCount() < 1) {
+            Cursor debtsCursor = db.query(TABLE_DEBTS, new String[]{DEBTS_KEY_ID}, null,
+                    null, null, null, DEBTS_KEY_ID + " ASC");
 
-            if (debt.id != null) { // It's a debt from the web
-                // Checks if debt doesn't already exist
-                cursor = db.query(TABLE_DEBTS, new String[]{DEBTS_KEY_ID}, DEBTS_KEY_ID + "= ?",
-                        new String[]{String.valueOf(debt.id)}, null, null, null);
-                if (cursor.getCount() > 0) {
-                    return;
-                }
+            if (debtsCursor.moveToFirst()) {
+                if (debtsCursor.getInt(0) < 0)
+                    lowestId = debtsCursor.getInt(0);
+            }
 
-            } else { // It's a new debt, we assign it a negative id, so there are not any conflicts with server database
-                // Find the currently lowest id in the database
-                int lowestId = 0;
+            debt.id = lowestId - 1;
+            debtsCursor.close();
+        }
 
-                cursor = db.query(TABLE_DEBTS, new String[]{DEBTS_KEY_ID}, null,
-                        null, null, null, DEBTS_KEY_ID + " ASC");
+        // Debt with this id can exist in the local database
+        // This happens during debt editing and when the user edits the debt during server synchronization
+        Cursor debtCursor = db.query(TABLE_DEBTS, new String[]{DEBTS_KEY_VERSION}, DEBTS_KEY_ID + "=?",
+                new String[]{String.valueOf(debt.id)}, null, null, null);
 
-                if (cursor.moveToFirst()) {
-                    if (cursor.getInt(0) < 0)
-                        lowestId = cursor.getInt(0);
-                }
-
-                debt.id = lowestId - 1;
+        // Update only the most recent versions of the debt
+        // blocks overriding of debts which were updated during server synchronization
+        if (debtCursor.moveToFirst()) {
+            if (debtCursor.getLong(0) > debt.version) {
+                return;
             }
         }
 
@@ -684,16 +684,17 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(DEBTS_KEY_MANAGER_ID, debt.managerId);
         values.put(DEBTS_KEY_VERSION, debt.version);
 
-        if (currentId == null || cursor.getCount() < 1) {
+        if (debtCursor.getCount() < 1) {
             // Debt doesn't exist
             db.insert(TABLE_DEBTS, null, values);
         } else {
             // Update debt id
-            db.update(TABLE_DEBTS, values, DEBTS_KEY_ID + "=?", new String[]{String.valueOf(currentId)});
+            db.update(TABLE_DEBTS, values, DEBTS_KEY_ID + "=?", new String[]{String.valueOf(debt.id)});
         }
 
         db.close();
-        cursor.close();
+        debtCursor.close();
+
     }
 
     /**
@@ -829,7 +830,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         ArrayList<Action> list = new ArrayList<>();
 
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.query(TABLE_ACTIONS, actionProjection, null, null, null, null, ACTIONS_KEY_DATE + " DESC", "50");
+        Cursor cursor = db.query(TABLE_ACTIONS, actionProjection, null, null, null, null, ACTIONS_KEY_DATE + " DESC", "15");
 
         if (cursor.moveToFirst()) {
             do {
@@ -859,11 +860,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     /**
-     * Truncates debts table
+     * Removes all debts, which were lastly updated BEFORE the time of server request
      */
     public void removeOfflineDebts() {
         SQLiteDatabase db = this.getWritableDatabase();
-        db.execSQL("delete from " + TABLE_DEBTS);
+        db.execSQL("delete from " + TABLE_DEBTS + " WHERE " + DEBTS_KEY_VERSION + "<" + String.valueOf(System.currentTimeMillis()));
         db.close();
     }
 }

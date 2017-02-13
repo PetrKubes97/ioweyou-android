@@ -45,19 +45,21 @@ public class ActionsFragment extends Fragment implements UpdateableFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View rootView = inflater.inflate(R.layout.fragment_actions, container, false);
-        lstActions = (ListView) rootView.findViewById(R.id.lst_actions);
-        txtNote = (TextView) rootView.findViewById(R.id.txt_note);
-        prgActions = (ProgressBar) rootView.findViewById(R.id.prg_actions);
+        View rootView = inflater.inflate(R.layout.fragment_list, container, false);
+        lstActions = (ListView) rootView.findViewById(R.id.lst_tab);
+        txtNote = (TextView) rootView.findViewById(R.id.txt_tab_note);
+        prgActions = (ProgressBar) rootView.findViewById(R.id.prg_tab);
 
+        txtNote.setText(getString(R.string.no_actions));
         prgActions.setVisibility(View.VISIBLE);
 
         actions = new ArrayList<>();
-        new Task().execute();
 
         toggleNote();
         adapter = new ActionsAdapter(getContext(), actions);
         lstActions.setAdapter(adapter);
+
+        this.update();
 
         return rootView;
     }

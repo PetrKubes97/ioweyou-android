@@ -14,6 +14,7 @@ import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -75,7 +76,7 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
     private static final String defaultCurrencyPos = "DEFAULT_CURRENCY_POS";
     // Widgets
     private AutoCompleteTextView txtName;
-    private EditText txtWhat;
+    private TextInputEditText txtWhat;
     private Spinner spnCurrency;
     private RadioButton rdioMyDebt;
     private RadioButton rdioTheirDebt;
@@ -107,11 +108,12 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
         // Setup actionbar
         Toolbar myToolbar = (Toolbar) findViewById(R.id.debt_toolbar);
         setSupportActionBar(myToolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         // Setup all widgets
         txtName = (AutoCompleteTextView) findViewById(R.id.txt_name);
-        txtWhat = (EditText) findViewById(R.id.txt_who);
+        txtWhat = (TextInputEditText) findViewById(R.id.txt_who);
         spnCurrency = (Spinner) findViewById(R.id.spn_currency);
         rdioMyDebt = (RadioButton) findViewById(R.id.rdio_my_debt);
         rdioTheirDebt = (RadioButton) findViewById(R.id.rdio_their_debt);
@@ -536,7 +538,7 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
         );
 
         // Add debt into the local database
-        db.addOrUpdateDebt(id, debt);
+        db.addOrUpdateDebt(debt);
 
         setResult(RESULT_OK);
         finish();

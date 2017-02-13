@@ -1,6 +1,7 @@
 package cz.petrkubes.ioweyou.Fragments;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -12,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import org.parceler.Parcels;
@@ -59,6 +61,7 @@ public class FriendsFragment extends Fragment implements UpdateableFragment {
     private ListView lstDialogDebts;
     private TextView txtDialogName;
     private TextView txtNote;
+    private ProgressBar prgFriends;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -72,17 +75,22 @@ public class FriendsFragment extends Fragment implements UpdateableFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        rootView = inflater.inflate(R.layout.fragment_friends, container, false);
-        lstFriends = (ListView) rootView.findViewById(R.id.lst_friends);
-        txtNote = (TextView) rootView.findViewById(R.id.txt_note);
+        rootView = inflater.inflate(R.layout.fragment_list, container, false);
+        lstFriends = (ListView) rootView.findViewById(R.id.lst_tab);
+        txtNote = (TextView) rootView.findViewById(R.id.txt_tab_note);
+        prgFriends = (ProgressBar) rootView.findViewById(R.id.prg_tab);
 
         // Apparently, OnCreateView can be called before OnCreate
         if (user == null) {
             user = db.getUser();
         }
 
-        friends = db.getExtendedFriendsWhoAreCreditorsOrDebtors(user.id);
+        txtNote.setText(getString(R.string.no_friend));
+
+        friends = new ArrayList<>();
+
         toggleNote();
+
         adapter = new FriendsAdapter(getContext(), friends);
         lstFriends.setAdapter(adapter);
 
@@ -93,19 +101,14 @@ public class FriendsFragment extends Fragment implements UpdateableFragment {
             }
         });
 
+        this.update();
+
         return rootView;
     }
 
     @Override
     public void update() {
-
-        if (user != null) {
-            friends = db.getExtendedFriendsWhoAreCreditorsOrDebtors(user.id);
-        }
-        toggleNote();
-        adapter.clear();
-        adapter.addAll(friends);
-        adapter.notifyDataSetChanged();
+        new Task().execute();
     }
 
     /**
@@ -153,7 +156,7 @@ public class FriendsFragment extends Fragment implements UpdateableFragment {
                     friendsDebtsAdapter.remove(debt);
                     debt.paidAt = new Date();
                     debt.version += 1;
-                    db.addOrUpdateDebt(debt.id, debt);
+                    db.addOrUpdateDebt(debt);
                     friendsDebtsAdapter.notifyDataSetChanged();
                 }
                 // Update friends adapter
@@ -186,6 +189,34 @@ public class FriendsFragment extends Fragment implements UpdateableFragment {
 
         // display dialog
         dialog.show();
+    }
+
+    /**
+     * Task for asynchronous populating of the list
+     */
+    private class Task extends AsyncTask<Void, Void, ArrayList<Friend>> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            prgFriends.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected ArrayList<Friend> doInBackground(Void[] params) {
+            if (user != null) {
+                friends = db.getExtendedFriendsWhoAreCreditorsOrDebtors(user.id);
+            }
+            return friends;
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<Friend> friends) {
+            toggleNote();
+            prgFriends.setVisibility(GONE);
+            adapter.clear();
+            adapter.addAll(friends);
+            adapter.notifyDataSetChanged();
+        }
     }
 
 }

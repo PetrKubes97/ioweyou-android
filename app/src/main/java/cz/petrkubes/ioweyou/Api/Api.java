@@ -537,7 +537,7 @@ public class Api {
 
                         Debt onlineDebt = Debt.fromJson(onlineDebtJson);
                         // Add every updated debt
-                        db.addOrUpdateDebt(onlineDebt.id, onlineDebt);
+                        db.addOrUpdateDebt(onlineDebt);
                     }
 
                 } catch (Exception e) {
