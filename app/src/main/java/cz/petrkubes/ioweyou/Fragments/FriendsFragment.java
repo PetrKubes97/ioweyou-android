@@ -31,6 +31,7 @@ import cz.petrkubes.ioweyou.Pojos.Friend;
 import cz.petrkubes.ioweyou.Pojos.User;
 import cz.petrkubes.ioweyou.R;
 import cz.petrkubes.ioweyou.Tools.Const;
+import cz.petrkubes.ioweyou.Tools.Tools;
 
 import static android.view.View.GONE;
 
@@ -61,6 +62,7 @@ public class FriendsFragment extends Fragment implements UpdateableFragment {
     private ListView lstDialogDebts;
     private TextView txtDialogName;
     private TextView txtNote;
+    private TextView txtTotal;
     private ProgressBar prgFriends;
 
     @Override
@@ -139,9 +141,13 @@ public class FriendsFragment extends Fragment implements UpdateableFragment {
         btnDialogAdd = (Button) friendDialogView.findViewById(R.id.btn_add_new_debt);
         txtDialogName = (TextView) friendDialogView.findViewById(R.id.txt_name);
         lstDialogDebts = (ListView) friendDialogView.findViewById(R.id.lst_debts);
+        txtTotal = (TextView) friendDialogView.findViewById(R.id.txt_total);
 
         // Set name
         txtDialogName.setText(friend.name);
+
+        // Set total
+        txtTotal.setText(Tools.fromHtml(friend.debtsString));
 
         final FriendsDebtsAdapter friendsDebtsAdapter = new FriendsDebtsAdapter(getContext(), friend.debts, user.id);
         lstDialogDebts.setAdapter(friendsDebtsAdapter);

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.support.v4.content.res.ResourcesCompat;
 import android.util.Log;
 import android.util.SparseArray;
 
@@ -376,9 +377,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 if (debt.thingName != null) {
 
                     if (friendOwes) {
-                        friend.totals.put("<font color='#009747'>" + debt.thingName + "</font>", 0.0);
+                        friend.totals.put("<font color='"+ ResourcesCompat.getColor(context.getResources(), R.color.green, null)+"'>" + debt.thingName + "</font>", 0.0);
                     } else {
-                        friend.totals.put("<font color='#ff3737'>" + debt.thingName + "</font>", 0.0);
+                        friend.totals.put("<font color='"+ ResourcesCompat.getColor(context.getResources(), R.color.red, null)+"'>" + debt.thingName + "</font>", 0.0);
                     }
 
                 } else {

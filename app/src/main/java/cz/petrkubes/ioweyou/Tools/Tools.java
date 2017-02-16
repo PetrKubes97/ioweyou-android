@@ -1,5 +1,9 @@
 package cz.petrkubes.ioweyou.Tools;
 
+import android.os.Build;
+import android.text.Html;
+import android.text.Spanned;
+
 import java.text.DateFormat;
 import java.text.Normalizer;
 import java.text.ParseException;
@@ -47,6 +51,20 @@ public class Tools {
                 .replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
 
         return text;
+    }
+
+    /**
+     * Fixes a weird bug
+     * @param source Html string
+     * @return Spanned
+     */
+    @SuppressWarnings("deprecation")
+    public static Spanned fromHtml(String source) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            return Html.fromHtml(source, Html.FROM_HTML_MODE_LEGACY);
+        } else {
+            return Html.fromHtml(source);
+        }
     }
 
 }

@@ -5,7 +5,9 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="8dp"
-    android:id="@+id/friend_debt_item_layout">
+    android:id="@+id/friend_debt_item_layout"
+    android:paddingLeft="0dp"
+    android:paddingStart="0dp">
 
 
     <TextView

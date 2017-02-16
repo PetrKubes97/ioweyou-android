@@ -21,6 +21,7 @@
     <string name="cancel">Cancel</string>
     <string name="edit">Edit</string>
     <string name="pay">Pay</string>
+    <string name="pay_selected">Pay selected debts</string>
     <string name="friend_add_a_new_debt">Add a new debt</string>
     <string name="changes_synced">All changes are successfully synced.</string>
     <string name="something_went_wrong">Something went wrong. :\'(</string>
@@ -38,4 +39,5 @@
     <string name="you">You</string>
     <string name="locked">Editable only by me</string>
     <string name="created_at">Created at:</string>
+    <string name="total">Total:</string>
 </resources>

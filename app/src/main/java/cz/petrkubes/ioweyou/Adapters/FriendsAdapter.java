@@ -16,6 +16,7 @@ import java.util.List;
 
 import cz.petrkubes.ioweyou.Pojos.Friend;
 import cz.petrkubes.ioweyou.R;
+import cz.petrkubes.ioweyou.Tools.Tools;
 
 /**
  * Adapter for displaying friends in the friends tab
@@ -58,7 +59,7 @@ public class FriendsAdapter extends ArrayAdapter<Friend> {
         // into the template view.
         if (friend != null) {
             viewHolder.txtName.setText(friend.name);
-            viewHolder.txtStuff.setText(fromHtml(friend.debtsString));
+            viewHolder.txtStuff.setText(Tools.fromHtml(friend.debtsString));
         }
 
         // Return the completed view to render on screen
@@ -74,16 +75,6 @@ public class FriendsAdapter extends ArrayAdapter<Friend> {
     @Override
     public int getCount() {
         return friends.size();
-    }
-
-    // Fixes a weird bug
-    @SuppressWarnings("deprecation")
-    private Spanned fromHtml(String source) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            return Html.fromHtml(source, Html.FROM_HTML_MODE_LEGACY);
-        } else {
-            return Html.fromHtml(source);
-        }
     }
 
     /**
