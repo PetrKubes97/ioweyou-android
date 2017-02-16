@@ -15,6 +15,8 @@ import cz.petrkubes.ioweyou.Pojos.Debt;
 import cz.petrkubes.ioweyou.R;
 import cz.petrkubes.ioweyou.Tools.Tools;
 
+import static android.view.View.GONE;
+
 /**
  * Adapter for displaying debts connected to a specific friend in Friends tab after clicking on a friend
  *
@@ -65,19 +67,26 @@ public class FriendsDebtsAdapter extends ArrayAdapter<Debt> {
         viewHolder.txtCreatedAt.setText(Tools.formatDate(debt.createdAt));
         viewHolder.chckbSelected.setChecked(selectedDebts.contains(debt));
 
-        viewHolder.layout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        // Disable buttons for locked debts
+        if (debt.managerId != null && !debt.managerId.equals(userId)) {
+            viewHolder.chckbSelected.setVisibility(GONE);
+        } else {
+            viewHolder.layout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
 
-                if (!selectedDebts.contains(debt)) {
-                    selectedDebts.add(debt);
-                    viewHolder.chckbSelected.setChecked(true);
-                } else {
-                    selectedDebts.remove(debt);
-                    viewHolder.chckbSelected.setChecked(false);
+                    if (!selectedDebts.contains(debt)) {
+                        selectedDebts.add(debt);
+                        viewHolder.chckbSelected.setChecked(true);
+                    } else {
+                        selectedDebts.remove(debt);
+                        viewHolder.chckbSelected.setChecked(false);
+                    }
                 }
-            }
-        });
+            });
+        }
+
+
 
         // Set color of owned items
         if (debt.creditorId != null && debt.creditorId.equals(userId)) {

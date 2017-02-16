@@ -460,6 +460,11 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
             creditorId = user.id;
         }
 
+        // Lock debt
+        if (chckLocked.isChecked()) {
+            managerId = user.id;
+        }
+
         // Set the other person taking part in this debt
         if (tempFacebookFriendId != null) {
             if (rdioMyDebt.isChecked()) {
