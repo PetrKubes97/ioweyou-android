@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
         tabLayout = (TabLayout) findViewById(R.id.tabs);
 
         // Setup tabs
-        pageAdapter = new FragmentsAdapter(getSupportFragmentManager());
+        pageAdapter = new FragmentsAdapter(getSupportFragmentManager(), getApplicationContext());
         viewPager = (ViewPager) findViewById(R.id.pager);
         viewPager.setAdapter(pageAdapter);
         viewPager.setOffscreenPageLimit(4);

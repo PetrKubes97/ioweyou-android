@@ -1,8 +1,11 @@
 package cz.petrkubes.ioweyou.Tools;
 
+import android.content.Context;
 import android.os.Build;
+import android.os.Handler;
 import android.text.Html;
 import android.text.Spanned;
+import android.view.inputmethod.InputMethodManager;
 
 import java.text.DateFormat;
 import java.text.Normalizer;
@@ -66,5 +69,4 @@ public class Tools {
             return Html.fromHtml(source);
         }
     }
-
 }

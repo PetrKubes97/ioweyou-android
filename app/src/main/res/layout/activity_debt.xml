@@ -49,11 +49,11 @@
         <AutoCompleteTextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/txt_name"
+            android:id="@+id/txt_who"
             android:layout_weight="1"
             android:hint="@string/who"
             android:textSize="18sp"
-            android:textColor="@android:color/white"/>
+            android:textColor="@android:color/white" />
 
     </android.support.design.widget.TextInputLayout>
 
@@ -77,7 +77,7 @@
             android:layout_height="match_parent"
             android:inputType="numberDecimal"
             android:ems="10"
-            android:id="@+id/txt_who"
+            android:id="@+id/txt_what"
             android:textSize="18sp"
             android:textColor="@android:color/white" />
     </android.support.design.widget.TextInputLayout>

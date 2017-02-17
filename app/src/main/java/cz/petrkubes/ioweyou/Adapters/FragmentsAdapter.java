@@ -1,16 +1,20 @@
 package cz.petrkubes.ioweyou.Adapters;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.content.res.ResourcesCompat;
 import android.util.Log;
 
 import cz.petrkubes.ioweyou.Fragments.ActionsFragment;
 import cz.petrkubes.ioweyou.Fragments.DebtsFragment;
 import cz.petrkubes.ioweyou.Fragments.FriendsFragment;
 import cz.petrkubes.ioweyou.Fragments.UpdateableFragment;
+import cz.petrkubes.ioweyou.R;
 import cz.petrkubes.ioweyou.Tools.Const;
 
 /**
@@ -23,9 +27,11 @@ public class FragmentsAdapter extends FragmentPagerAdapter {
 
     private Fragment fragment;
     private Bundle args;
+    private Context context;
 
-    public FragmentsAdapter(FragmentManager fm) {
+    public FragmentsAdapter(FragmentManager fm, Context context) {
         super(fm);
+        this.context = context;
     }
 
     @Override
@@ -74,13 +80,13 @@ public class FragmentsAdapter extends FragmentPagerAdapter {
     public CharSequence getPageTitle(int position) {
         switch (position) {
             case 0:
-                return "My debts";
+                return context.getString(R.string.my_debts);
             case 1:
-                return "Their debts";
+                return context.getString(R.string.their_debts);
             case 2:
-                return "Action feed";
+                return context.getString(R.string.action_feed);
             case 3:
-                return "Friends";
+                return context.getString(R.string.friends);
             default:
                 return "Error";
         }

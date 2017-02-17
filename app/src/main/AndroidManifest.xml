@@ -32,7 +32,7 @@
             android:label="@string/app_name" />
         <activity
             android:name=".Activities.DebtActivity"
-            android:label="@string/add_debt_label"
+            android:label="@string/add_debt"
             android:parentActivityName=".Activities.MainActivity" />
         <activity
             android:name="com.facebook.FacebookActivity"

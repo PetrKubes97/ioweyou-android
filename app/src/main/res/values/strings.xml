@@ -1,16 +1,15 @@
 <resources>
     <string name="app_name">I Owe You</string>
-    <string name="facebook_app_id">652914441557685</string>
-    <string name="fb_login_protocol_scheme">fb652914441557685</string>
-    <string name="add_debt_label">Add debt</string>
+    <string name="facebook_app_id" translatable="false">652914441557685</string>
+    <string name="fb_login_protocol_scheme" translatable="false">fb652914441557685</string>
     <string name="who">Name</string>
     <string name="i_owe">My debt.</string>
     <string name="they_owe">Their debt.</string>
     <string name="amount">Amount</string>
     <string name="money">Money</string>
     <string name="thing">Thing</string>
-    <string name="add_debt">Add debt!</string>
-    <string name="transition_button">transitionButton</string>
+    <string name="add_debt">Add debt</string>
+    <string name="transition_button" translatable="false">transitionButton</string>
     <string name="note">Note</string>
     <string name="loading_login">Trying to log you in. Don\'t be scared…</string>
     <string name="mark_as_paid">Mark as paid</string>
@@ -40,4 +39,15 @@
     <string name="locked">Editable only by me</string>
     <string name="created_at">Created at:</string>
     <string name="total">Total:</string>
+    <string name="this_field_cant_be_empty">This field can\'t be empty.</string>
+    <string name="this_field_has_to_be_a_number">This field has to be a number.</string>
+    <string name="this_number_is_too_big">This number is too big.</string>
+    <string name="you_cant_owe_zero">Sorry, you can\'t owe someone 0 money. :-)</string>
+    <string name="my_debts">My debts</string>
+    <string name="their_debts">Their debts</string>
+    <string name="action_feed">Action feed</string>
+    <string name="friends">Friends</string>
+    <string name="synced">synced</string>
+    <string name="not_synced">not synced</string>
+    <string name="partial_payment">Partial payment</string>
 </resources>

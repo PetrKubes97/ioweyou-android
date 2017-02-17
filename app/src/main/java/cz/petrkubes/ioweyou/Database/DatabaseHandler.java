@@ -778,9 +778,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         // 3. status
         if (debt.id < 0) {
-            debt.status = "not synced";
+            debt.status = context.getString(R.string.not_synced);;
         } else {
-            debt.status = "synced";
+            debt.status = context.getString(R.string.synced);
         }
 
         return debt;

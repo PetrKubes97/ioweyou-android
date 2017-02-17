@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Switch;
@@ -60,7 +61,7 @@ public class DebtsFragment extends Fragment implements UpdateableFragment {
 
     // Dialog elements
     private Button btnDialogPay;
-    private Button btnDialogEdit;
+    private ImageButton btnDialogEdit;
     private Button btnDialogCancel;
     private TextView txtDialogWho;
     private TextView txtDialogWhat;
@@ -165,7 +166,7 @@ public class DebtsFragment extends Fragment implements UpdateableFragment {
         // Set up buttons, text views and switch
         btnDialogPay = (Button) debtDialogView.findViewById(R.id.btn_pay);
         btnDialogCancel = (Button) debtDialogView.findViewById(R.id.btn_cancel);
-        btnDialogEdit = (Button) debtDialogView.findViewById(R.id.btn_edit);
+        btnDialogEdit = (ImageButton) debtDialogView.findViewById(R.id.btn_edit);
         swtchPayment = (Switch) debtDialogView.findViewById(R.id.swtch_payment);
 
         txtDialogWhat = (TextView) debtDialogView.findViewById(R.id.txt_what);

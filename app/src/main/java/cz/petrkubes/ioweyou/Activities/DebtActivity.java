@@ -112,8 +112,8 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         // Setup all widgets
-        txtName = (AutoCompleteTextView) findViewById(R.id.txt_name);
-        txtWhat = (TextInputEditText) findViewById(R.id.txt_who);
+        txtName = (AutoCompleteTextView) findViewById(R.id.txt_who);
+        txtWhat = (TextInputEditText) findViewById(R.id.txt_what);
         spnCurrency = (Spinner) findViewById(R.id.spn_currency);
         rdioMyDebt = (RadioButton) findViewById(R.id.rdio_my_debt);
         rdioTheirDebt = (RadioButton) findViewById(R.id.rdio_their_debt);
@@ -271,6 +271,10 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
 
 
         // --------------------- Pre-filling widgets while editing debt ----------------------------
+        // Temporary disable animation to avoid textInputLayout bug
+        txtILWhat.setHintAnimationEnabled(false);
+        txtILWho.setHintAnimationEnabled(false);
+
         // Check my or their debt
         if (getIntent().getBooleanExtra(MainActivity.MY_DEBT, true)) {
             rdioMyDebt.setChecked(true);
@@ -290,6 +294,9 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
         // Edit debt
         debtToEdit = Parcels.unwrap(getIntent().getParcelableExtra(DebtsFragment.DEBT_TO_EDIT));
         if (debtToEdit != null) {
+
+            // Change activity title
+            setTitle(getString(R.string.edit));
 
             // disable fields, which cannot be edited
             txtName.setFocusable(false);
@@ -340,26 +347,27 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
                 rdioMyDebt.setChecked(true);
             }
 
+            txtWhat.requestFocus();
+            showKeyboard(250);
+
         } else {
             // hide buttons which have no use for a new debt
             btnDelete.setVisibility(View.GONE);
 
-            // Show keyboard - it is necessary to wait for the animation to finish
+            // Set the right focus
             if (txtName.getText().length() > 0) {
                 txtWhat.requestFocus();
             } else {
                 txtName.requestFocus();
             }
 
-            Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                    imm.showSoftInput(getCurrentFocus(), InputMethodManager.SHOW_IMPLICIT);
-                }
-            }, 400);
+            showKeyboard(400);
         }
+
+        // Re-enable animation of textInputLayouts
+        txtILWhat.setHintAnimationEnabled(true);
+        txtILWho.setHintAnimationEnabled(true);
+
 
         // Add debt button
         btnAddDebt.setOnClickListener(new View.OnClickListener() {
@@ -478,7 +486,7 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
 
         // Check if both sides of debt are set
         if ((creditorId == null || debtorId == null) && (customFriendName == null || customFriendName.isEmpty())) {
-            txtILWho.setError("This field can't be empty.");
+            txtILWho.setError(getString(R.string.this_field_cant_be_empty));
             return;
         }
 
@@ -487,7 +495,7 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
             thingName = txtWhat.getText().toString();
 
             if (thingName.isEmpty()) {
-                txtILWhat.setError("This field can't be empty.");
+                txtILWhat.setError(getString(R.string.this_field_cant_be_empty));
                 return;
             }
 
@@ -496,13 +504,13 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
             try {
                 amount = Double.parseDouble(txtWhat.getText().toString());
             } catch (NumberFormatException e) {
-                txtILWhat.setError("This field has to be a number.");
+                txtILWhat.setError(getString(R.string.this_field_has_to_be_a_number));
                 return;
             }
 
             // Check if amount is not too big
             if (amount > 999999999) {
-                txtILWhat.setError("This number is too big");
+                txtILWhat.setError(getString(R.string.this_number_is_too_big));
                 return;
             }
 
@@ -513,7 +521,7 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
             editor.apply();
 
             if (amount < 1) {
-                txtILWhat.setError("Sorry, you can't owe someone 0 money. :-)");
+                txtILWhat.setError(getString(R.string.you_cant_owe_zero));
                 return;
             }
         }
@@ -589,5 +597,16 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
         createdAtCal.set(Calendar.MINUTE, minute);
         createdAt = createdAtCal.getTime();
         btnCreatedAt.setText(Tools.formatDate(createdAt));
+    }
+
+    private void showKeyboard(long delay) {
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.showSoftInput(getCurrentFocus(), InputMethodManager.SHOW_IMPLICIT);
+            }
+        }, delay);
     }
 }
