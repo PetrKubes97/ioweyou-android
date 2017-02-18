@@ -1,6 +1,8 @@
 package cz.petrkubes.ioweyou.Api;
 
 import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -256,6 +258,24 @@ public class Api {
             if (code >= 300) {
                 successfull = false;
                 message = json.getString("message");
+            }
+
+            // Get version
+            int minVersion = Integer.parseInt(urlConnection.getHeaderField("X-Min-Version"));
+            int version = 0;
+
+            try {
+                PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+                version = pInfo.versionCode;
+            } catch (PackageManager.NameNotFoundException e) {
+                e.printStackTrace();
+            }
+
+            Log.d(Const.TAG, String.valueOf(minVersion));
+
+            if (minVersion > version) {
+                successfull = false;
+                message = ApiFailureHandler.NEEDS_UPDATE;
             }
 
         } catch (Exception e) {

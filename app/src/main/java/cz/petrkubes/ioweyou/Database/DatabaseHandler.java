@@ -28,7 +28,7 @@ import cz.petrkubes.ioweyou.Tools.Tools;
 public class DatabaseHandler extends SQLiteOpenHelper {
 
     // Database Version
-    private static final int DATABASE_VERSION = 24;
+    private static final int DATABASE_VERSION = 25;
     // Database Name
     private static final String DATABASE_NAME = "payUBack.db";
     // Tables names
@@ -37,6 +37,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String TABLE_FRIENDS = "friends";
     private static final String TABLE_CURRENCIES = "currencies";
     private static final String TABLE_ACTIONS = "actions";
+    private static final String TABLE_ACTIONS_MESSAGES = "actions_messages";
     // Column names
     private static final String USERS_KEY_ID = "id";
     private static final String USERS_KEY_NAME = "name";
@@ -71,6 +72,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String ACTIONS_KEY_USER2_NAME = "user2_name";
     private static final String ACTIONS_KEY_NOTE = "note";
     private static final String ACTIONS_KEY_DATE = "date";
+    private static final String ACTIONS_MESSAGES_KEY_ID = "id";
+    private static final String ACTIONS_MESSAGES_KEY_ACTION_ID = "action_id";
+    private static final String ACTIONS_MESSAGES_KEY_MESSAGE = "message";
+
+
     private Context context;
     // Strings including all columns
     private String[] userProjection = new String[]{
@@ -116,6 +122,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             ACTIONS_KEY_USER2_NAME,
             ACTIONS_KEY_NOTE,
             ACTIONS_KEY_DATE
+    };
+
+    private String[] actionsMessageProjection = new String[]{
+            ACTIONS_MESSAGES_KEY_ID,
+            ACTIONS_MESSAGES_KEY_ACTION_ID,
+            ACTIONS_MESSAGES_KEY_MESSAGE
     };
 
     public DatabaseHandler(Context context) {
@@ -168,12 +180,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 ACTIONS_KEY_NOTE + " TEXT, " +
                 ACTIONS_KEY_DATE + " NUMERIC);";
 
+        String CREATE_ACTIONS_MESSAGES_TABLE = "CREATE TABLE " + TABLE_ACTIONS_MESSAGES + " (" +
+                ACTIONS_MESSAGES_KEY_ID + " INTEGER PRIMARY KEY, " +
+                ACTIONS_MESSAGES_KEY_ACTION_ID + " INTEGER, " +
+                ACTIONS_MESSAGES_KEY_MESSAGE + " TEXt);";
+
 
         db.execSQL(CREATE_DEBTS_TABLE);
         db.execSQL(CREATE_FRIENDS_TABLE);
         db.execSQL(CREATE_USERS_TABLE);
         db.execSQL(CREATE_CURRENCIES_TABLE);
         db.execSQL(CREATE_ACTIONS_TABLE);
+        db.execSQL(CREATE_ACTIONS_MESSAGES_TABLE);
     }
 
     @Override
@@ -804,18 +822,26 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
 
         // Add action into the database
-        ContentValues values = new ContentValues();
-        values.put(ACTIONS_KEY_ID, action.id);
-        values.put(ACTIONS_KEY_TYPE, action.type);
-        values.put(ACTIONS_KEY_DEBT_ID, action.debtId);
-        values.put(ACTIONS_KEY_USER1_ID, action.user1Id);
-        values.put(ACTIONS_KEY_USER1_NAME, action.user1Name);
-        values.put(ACTIONS_KEY_USER2_ID, action.user2Id);
-        values.put(ACTIONS_KEY_USER2_NAME, action.user2Name);
-        values.put(ACTIONS_KEY_NOTE, action.note);
-        values.put(ACTIONS_KEY_DATE, Tools.formatDate(action.date));
+        ContentValues actionValues = new ContentValues();
+        actionValues.put(ACTIONS_KEY_ID, action.id);
+        actionValues.put(ACTIONS_KEY_TYPE, action.type);
+        actionValues.put(ACTIONS_KEY_DEBT_ID, action.debtId);
+        actionValues.put(ACTIONS_KEY_USER1_ID, action.user1Id);
+        actionValues.put(ACTIONS_KEY_USER1_NAME, action.user1Name);
+        actionValues.put(ACTIONS_KEY_USER2_ID, action.user2Id);
+        actionValues.put(ACTIONS_KEY_USER2_NAME, action.user2Name);
+        actionValues.put(ACTIONS_KEY_NOTE, action.note);
+        actionValues.put(ACTIONS_KEY_DATE, Tools.formatDate(action.date));
 
-        db.insert(TABLE_ACTIONS, null, values);
+        db.insert(TABLE_ACTIONS, null, actionValues);
+
+        // add action messages
+        ContentValues messageValues = new ContentValues();
+        for (String message : action.messages) {
+            messageValues.put(ACTIONS_MESSAGES_KEY_ACTION_ID, action.id);
+            messageValues.put(ACTIONS_MESSAGES_KEY_MESSAGE, message);
+            db.insert(TABLE_ACTIONS_MESSAGES, null, messageValues);
+        }
 
         db.close();
         cursor.close();
@@ -836,6 +862,17 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         if (cursor.moveToFirst()) {
             do {
 
+                Cursor messagesCursor = db.query(TABLE_ACTIONS_MESSAGES, actionsMessageProjection,
+                        ACTIONS_MESSAGES_KEY_ACTION_ID + "=?", new String[] {String.valueOf(cursor.getInt(0))}, null, null, null);
+
+                ArrayList<String> messages = new ArrayList<>();
+
+                if (messagesCursor.moveToFirst()) {
+                    do {
+                        messages.add(messagesCursor.getString(2));
+                    } while (messagesCursor.moveToNext());
+                }
+
                 Action action = new Action(
                         cursor.getInt(0),
                         cursor.getString(1),
@@ -845,8 +882,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                         cursor.getInt(5),
                         cursor.getString(6),
                         cursor.getString(7),
-                        Tools.parseDate(cursor.getString(8))
+                        Tools.parseDate(cursor.getString(8)),
+                        messages
                 );
+
+                messagesCursor.close();
 
                 list.add(action);
 

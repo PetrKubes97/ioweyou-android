@@ -553,6 +553,13 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
         // Add debt into the local database
         db.addOrUpdateDebt(debt);
 
+        btnAddDebt.setBackgroundColor(getResources().getColor(R.color.bpBlue));
+
+        if(getCurrentFocus()!=null) {
+            InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        }
+
         setResult(RESULT_OK);
         finish();
     }

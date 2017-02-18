@@ -48,4 +48,21 @@
     <string name="synced">synchronizováno</string>
     <string name="not_synced">nesynchronizováno</string>
     <string name="partial_payment">Částečná platba</string>
+    <string name="debt_amount_changed">Částka byla změněna.</string>
+    <string name="debt_creditor_debtor_switched">Věřitel a dlužník se prohodili.</string>
+    <string name="debt_currency_changed">Měna byla změněna.</string>
+    <string name="debt_deleted">Dluh byl smazán.</string>
+    <string name="debt_friend_name_changed">Jméno přítele bylo změněno.</string>
+    <string name="debt_marked_as_paid">Dluh byl označen jako zaplacený.</string>
+    <string name="debt_marked_as_unpaid">Dluh byl označen jako nezaplacený.</string>
+    <string name="debt_money_to_thing">Byl změněn předmět dluhu z peněz na věc.</string>
+    <string name="debt_new">Byl vytvořen nový dluh.</string>
+    <string name="debt_note_changed">Poznámka byla změněna.</string>
+    <string name="debt_permission_changed">Oprávnění k úpravě dluhu bylo změněno.</string>
+    <string name="debt_restored">Dluh byl obnoven.</string>
+    <string name="debt_thing_name_changed">Název dlužené věci byl změněn.</string>
+    <string name="debt_thing_to_money">Byl změněn předmět dluhu z věci na peníze.</string>
+    <string name="needs_update">"To je nepříjemné. Tato verze aplikace je bohužel příliš stará a nemůže fungovat. Aktualizujte ji prosím v Google Play. "</string>
+    <string name="link"><a href="https://play.google.com/store/apps/details?id=cz.petrkubes.payuback">https://play.google.com/store/apps/details?id=cz.petrkubes.payuback</a></string>
+    <string name="login_with_facebook">Přihlaste se pomocí Facebooku, abyste mohli jednoduše sdílet dluhy s přáteli.</string>
 </resources>

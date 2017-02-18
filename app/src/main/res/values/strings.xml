@@ -11,7 +11,7 @@
     <string name="add_debt">Add debt</string>
     <string name="transition_button" translatable="false">transitionButton</string>
     <string name="note">Note</string>
-    <string name="loading_login">Trying to log you in. Don\'t be scared…</string>
+    <string name="loading_login">Trying to log you in. Don\"t be scared…</string>
     <string name="mark_as_paid">Mark as paid</string>
     <string name="mark_as_unpaid">Mark as unpaid</string>
     <string name="no">No</string>
@@ -23,7 +23,7 @@
     <string name="pay_selected">Pay selected debts</string>
     <string name="friend_add_a_new_debt">Add a new debt</string>
     <string name="changes_synced">All changes are successfully synced.</string>
-    <string name="something_went_wrong">Something went wrong. :\'(</string>
+    <string name="something_went_wrong">Something went wrong. :\"(</string>
     <string name="logout">Log out</string>
     <string name="refresh">Refresh</string>
     <string name="do_you_want_to_delete_this_debt">Do you want to delete this debt?</string>
@@ -31,18 +31,18 @@
     <string name="exit">Exit</string>
     <string name="are_you_sure_you_want_to_exit">Do you really want to close this app?</string>
     <string name="no_internet">No internet connection available.</string>
-    <string name="you_do_not_owe_anyone">You don\'t have any debts! (ง ͠° ͟ل͜ ͡°)ง</string>
+    <string name="you_do_not_owe_anyone">You don\"t have any debts! (ง ͠° ͟ل͜ ͡°)ง</string>
     <string name="no_one_owes_you">No one owes you any money. Or do they? (¬_¬) </string>
     <string name="no_actions">You will find any changes that affect your debts here. </string>
-    <string name="no_friend">Hey, here you can see your friends and settle up all of their debts at once. Neat, isn\'t it?</string>
+    <string name="no_friend">Hey, here you can see your friends and settle up all of their debts at once. Neat, isn\"t it?</string>
     <string name="you">You</string>
     <string name="locked">Editable only by me</string>
     <string name="created_at">Created at:</string>
     <string name="total">Total:</string>
-    <string name="this_field_cant_be_empty">This field can\'t be empty.</string>
+    <string name="this_field_cant_be_empty">This field can\"t be empty.</string>
     <string name="this_field_has_to_be_a_number">This field has to be a number.</string>
     <string name="this_number_is_too_big">This number is too big.</string>
-    <string name="you_cant_owe_zero">Sorry, you can\'t owe someone 0 money. :-)</string>
+    <string name="you_cant_owe_zero">Sorry, you can\"t owe someone 0 money. :-)</string>
     <string name="my_debts">My debts</string>
     <string name="their_debts">Their debts</string>
     <string name="action_feed">Action feed</string>
@@ -50,4 +50,23 @@
     <string name="synced">synced</string>
     <string name="not_synced">not synced</string>
     <string name="partial_payment">Partial payment</string>
+
+    <string name="debt_new">A new debt was created.</string>
+    <string name="debt_marked_as_paid">Debt was marked as paid.</string>
+    <string name="debt_marked_as_unpaid">Debt was marked as unpaid.</string>
+    <string name="debt_deleted">Debt was deleted.</string>
+    <string name="debt_restored">Debt was restored.</string>
+    <string name="debt_friend_name_changed">Name of the friend was changed.</string>
+    <string name="debt_amount_changed">Amount was changed.</string>
+    <string name="debt_currency_changed">Currency was changed.</string>
+    <string name="debt_money_to_thing">Owed subject was changed from money to a thing.</string>
+    <string name="debt_thing_to_money">Owed subject was changed from a thing to money.</string>
+    <string name="debt_thing_name_changed">Name of owed thing was changed.</string>
+    <string name="debt_note_changed">Note was changed.</string>
+    <string name="debt_creditor_debtor_switched">Creditor and debtor were switched.</string>
+    <string name="debt_permission_changed">Permission to edit this debt was changed.</string>\
+
+    <string name="needs_update">I\'m sorry, this version of the app is too old and needs an update to work. Please go to Google Play and update.</string>
+    <string name="link"><a href="https://play.google.com/store/apps/details?id=cz.petrkubes.payuback">https://play.google.com/store/apps/details?id=cz.petrkubes.payuback</a></string>
+    <string name="login_with_facebook">Login with Facebook so it\'s easier to share debts with your friends. ;-)</string>
 </resources>

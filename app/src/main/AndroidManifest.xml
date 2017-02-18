@@ -34,6 +34,10 @@
             android:name=".Activities.DebtActivity"
             android:label="@string/add_debt"
             android:parentActivityName=".Activities.MainActivity" />
+
+        <activity
+            android:name=".Activities.NeedsUpdateActivity"
+            android:label="@string/app_name" />
         <activity
             android:name="com.facebook.FacebookActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"

@@ -26,7 +26,7 @@
         android:contentDescription="logo" />
 
     <TextView
-        android:text="Login with Facebook so it's easier to share debts with your friends. ;-)"
+        android:text="@string/login_with_facebook"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/textView"
