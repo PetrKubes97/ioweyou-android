@@ -318,7 +318,7 @@ public class MainActivity extends AppCompatActivity {
         if (jobScheduler.getAllPendingJobs().size() < 1) {
             ComponentName mServiceComponent = new ComponentName(this, UpdateAllService.class);
             JobInfo jobInfo = new JobInfo.Builder(0, mServiceComponent)
-                    .setPeriodic(6 * 60 * 60 * 1000) // 5 hours
+                    .setPeriodic(4 * 60 * 60 * 1000) // 4 hours
                     .setRequiresCharging(false)
                     .setPersisted(true)
                     .build();

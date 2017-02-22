@@ -202,6 +202,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_DEBTS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_CURRENCIES);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_ACTIONS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ACTIONS_MESSAGES);
 
         // Create tables again
         onCreate(db);
@@ -217,6 +218,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL("DELETE FROM " + TABLE_DEBTS);
         db.execSQL("DELETE FROM " + TABLE_CURRENCIES);
         db.execSQL("DELETE FROM " + TABLE_ACTIONS);
+        db.execSQL("DELETE FROM " + TABLE_ACTIONS_MESSAGES);
         db.close();
     }
 

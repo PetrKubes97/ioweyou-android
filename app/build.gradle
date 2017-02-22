@@ -10,8 +10,8 @@ android {
         applicationId "cz.petrkubes.payuback"
         minSdkVersion 21
         targetSdkVersion 25
-        versionCode 12
-        versionName "1.8"
+        versionCode 13
+        versionName "1.81"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -27,8 +27,8 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:25.1.1'
-    compile 'com.android.support:design:25.1.1'
+    compile 'com.android.support:appcompat-v7:25.2.0'
+    compile 'com.android.support:design:25.2.0'
     compile 'com.facebook.android:facebook-android-sdk:4.16.1'
     compile 'com.facebook.stetho:stetho:1.4.1'
     compile 'com.facebook.stetho:stetho-urlconnection:1.4.1'

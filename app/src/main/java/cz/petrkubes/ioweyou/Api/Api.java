@@ -31,6 +31,7 @@ import cz.petrkubes.ioweyou.Pojos.Friend;
 import cz.petrkubes.ioweyou.Pojos.User;
 import cz.petrkubes.ioweyou.R;
 import cz.petrkubes.ioweyou.Tools.Const;
+import cz.petrkubes.ioweyou.Tools.Tools;
 
 /**
  * Class handling all http requests
@@ -381,10 +382,9 @@ public class Api {
                     }
 
                     // It is necessary to convert date string to Date class
-                    DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                     Date registeredAt = null;
 
-                    registeredAt = df.parse(result.json.getString("registeredAt"));
+                    registeredAt = Tools.parseDate(result.json.getString("registeredAt"));
 
                     User user = new User(
                             result.json.getInt("id"),
