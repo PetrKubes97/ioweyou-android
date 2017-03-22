@@ -220,6 +220,7 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
         rdioThing.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                txtWhat.setText("");
                 // if button is checked
                 if (b) {
                     spnCurrency.setVisibility(View.GONE);

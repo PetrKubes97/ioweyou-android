@@ -53,6 +53,8 @@ class ApiFailureHandler {
         } else if (message.equals(NEEDS_UPDATE)) {
             callback.onFailure(message);
             needsUpdate();
+        } else if (StatusCode == 500) {
+            callback.onFailure("Server error 500. Please contact the developer.");
         } else {
             callback.onFailure(message);
         }

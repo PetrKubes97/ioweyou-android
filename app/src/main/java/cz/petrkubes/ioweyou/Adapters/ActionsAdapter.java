@@ -107,7 +107,12 @@ public class ActionsAdapter extends ArrayAdapter<Action> {
     private String createMessage(Action action) {
         String finalMessage = "";
         for (String message : action.messages) {
-            finalMessage += context.getString(context.getResources().getIdentifier(message, "string", context.getPackageName())) + " ";
+
+            try {
+                finalMessage += context.getString(context.getResources().getIdentifier(message, "string", context.getPackageName())) + " ";
+            } catch (Exception e) {
+                Log.d(Const.TAG, "Action Message not found.");
+            }
         }
 
         return finalMessage;

@@ -65,4 +65,5 @@
     <string name="needs_update">"To je nepříjemné. Tato verze aplikace je bohužel příliš stará a nemůže fungovat. Aktualizujte ji prosím v Google Play. "</string>
     <string name="link"><a href="https://play.google.com/store/apps/details?id=cz.petrkubes.payuback">https://play.google.com/store/apps/details?id=cz.petrkubes.payuback</a></string>
     <string name="login_with_facebook">Přihlaste se pomocí Facebooku, abyste mohli jednoduše sdílet dluhy s přáteli.</string>
+    <string name="debt_interval_changed">Doba opakování dluhu byla změněna.</string>
 </resources>

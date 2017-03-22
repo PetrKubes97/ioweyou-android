@@ -61,10 +61,11 @@
     <string name="debt_currency_changed">Currency was changed.</string>
     <string name="debt_money_to_thing">Owed subject was changed from money to a thing.</string>
     <string name="debt_thing_to_money">Owed subject was changed from a thing to money.</string>
-    <string name="debt_thing_name_changed">Name of owed thing was changed.</string>
+    <string name="debt_thing_name_changed">Name of the owed thing was changed.</string>
     <string name="debt_note_changed">Note was changed.</string>
     <string name="debt_creditor_debtor_switched">Creditor and debtor were switched.</string>
-    <string name="debt_permission_changed">Permission to edit this debt was changed.</string>\
+    <string name="debt_permission_changed">Permission to edit this debt was changed.</string>
+    <string name="debt_interval_changed">Debt interval was changed.</string>
 
     <string name="needs_update">I\'m sorry, this version of the app is too old and needs an update to work. Please go to Google Play and update.</string>
     <string name="link"><a href="https://play.google.com/store/apps/details?id=cz.petrkubes.payuback">https://play.google.com/store/apps/details?id=cz.petrkubes.payuback</a></string>
