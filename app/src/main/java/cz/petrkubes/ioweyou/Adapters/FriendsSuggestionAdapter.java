@@ -1,6 +1,7 @@
 package cz.petrkubes.ioweyou.Adapters;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
@@ -37,8 +38,9 @@ public class FriendsSuggestionAdapter extends ArrayAdapter<Friend> implements Fi
         this.originalList = friends;
     }
 
+    @NonNull
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(int position, View convertView, @NonNull ViewGroup parent) {
 
         // Get friend object for this position
         Friend friend = suggestions.get(position);
@@ -61,6 +63,7 @@ public class FriendsSuggestionAdapter extends ArrayAdapter<Friend> implements Fi
             // View is being recycled, retrieve the viewHolder object from tag
             viewHolder = (ViewHolder) convertView.getTag();
         }
+
         // Populate the data into the template view using the data object
         viewHolder.name.setText(friend.name);
         if (friend.email == null) {
@@ -68,7 +71,6 @@ public class FriendsSuggestionAdapter extends ArrayAdapter<Friend> implements Fi
         } else {
             viewHolder.email.setText(friend.email);
         }
-
 
         // Make Facebook friends blue
         if (friend.id != null) {
@@ -96,6 +98,7 @@ public class FriendsSuggestionAdapter extends ArrayAdapter<Friend> implements Fi
         return suggestions.size(); // Return the size of the suggestions list.
     }
 
+    @NonNull
     @Override
     public Filter getFilter() {
         return filter;
@@ -126,7 +129,7 @@ public class FriendsSuggestionAdapter extends ArrayAdapter<Friend> implements Fi
                     }
                 }
             }
-            FilterResults results = new FilterResults(); // Create new Filter Results and return this to publishResults;
+            FilterResults results = new FilterResults(); // Create new Filter Results and return this to publishResults
             results.values = tempSuggestions;
             results.count = tempSuggestions.size();
             return results;

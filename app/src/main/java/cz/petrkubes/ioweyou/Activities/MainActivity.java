@@ -7,8 +7,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.PorterDuff;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -20,16 +18,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.facebook.FacebookSdk;
 import com.facebook.login.LoginManager;
-import com.facebook.stetho.Stetho;
 
 import cz.petrkubes.ioweyou.Adapters.FragmentsAdapter;
 import cz.petrkubes.ioweyou.Api.Api;
@@ -57,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
     private FragmentsAdapter pageAdapter;
     private ViewPager viewPager;
     private TabLayout tabLayout;
-    private ProgressBar toolbarPragressBar;
+    private ProgressBar toolbarProgressBar;
     private Toolbar toolbar;
     private CoordinatorLayout coordinatorLayout;
 
@@ -69,15 +63,15 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         // Library only for testing purposes
-        Stetho.initializeWithDefaults(this);
+        //Stetho.initializeWithDefaults(this);
 
         setContentView(R.layout.activity_main);
 
         // Setup actionbar
         toolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(toolbar);
-        toolbarPragressBar = (ProgressBar) findViewById(R.id.toolbar_progress_bar);
-        toolbarPragressBar.setVisibility(View.GONE);
+        toolbarProgressBar = (ProgressBar) findViewById(R.id.toolbar_progress_bar);
+        toolbarProgressBar.setVisibility(View.GONE);
 
         // Parent view for snackbar
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
@@ -189,6 +183,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
+     * This is kind of a hacky solution. Toolbar progressbar cannot be updated before the menu is created, so I can't update debts onStart or onCreate of the Actrivity
+     */
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        // Updates debts and actions when the user launches the app
+        // This is necessary, because JobScheduler job can be turned off by Android system
+        updateDebtsAndActions();
+
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    /**
      * Show an alertDialog on pressing a back button
      */
     @Override
@@ -282,30 +288,17 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Toggles loading in the toolbar
-     * disables add debt button, adding debt while loading can cause problems
      */
     private void toggleLoading() {
-        final MenuItem item = toolbar.getMenu().getItem(0);
-        /*
-        if (btnAddDebt.isEnabled()) {
-            btnAddDebt.setEnabled(false);
 
-            Animation animation = AnimationUtils.loadAnimation(getApplicationContext(),
-                    R.anim.move_down);
-            btnAddDebt.startAnimation(animation);
-        } else {
-            btnAddDebt.setEnabled(true);
-            Animation animation = AnimationUtils.loadAnimation(getApplicationContext(),
-                    R.anim.move_up);
-            btnAddDebt.startAnimation(animation);
-        }*/
+        final MenuItem item = toolbar.getMenu().getItem(0);
 
         if (item.isVisible()) {
             item.setVisible(false);
-            toolbarPragressBar.setVisibility(View.VISIBLE);
+            toolbarProgressBar.setVisibility(View.VISIBLE);
         } else {
             item.setVisible(true);
-            toolbarPragressBar.setVisibility(View.GONE);
+            toolbarProgressBar.setVisibility(View.GONE);
         }
     }
 

@@ -11,14 +11,14 @@ public class User {
     public String apiKey;
     public String email;
     public String name;
-    public Date registredAt;
+    public Date registeredAt;
 
-    public User(Integer id, String apiKey, String email, String name, Date registredAt) {
+    public User(Integer id, String apiKey, String email, String name, Date registeredAt) {
         this.id = id;
         this.apiKey = apiKey;
         this.email = email;
         this.name = name;
-        this.registredAt = registredAt;
+        this.registeredAt = registeredAt;
     }
 
 

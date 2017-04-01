@@ -124,7 +124,7 @@ public class LoginActivity extends AppCompatActivity {
 
 
     /**
-     * Displays progress bar, logs user in, and starts main activity
+     * Displays progress bar, logs user in, and starts the main activity
      *
      * @param facebookId    user's facebook id
      * @param facebookToken user's facebook token

@@ -13,6 +13,6 @@ public class ApiResult {
     public String message;
     public JSONObject json;
     public SimpleCallback callback;
-    public boolean successfull;
+    public boolean successful;
 
 }

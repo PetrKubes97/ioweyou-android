@@ -16,8 +16,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -102,10 +100,10 @@ public class Api {
 
     }
 
-    // --------------------------------------- Api calls ------------------------------------------ //
+    // --------------------------------------- Methods executing api calls consequently ------------------------------------------ //
 
     /**
-     * Updated debts and actions
+     * Update debts and actions
      *
      * @param params requires a callback
      */
@@ -186,9 +184,10 @@ public class Api {
         new Login().execute(customParams);
     }
 
+    // -------------------------------------------------------------------------------------------------- //
     /**
-     * method doing the actual web request
-     * the method does not run in a seperate thread, therefore must be executed only in a async task
+     * Method doing the actual web request
+     * the method does not run in a separated thread, therefore must be executed only in a async task
      *
      * @param address url
      * @param method  request type, ex. POST, GET
@@ -206,7 +205,7 @@ public class Api {
 
         int code = 1000;
         String message = null;
-        boolean successfull = true;
+        boolean successful = true;
 
         try {
             // Create URL connection
@@ -257,7 +256,7 @@ public class Api {
 
             // Get error message
             if (code >= 300) {
-                successfull = false;
+                successful = false;
                 message = json.getString("message");
             }
 
@@ -275,12 +274,12 @@ public class Api {
             Log.d(Const.TAG, String.valueOf(minVersion));
 
             if (minVersion > version) {
-                successfull = false;
+                successful = false;
                 message = ApiFailureHandler.NEEDS_UPDATE;
             }
 
         } catch (Exception e) {
-            successfull = false;
+            successful = false;
             message = e.getMessage();
         } finally {
             if (urlConnection != null) {
@@ -293,7 +292,7 @@ public class Api {
         result.message = message;
         result.json = json;
         result.callback = params.callback;
-        result.successfull = successfull;
+        result.successful = successful;
 
         return result;
     }
@@ -309,7 +308,7 @@ public class Api {
         return cm.getActiveNetworkInfo() != null;
     }
 
-    // --------------------------------------- Functions below only run multiple of functions in a row ------------------------------------------ //
+    // ------------------------------- Api Calls ------------------------------------ //
 
     /**
      * Requires parameter jsonToSend to be set and it has to include facebook parameters
@@ -321,7 +320,7 @@ public class Api {
             Log.d(Const.TAG, "Api: login");
             ApiResult result = getResult(Const.BASE_URL + "user/login", "POST", params[0], null);
 
-            if (result.successfull) {
+            if (result.successful) {
                 try {
                     // 1. case: user logged in for the first time so a new row is created with his id
                     // 2. case: user logged in and already has a row in the database so we just update the api key
@@ -334,7 +333,7 @@ public class Api {
                     ));
 
                 } catch (JSONException e) {
-                    result.successfull = false;
+                    result.successful = false;
                     result.message = e.getMessage();
                     return result;
                 }
@@ -345,7 +344,7 @@ public class Api {
 
         @Override
         protected void onPostExecute(ApiResult apiResult) {
-            if (apiResult.successfull) {
+            if (apiResult.successful) {
                 apiResult.callback.onSuccess(API_LOGIN);
             } else {
                 apiFailureHandler.HandleFailure(apiResult.code, apiResult.message, apiResult.callback);
@@ -364,7 +363,7 @@ public class Api {
             User currentUser = db.getUser();
             ApiResult result = getResult(Const.BASE_URL + "user/", "GET", params[0], currentUser.apiKey);
 
-            if (result.successfull) {
+            if (result.successful) {
                 try {
                     // Go through every friend and add him to database
                     JSONArray friendsJson = result.json.getJSONArray("friends");
@@ -382,9 +381,7 @@ public class Api {
                     }
 
                     // It is necessary to convert date string to Date class
-                    Date registeredAt = null;
-
-                    registeredAt = Tools.parseDate(result.json.getString("registeredAt"));
+                    Date registeredAt = Tools.parseDate(result.json.getString("registeredAt"));
 
                     User user = new User(
                             result.json.getInt("id"),
@@ -396,7 +393,7 @@ public class Api {
                     db.addOrUpdateUser(user);
 
                 } catch (Exception e) {
-                    result.successfull = false;
+                    result.successful = false;
                     result.message = e.getMessage();
                 }
             }
@@ -406,7 +403,7 @@ public class Api {
 
         @Override
         protected void onPostExecute(ApiResult apiResult) {
-            if (apiResult.successfull) {
+            if (apiResult.successful) {
                 apiResult.callback.onSuccess(API_GET_USER);
             } else {
                 apiFailureHandler.HandleFailure(apiResult.code, apiResult.message, apiResult.callback);
@@ -425,7 +422,7 @@ public class Api {
             User currentUser = db.getUser();
             ApiResult result = getResult(Const.BASE_URL + "currencies/", "GET", params[0], currentUser.apiKey);
 
-            if (result.successfull) {
+            if (result.successful) {
                 try {
                     // Go through every currency and add it to the database
                     JSONArray currenciesJson = result.json.getJSONArray("currencies");
@@ -442,7 +439,7 @@ public class Api {
                     }
 
                 } catch (Exception e) {
-                    result.successfull = false;
+                    result.successful = false;
                     result.message = e.getMessage();
                 }
             }
@@ -452,15 +449,13 @@ public class Api {
 
         @Override
         protected void onPostExecute(ApiResult apiResult) {
-            if (apiResult.successfull) {
+            if (apiResult.successful) {
                 apiResult.callback.onSuccess(API_GET_CURENCIES);
             } else {
                 apiFailureHandler.HandleFailure(apiResult.code, apiResult.message, apiResult.callback);
             }
         }
     }
-
-    // --------------------------------------- Other private methods ------------------------------------------ //
 
     /**
      * Downloads and saves actions
@@ -473,9 +468,9 @@ public class Api {
             User currentUser = db.getUser();
             ApiResult result = getResult(Const.BASE_URL + "actions/", "GET", params[0], currentUser.apiKey);
 
-            if (result.successfull) {
+            if (result.successful) {
                 try {
-                    // Go through every friend and add him to database
+                    // Go through every action and add him to the database
                     JSONArray actionsJson = result.json.getJSONArray("actions");
 
                     for (int i = 0; i < actionsJson.length(); i++) {
@@ -486,7 +481,7 @@ public class Api {
 
                 } catch (Exception e) {
                     result.message = e.getMessage();
-                    result.successfull = false;
+                    result.successful = false;
                 }
             }
 
@@ -495,7 +490,7 @@ public class Api {
 
         @Override
         protected void onPostExecute(ApiResult apiResult) {
-            if (apiResult.successfull) {
+            if (apiResult.successful) {
                 apiResult.callback.onSuccess(API_GET_ACTIONS);
             } else {
                 apiFailureHandler.HandleFailure(apiResult.code, apiResult.message, apiResult.callback);
@@ -529,7 +524,7 @@ public class Api {
                 debtsJson.put("debts", offlineDebtsJson);
             } catch (Exception e) {
                 ApiResult result = new ApiResult();
-                result.successfull = false;
+                result.successful = false;
                 result.message = e.getMessage();
                 return result;
             }
@@ -538,7 +533,7 @@ public class Api {
 
             ApiResult result = getResult(Const.BASE_URL + "debts/update", "POST", params[0], currentUser.apiKey);
 
-            if (result.successfull) {
+            if (result.successful) {
                 try {
                     JSONArray onlineDebtsArr = result.json.getJSONArray("debts");
 
@@ -548,7 +543,7 @@ public class Api {
                         db.removeOfflineDebts();
                     } else {
                         result.message = "Ok, this error message has no logical explanation AT ALL.";
-                        result.successfull = false;
+                        result.successful = false;
                     }
 
                     for (int i = 0; i < onlineDebtsArr.length(); i++) {
@@ -561,7 +556,7 @@ public class Api {
                     }
 
                 } catch (Exception e) {
-                    result.successfull = false;
+                    result.successful = false;
                     result.message = e.getMessage();
                 }
             }
@@ -571,7 +566,7 @@ public class Api {
 
         @Override
         protected void onPostExecute(ApiResult apiResult) {
-            if (apiResult.successfull) {
+            if (apiResult.successful) {
                 apiResult.callback.onSuccess(API_UPDATE_DEBTS);
             } else {
                 apiFailureHandler.HandleFailure(apiResult.code, apiResult.message, apiResult.callback);

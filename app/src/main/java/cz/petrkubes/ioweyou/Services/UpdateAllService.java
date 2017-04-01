@@ -27,10 +27,10 @@ public class UpdateAllService extends JobService {
     public boolean onStartJob(final JobParameters params) {
         Log.i(Const.TAG, "on start job: " + params.getJobId());
 
-        // Sometimes there is an update which logs user out
-        // In that case, it is necessary to stop the background job and properly log him out
         DatabaseHandler db = new DatabaseHandler(getApplicationContext());
 
+        // There can be an update which logs user out
+        // In that case, it is necessary to stop the background job and properly log him out
         if (db.getUser() == null) {
             // Logout from facebook
             if (!FacebookSdk.isInitialized()) {

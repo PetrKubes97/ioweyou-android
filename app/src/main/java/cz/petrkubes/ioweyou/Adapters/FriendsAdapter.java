@@ -2,6 +2,7 @@ package cz.petrkubes.ioweyou.Adapters;
 
 import android.content.Context;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.Html;
 import android.text.Spanned;
@@ -26,15 +27,16 @@ import cz.petrkubes.ioweyou.Tools.Tools;
 
 public class FriendsAdapter extends ArrayAdapter<Friend> {
 
-    ArrayList<Friend> friends;
+    private ArrayList<Friend> friends;
 
     public FriendsAdapter(Context context, List<Friend> friends) {
         super(context, R.layout.item_debt, friends);
         this.friends = (ArrayList<Friend>) friends;
     }
 
+    @NonNull
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(int position, View convertView, @NonNull ViewGroup parent) {
 
         Friend friend = getItem(position);
 
@@ -55,8 +57,7 @@ public class FriendsAdapter extends ArrayAdapter<Friend> {
             viewHolder = (FriendsAdapter.ViewHolder) convertView.getTag();
         }
 
-        // Populate the data from the data object via the viewHolder object
-        // into the template view.
+        // Populate the data from the data object via the viewHolder object into the template view.
         if (friend != null) {
             viewHolder.txtName.setText(friend.name);
             viewHolder.txtStuff.setText(Tools.fromHtml(friend.debtsString));

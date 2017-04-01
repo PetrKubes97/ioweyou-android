@@ -58,6 +58,7 @@ public class Tools {
 
     /**
      * Fixes a weird bug
+     *
      * @param source Html string
      * @return Spanned
      */

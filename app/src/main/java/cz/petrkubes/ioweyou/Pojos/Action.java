@@ -56,9 +56,9 @@ public class Action {
     /**
      * Generates action object from a JSONObject
      *
-     * @param response JSONObject
+     * @param response JSONObject containing the debt
      * @return Action
-     * @throws Exception
+     * @throws Exception JSONException
      */
     public static Action fromJson(JSONObject response) throws Exception {
 

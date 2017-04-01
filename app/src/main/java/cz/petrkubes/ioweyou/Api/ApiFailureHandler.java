@@ -22,9 +22,8 @@ import cz.petrkubes.ioweyou.Tools.Const;
 class ApiFailureHandler {
 
     private static final int UNAUTHORIZED = 401;
+    private static final int SERVER_ERROR = 500;
 
-    // Error codes made up by me
-    private static final int NO_INTERNET = 600;
 
     public static final String NEEDS_UPDATE = "needs_update";
 
@@ -53,7 +52,7 @@ class ApiFailureHandler {
         } else if (message.equals(NEEDS_UPDATE)) {
             callback.onFailure(message);
             needsUpdate();
-        } else if (StatusCode == 500) {
+        } else if (StatusCode == SERVER_ERROR) {
             callback.onFailure("Server error 500. Please contact the developer.");
         } else {
             callback.onFailure(message);

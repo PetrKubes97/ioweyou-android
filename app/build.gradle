@@ -10,8 +10,8 @@ android {
         applicationId "cz.petrkubes.payuback"
         minSdkVersion 21
         targetSdkVersion 25
-        versionCode 14
-        versionName "1.82"
+        versionCode 16
+        versionName "1.85"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

@@ -74,6 +74,7 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
     private static final String FRAG_TAG_DATE_PICKER = "fragment_date_picker_created_at";
     private static final String FRAG_TAG_TIME_PICKER = "fragment_time_picker_created_at";
     private static final String defaultCurrencyPos = "DEFAULT_CURRENCY_POS";
+
     // Widgets
     private AutoCompleteTextView txtName;
     private TextInputEditText txtWhat;
@@ -271,7 +272,7 @@ public class DebtActivity extends AppCompatActivity implements CalendarDatePicke
         });
 
 
-        // --------------------- Pre-filling widgets while editing debt ----------------------------
+        // --------------------- Pre-filling widgets when editing debt ----------------------------
         // Temporary disable animation to avoid textInputLayout bug
         txtILWhat.setHintAnimationEnabled(false);
         txtILWho.setHintAnimationEnabled(false);

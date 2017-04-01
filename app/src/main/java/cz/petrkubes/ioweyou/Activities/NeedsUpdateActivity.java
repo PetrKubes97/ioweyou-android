@@ -7,7 +7,9 @@ import android.support.v7.app.AppCompatActivity;
 import cz.petrkubes.ioweyou.R;
 
 /**
- * Created by petr on 18.2.17.
+ * This Activity shows up, when server's api is not compatible with the old version of the android app
+ *
+ * @author Petr Kubes
  */
 
 public class NeedsUpdateActivity extends AppCompatActivity {

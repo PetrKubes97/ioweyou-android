@@ -6,8 +6,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.support.v4.content.res.ResourcesCompat;
-import android.util.Log;
-import android.util.SparseArray;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,11 +17,12 @@ import cz.petrkubes.ioweyou.Pojos.Debt;
 import cz.petrkubes.ioweyou.Pojos.Friend;
 import cz.petrkubes.ioweyou.Pojos.User;
 import cz.petrkubes.ioweyou.R;
-import cz.petrkubes.ioweyou.Tools.Const;
 import cz.petrkubes.ioweyou.Tools.Tools;
 
 /**
  * Class for handling all reading and writing to the local database
+ *
+ * @author Petr Kubes
  */
 public class DatabaseHandler extends SQLiteOpenHelper {
 
@@ -248,8 +247,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         if (user.apiKey != null) {
             values.put(USERS_KEY_API_KEY, user.apiKey);
         }
-        if (user.registredAt != null) {
-            values.put(USERS_KEY_REGISTERED_AT, String.valueOf(user.registredAt));
+        if (user.registeredAt != null) {
+            values.put(USERS_KEY_REGISTERED_AT, String.valueOf(user.registeredAt));
         }
 
         if (cursor.getCount() > 0) {
@@ -351,6 +350,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
      * Returns a list of friends who have a common debt with the user
      * Returned friend objects contain additional values - ex. debtsString
      *
+     * @param userId User's id
      * @return ArrayList<Friend>
      */
     public ArrayList<Friend> getExtendedFriendsWhoAreCreditorsOrDebtors(Integer userId) {
@@ -473,6 +473,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
      */
     private String getFriendHashFromDebt(Debt debt, int userId) {
 
+        if (debt == null) {
+            return "error";
+        }
+
         if (debt.customFriendName != null) {
             return String.valueOf(debt.customFriendName);
         } else if (userId == debt.creditorId && debt.debtorId != null && debt.debtorId > 0) {
@@ -488,6 +492,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     /**
      * Get friend by id
      *
+     * @param id id of the friend
      * @return Friend
      */
     public Friend getFriend(Integer id) {
@@ -512,7 +517,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     /**
-     * Inserts currency into local database
+     * Inserts currency into the local database
      *
      * @param currency currency received from the web
      */
@@ -539,7 +544,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     /**
-     * Returns list of currencies in local database
+     * Returns list of currencies in the local database
      *
      * @return ArrayList<Currency>
      */
@@ -567,6 +572,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     /**
      * Get currency by id
      *
+     * @param id id of the friend
      * @return Currency
      */
     public Currency getCurrency(int id) {
@@ -587,28 +593,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.close();
 
         return currency;
-    }
-
-    /**
-     * Returns a debt by id
-     *
-     * @return Debt
-     */
-    public Debt getDebt(Integer id) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.query(TABLE_DEBTS, debtProjection, DEBTS_KEY_ID + "=?",
-                new String[]{String.valueOf(id)}, null, null, null);
-
-        Debt debt = null;
-
-        if (cursor.moveToFirst()) {
-            debt = Debt.fromCursor(cursor);
-        }
-
-        cursor.close();
-        db.close();
-
-        return debt;
     }
 
     /**
@@ -637,7 +621,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     /**
      * Update debt.
      *
-     * @param debt      Current version of the debt
+     * @param debt Current version of the debt
      */
     public void addOrUpdateDebt(Debt debt) {
 
@@ -758,6 +742,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     /**
+     * Get debt with additional variables for displaying
+     *
      * @param debt   Original debt
      * @param userId userId
      * @return Debt with additional variable like debt.what, debt.who etc.
@@ -851,7 +837,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     /**
      * Returns list of actions in the local database
-     * Limit 50
      *
      * @return ArrayList<Action>
      */
@@ -859,7 +844,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         ArrayList<Action> list = new ArrayList<>();
 
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.query(TABLE_ACTIONS, actionProjection, null, null, null, null, ACTIONS_KEY_DATE + " DESC", "15");
+        Cursor cursor = db.query(TABLE_ACTIONS, actionProjection, null, null, null, null, ACTIONS_KEY_DATE + " DESC", "25");
 
         if (cursor.moveToFirst()) {
             do {
@@ -903,7 +888,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     /**
-     * Removes all debts, which were lastly updated BEFORE the time of server request
+     * Removes all debts, which were updated BEFORE the time of server request
      */
     public void removeOfflineDebts() {
         SQLiteDatabase db = this.getWritableDatabase();

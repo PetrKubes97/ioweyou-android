@@ -1,6 +1,7 @@
 package cz.petrkubes.ioweyou.Adapters;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,8 +34,9 @@ public class DebtsAdapter extends ArrayAdapter<Debt> {
         this.myDebts = myDebts;
     }
 
+    @NonNull
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(int position, View convertView, @NonNull ViewGroup parent) {
 
         Debt debt = getItem(position);
 
@@ -59,19 +61,21 @@ public class DebtsAdapter extends ArrayAdapter<Debt> {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        // Populate the data from the data object via the viewHolder object into the template view.
-        viewHolder.txtName.setText(debt.who);
-        viewHolder.txtWhat.setText(debt.what);
-        viewHolder.txtNote.setText(debt.note);
-        viewHolder.txtDate.setText(Tools.formatDate(debt.createdAt));
-        viewHolder.txtStatus.setText(debt.status);
-        viewHolder.txtId.setText(String.format(Locale.getDefault(), "#%d", debt.id));
+        if (debt != null) {
+            // Populate the data from the data object via the viewHolder object into the template view.
+            viewHolder.txtName.setText(debt.who);
+            viewHolder.txtWhat.setText(debt.what);
+            viewHolder.txtNote.setText(debt.note);
+            viewHolder.txtDate.setText(Tools.formatDate(debt.createdAt));
+            viewHolder.txtStatus.setText(debt.status);
+            viewHolder.txtId.setText(String.format(Locale.getDefault(), "#%d", debt.id));
 
-        // Set color of owned items
-        if (myDebts) {
-            viewHolder.txtWhat.setTextColor(getContext().getResources().getColor(R.color.red));
-        } else {
-            viewHolder.txtWhat.setTextColor(getContext().getResources().getColor(R.color.green));
+            // Set color of owned items
+            if (myDebts) {
+                viewHolder.txtWhat.setTextColor(getContext().getResources().getColor(R.color.red));
+            } else {
+                viewHolder.txtWhat.setTextColor(getContext().getResources().getColor(R.color.green));
+            }
         }
 
         // Return the completed view to render on screen

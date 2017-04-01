@@ -1,6 +1,7 @@
 package cz.petrkubes.ioweyou.Adapters;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,11 +34,12 @@ public class FriendsDebtsAdapter extends ArrayAdapter<Debt> {
         super(context, R.layout.item_friends_debts, objects);
         this.debts = objects;
         this.userId = userId;
-        selectedDebts = new ArrayList<Debt>();
+        selectedDebts = new ArrayList<>();
     }
 
+    @NonNull
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(int position, View convertView, @NonNull ViewGroup parent) {
 
         final Debt debt = getItem(position);
         final FriendsDebtsAdapter.ViewHolder viewHolder;
@@ -60,39 +62,38 @@ public class FriendsDebtsAdapter extends ArrayAdapter<Debt> {
             viewHolder = (FriendsDebtsAdapter.ViewHolder) convertView.getTag();
         }
 
-        // Populate the data from the data object via the viewHolder object
-        // into the template view.
-        viewHolder.txtWhat.setText(debt.what);
-        viewHolder.txtNote.setText(debt.note);
-        viewHolder.txtCreatedAt.setText(Tools.formatDate(debt.createdAt));
-        viewHolder.chckbSelected.setChecked(selectedDebts.contains(debt));
+        if (debt != null) {
+            // Populate the data from the data object via the viewHolder object into the template view.
+            viewHolder.txtWhat.setText(debt.what);
+            viewHolder.txtNote.setText(debt.note);
+            viewHolder.txtCreatedAt.setText(Tools.formatDate(debt.createdAt));
+            viewHolder.chckbSelected.setChecked(selectedDebts.contains(debt));
 
-        // Disable buttons for locked debts
-        if (debt.managerId != null && !debt.managerId.equals(userId)) {
-            viewHolder.chckbSelected.setVisibility(GONE);
-        } else {
-            viewHolder.layout.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
+            // Disable buttons for locked debts
+            if (debt.managerId != null && !debt.managerId.equals(userId)) {
+                viewHolder.chckbSelected.setVisibility(GONE);
+            } else {
+                viewHolder.layout.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
 
-                    if (!selectedDebts.contains(debt)) {
-                        selectedDebts.add(debt);
-                        viewHolder.chckbSelected.setChecked(true);
-                    } else {
-                        selectedDebts.remove(debt);
-                        viewHolder.chckbSelected.setChecked(false);
+                        if (!selectedDebts.contains(debt)) {
+                            selectedDebts.add(debt);
+                            viewHolder.chckbSelected.setChecked(true);
+                        } else {
+                            selectedDebts.remove(debt);
+                            viewHolder.chckbSelected.setChecked(false);
+                        }
                     }
-                }
-            });
-        }
+                });
+            }
 
-
-
-        // Set color of owned items
-        if (debt.creditorId != null && debt.creditorId.equals(userId)) {
-            viewHolder.txtWhat.setTextColor(getContext().getResources().getColor(R.color.green));
-        } else {
-            viewHolder.txtWhat.setTextColor(getContext().getResources().getColor(R.color.red));
+            // Set color of owned items
+            if (debt.creditorId != null && debt.creditorId.equals(userId)) {
+                viewHolder.txtWhat.setTextColor(getContext().getResources().getColor(R.color.green));
+            } else {
+                viewHolder.txtWhat.setTextColor(getContext().getResources().getColor(R.color.red));
+            }
         }
 
         // Return the completed view to render on screen

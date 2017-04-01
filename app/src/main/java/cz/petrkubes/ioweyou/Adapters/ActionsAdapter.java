@@ -20,7 +20,7 @@ import cz.petrkubes.ioweyou.Tools.Const;
 import cz.petrkubes.ioweyou.Tools.Tools;
 
 /**
- * Adapter for displaying info about actions in listview
+ * Adapter for displaying info about actions in a actions listview
  *
  * @author Petr Kubes
  */
@@ -65,14 +65,11 @@ public class ActionsAdapter extends ArrayAdapter<Action> {
             viewHolder.layout = (ConstraintLayout) convertView.findViewById(R.id.layout);
 
             convertView.setTag(viewHolder);
-            Log.d(Const.TAG, "inflating: " + message + "length: " + String.valueOf(message.length()));
         } else {
             viewHolder = (ActionsAdapter.ViewHolder) convertView.getTag();
-            Log.d(Const.TAG, "recycling");
         }
 
-        // Populate the data from the data object via the viewHolder object
-        // into the template view.
+        // Populate the data from the data object via the viewHolder object into the template view.
         viewHolder.txtUser1.setText(action.user1Name);
         viewHolder.txtUser2.setText(action.user2Name);
         viewHolder.txtMessage.setText(String.format(Locale.getDefault(), "#%d: %s", action.debtId, message));
@@ -104,6 +101,13 @@ public class ActionsAdapter extends ArrayAdapter<Action> {
         ConstraintLayout layout;
     }
 
+    /**
+     * Creates a message from message tags connected to the action.
+     * This allows proper translation of messages.
+     *
+     * @param action The action we want to generate message for
+     * @return String message
+     */
     private String createMessage(Action action) {
         String finalMessage = "";
         for (String message : action.messages) {
